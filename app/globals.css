@@ -165,7 +165,7 @@
       min-height:430px;
       background:
         linear-gradient(135deg, rgba(0,138,75,.77), rgba(0,102,179,.68)),
-        url('/assets/home/01-hero.jpg') center/cover;
+        url('https://images.unsplash.com/photo-1483729558449-99ef09a8c325?q=80&w=1600&auto=format&fit=crop') center/cover;
       padding:30px;
       color:var(--white);
       display:flex;
@@ -302,15 +302,15 @@
     }
 
     .campus-norte{
-      background-image:url('/assets/sedes/norte/01-fachada.jpg');
+      background-image:url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1400&auto=format&fit=crop');
     }
 
     .campus-centro{
-      background-image:url('/assets/sedes/centro/01-fachada.jpg');
+      background-image:url('https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1400&auto=format&fit=crop');
     }
 
     .campus-virtual{
-      background-image:url('/assets/sedes/virtual/01-virtual.jpg');
+      background-image:url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1400&auto=format&fit=crop');
     }
 
     .courses-section{
@@ -337,15 +337,15 @@
 
     .course-card:hover{transform:translateY(-7px);box-shadow:0 25px 70px rgba(0,0,0,.2)}
     .course-img{height:235px;background-size:cover;background-position:center}
-    .img-presencial{background-image:url('/assets/cursos/presencial/01-presencial.jpg')}
-    .img-virtual{background-image:url('/assets/cursos/virtual/01-virtual.jpg')}
-    .img-expresso{background-image:url('/assets/cursos/expresso/01-expresso.jpg')}
-    .img-empresas{background-image:url('/assets/cursos/empresas/01-empresas.jpg')}
-    .img-celpe{background-image:url('/assets/cursos/celpe/01-celpe.jpg')}
-    .img-ninos{background-image:url('/assets/programas/ninos/01-ninos.jpg')}
-    .img-samba{background-image:url('/assets/cursos/samba/01-samba.jpg')}
-    .img-viajes{background-image:url('/assets/programas/viajes/01-viajes.jpg')}
-    .img-nivel{background-image:url('/assets/cursos/nivel/01-nivel.jpg')}
+    .img-presencial{background-image:url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1200&auto=format&fit=crop')}
+    .img-virtual{background-image:url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop')}
+    .img-expresso{background-image:url('https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=1200&auto=format&fit=crop')}
+    .img-empresas{background-image:url('https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1200&auto=format&fit=crop')}
+    .img-celpe{background-image:url('https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=80&w=1200&auto=format&fit=crop')}
+    .img-ninos{background-image:url('https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?q=80&w=1200&auto=format&fit=crop')}
+    .img-samba{background-image:url('https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=1200&auto=format&fit=crop')}
+    .img-viajes{background-image:url('https://images.unsplash.com/photo-1483729558449-99ef09a8c325?q=80&w=1200&auto=format&fit=crop')}
+    .img-nivel{background-image:url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop')}
 
     .course-content{
       padding:26px;
@@ -450,12 +450,12 @@
     .culture-card h3,.culture-card span{position:relative;z-index:2}
     .culture-card h3{font-size:23px;letter-spacing:-.03em}
     .culture-card span{font-size:13px;color:#e8e8e8;margin-top:4px}
-    .c1{background-image:url('/assets/cultura/musica/01-musica.jpg')}
-    .c2{background-image:url('/assets/cultura/cine/01-cine.jpg')}
-    .c3{background-image:url('/assets/cultura/gastronomia/01-gastronomia.jpg')}
-    .c4{background-image:url('/assets/cultura/arte/01-arte.jpg')}
-    .c5{background-image:url('/assets/cultura/literatura/01-literatura.jpg')}
-    .c6{background-image:url('/assets/cultura/viajes/01-viajes.jpg')}
+    .c1{background-image:url('https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=900&auto=format&fit=crop')}
+    .c2{background-image:url('https://images.unsplash.com/photo-1508973379184-7517410fb0bc?q=80&w=900&auto=format&fit=crop')}
+    .c3{background-image:url('https://images.unsplash.com/photo-1543353071-873f17a7a088?q=80&w=900&auto=format&fit=crop')}
+    .c4{background-image:url('https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?q=80&w=900&auto=format&fit=crop')}
+    .c5{background-image:url('https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=900&auto=format&fit=crop')}
+    .c6{background-image:url('https://images.unsplash.com/photo-1516306580123-e6e52b1b7b5f?q=80&w=900&auto=format&fit=crop')}
 
     .cycles-section{background:var(--black);color:var(--white)}
     .cycle-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
@@ -493,14 +493,14 @@
     .dual-card > *{position:relative;z-index:2}
     .dual-card h2{font-size:clamp(42px,5vw,78px);line-height:.88;letter-spacing:-.07em;text-transform:uppercase}
     .dual-card p{font-size:19px;line-height:1.45;color:rgba(255,255,255,.9);max-width:560px}
-    .dual-ninos{background-image:url('/assets/programas/ninos/01-ninos.jpg')}
-    .dual-viajes{background-image:url('/assets/programas/viajes/01-viajes.jpg')}
+    .dual-ninos{background-image:url('https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?q=80&w=1200&auto=format&fit=crop')}
+    .dual-viajes{background-image:url('https://images.unsplash.com/photo-1483729558449-99ef09a8c325?q=80&w=1200&auto=format&fit=crop')}
 
     .alumni-section{background:var(--white)}
     .alumni-box{
       background:
         linear-gradient(135deg, rgba(0,138,75,.95), rgba(0,102,179,.88)),
-        url('/assets/comunidad/alumni/01-alumni.jpg') center/cover;
+        url('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=1600&auto=format&fit=crop') center/cover;
       border-radius:46px;
       padding:60px;
       color:var(--white);
