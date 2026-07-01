@@ -1,26 +1,26 @@
 export default function Home() {
   return (
     <>
-    <div className="topbar">
-  <div className="topbar-left">
-    <span>🇧🇷 30 años conectando Colombia con Brasil</span>
-    <a href="tel:+573125841068">📞 (+57) 312 584 1068</a>
-    <a href="mailto:informacion@ibraco.org.co">✉ informacion@ibraco.org.co</a>
-  </div>
+      <div className="topbar">
+        <div className="topbar-left">
+          <span className="topbar-highlight">🇧🇷 30 años conectando Colombia con Brasil</span>
+          <a href="tel:+573125841068">📞 (+57) 312 584 1068</a>
+          <a href="mailto:informacion@ibraco.org.co">✉ informacion@ibraco.org.co</a>
+        </div>
 
-  <div className="topbar-center">
-    <span>🇨🇴 Español</span>
-  </div>
+        <div className="topbar-center">
+          <span>🇨🇴 Español ▾</span>
+        </div>
 
-  <div className="topbar-right">
-    <a href="#">Ingreso Estudiantes</a>
-    <a href="#">Preinscripción</a>
-    <a href="#">X</a>
-    <a href="#">Facebook</a>
-    <a href="#">Instagram</a>
-    <a href="#">LinkedIn</a>
-  </div>
-</div>
+        <div className="topbar-right">
+          <a href="#">Ingreso Estudiantes</a>
+          <a href="#">Preinscripción</a>
+          <a href="#" aria-label="X">𝕏</a>
+          <a href="#" aria-label="Facebook">f</a>
+          <a href="#" aria-label="Instagram">◎</a>
+          <a href="#" aria-label="LinkedIn">in</a>
+        </div>
+      </div>
       <header className="navbar">
         <a href="#" className="logo-box" aria-label="IBRACO inicio">
           <img
@@ -99,7 +99,7 @@ export default function Home() {
                 <small>Estudiantes al año</small>
               </div>
               <div className="hero-stat">
-                <strong>25+</strong>
+                <strong>30+</strong>
                 <small>Años de trayectoria</small>
               </div>
               <div className="hero-stat">
@@ -201,7 +201,7 @@ export default function Home() {
 
           <div className="lusophone-grid">
             <article className="lusophone-card">
-              <strong>🇧🇷</strong>
+              <strong>BR</strong>
               <h3>Brasil</h3>
               <p>
                 El mayor mercado de habla portuguesa y una potencia cultural,
@@ -210,7 +210,7 @@ export default function Home() {
             </article>
 
             <article className="lusophone-card">
-              <strong>💼</strong>
+              <strong>NEG</strong>
               <h3>Trabajo</h3>
               <p>
                 Portugués para empresas, profesionales y equipos que se conectan
@@ -219,7 +219,7 @@ export default function Home() {
             </article>
 
             <article className="lusophone-card">
-              <strong>🎓</strong>
+              <strong>EDU</strong>
               <h3>Estudio</h3>
               <p>
                 Una herramienta para certificaciones, movilidad académica y
@@ -228,7 +228,7 @@ export default function Home() {
             </article>
 
             <article className="lusophone-card">
-              <strong>🌎</strong>
+              <strong>CUL</strong>
               <h3>Cultura</h3>
               <p>
                 Un idioma para viajar, conversar, leer, cantar y vivir nuevas
