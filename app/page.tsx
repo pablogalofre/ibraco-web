@@ -1,6 +1,26 @@
 export default function Home() {
   return (
     <>
+    <div className="topbar">
+  <div className="topbar-left">
+    <span>🇧🇷 30 años conectando Colombia con Brasil</span>
+    <a href="tel:+573125841068">📞 (+57) 312 584 1068</a>
+    <a href="mailto:informacion@ibraco.org.co">✉ informacion@ibraco.org.co</a>
+  </div>
+
+  <div className="topbar-center">
+    <span>🇨🇴 Español</span>
+  </div>
+
+  <div className="topbar-right">
+    <a href="#">Ingreso Estudiantes</a>
+    <a href="#">Preinscripción</a>
+    <a href="#">X</a>
+    <a href="#">Facebook</a>
+    <a href="#">Instagram</a>
+    <a href="#">LinkedIn</a>
+  </div>
+</div>
       <header className="navbar">
         <a href="#" className="logo-box" aria-label="IBRACO inicio">
           <img
