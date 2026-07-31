@@ -1,0 +1,402 @@
+/* =========================================================
+   IBRACO ALUMNI · IMÁGENES TEMPORALES
+   ========================================================= */
+
+.alumni-page-hero {
+  min-height: 790px;
+  padding: 190px 7vw 90px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  color: #ffffff;
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(16, 16, 16, 0.96) 0%,
+      rgba(16, 16, 16, 0.76) 50%,
+      rgba(0, 138, 75, 0.18) 100%
+    ),
+    url("https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=2200&q=88");
+  background-position: center;
+  background-size: cover;
+}
+
+.alumni-page-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      circle at 88% 24%,
+      rgba(255, 230, 0, 0.23),
+      transparent 28%
+    );
+}
+
+.alumni-page-hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 1050px;
+}
+
+.alumni-page-hero h1 {
+  max-width: 1050px;
+  margin: 24px 0 30px;
+  font-size: clamp(64px, 9vw, 132px);
+  line-height: 0.82;
+  letter-spacing: -0.08em;
+  text-transform: uppercase;
+}
+
+.alumni-page-hero p {
+  max-width: 760px;
+  margin-bottom: 32px;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 21px;
+  line-height: 1.52;
+}
+
+.alumni-hero-secondary {
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+.alumni-hero-trust {
+  margin-top: 34px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.alumni-hero-trust span {
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.09);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  backdrop-filter: blur(9px);
+}
+
+.alumni-introduction {
+  padding: 100px 6vw 45px;
+  background: #fff9e8;
+}
+
+.alumni-benefits-grid {
+  padding: 20px 6vw 110px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  background: #fff9e8;
+}
+
+.alumni-benefit-card {
+  overflow: hidden;
+  border-radius: 30px;
+  background: #ffffff;
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.09);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.alumni-benefit-card:hover {
+  transform: translateY(-7px);
+  box-shadow: 0 28px 74px rgba(0, 0, 0, 0.15);
+}
+
+.alumni-benefit-image {
+  width: 100%;
+  height: 275px;
+  position: relative;
+  padding: 22px;
+  display: flex;
+  align-items: flex-end;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.alumni-benefit-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.04),
+      rgba(0, 0, 0, 0.76)
+    );
+}
+
+.alumni-benefit-label {
+  position: relative;
+  z-index: 2;
+  padding: 9px 13px;
+  border-radius: 999px;
+  background: #ffe600;
+  color: #101010;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.alumni-benefit-content {
+  min-height: 270px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+}
+
+.alumni-benefit-content h2 {
+  margin-bottom: 15px;
+  color: #101010;
+  font-size: 34px;
+  line-height: 0.95;
+  letter-spacing: -0.048em;
+  text-transform: uppercase;
+}
+
+.alumni-benefit-content p {
+  margin-bottom: 25px;
+  color: #5c5c5c;
+  line-height: 1.52;
+  flex-grow: 1;
+}
+
+.alumni-community {
+  min-height: 660px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #101010;
+  color: #ffffff;
+}
+
+.alumni-community-image {
+  min-height: 660px;
+  background-image:
+    linear-gradient(
+      135deg,
+      rgba(0, 138, 75, 0.18),
+      rgba(0, 102, 179, 0.15)
+    ),
+    url("https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1700&q=88");
+  background-position: center;
+  background-size: cover;
+}
+
+.alumni-community-content {
+  padding: 80px 7vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.alumni-community-content h2 {
+  margin: 20px 0 24px;
+  font-size: clamp(52px, 7vw, 96px);
+  line-height: 0.84;
+  letter-spacing: -0.075em;
+  text-transform: uppercase;
+}
+
+.alumni-community-content p {
+  max-width: 680px;
+  margin-bottom: 30px;
+  color: #d7d7d7;
+  font-size: 20px;
+  line-height: 1.52;
+}
+
+.alumni-community-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.alumni-community-content .btn-secondary {
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+.alumni-journey-section {
+  padding: 100px 6vw;
+  background: #ffffff;
+}
+
+.alumni-journey-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.alumni-journey-card {
+  min-height: 330px;
+  padding: 30px;
+  border-radius: 28px;
+  display: flex;
+  flex-direction: column;
+  background: #fff9e8;
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.06);
+}
+
+.alumni-journey-number {
+  width: fit-content;
+  margin-bottom: auto;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #101010;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.alumni-journey-card h3 {
+  margin: 45px 0 14px;
+  color: #101010;
+  font-size: 29px;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
+}
+
+.alumni-journey-card p {
+  color: #5c5c5c;
+  line-height: 1.5;
+}
+
+.alumni-opportunities {
+  min-height: 650px;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  background: #ffe600;
+}
+
+.alumni-opportunities-content {
+  padding: 80px 7vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.alumni-opportunities-content h2 {
+  max-width: 850px;
+  margin: 20px 0 22px;
+  color: #101010;
+  font-size: clamp(52px, 7vw, 96px);
+  line-height: 0.84;
+  letter-spacing: -0.075em;
+  text-transform: uppercase;
+}
+
+.alumni-opportunities-content > p {
+  max-width: 680px;
+  margin-bottom: 30px;
+  color: #333333;
+  font-size: 19px;
+  line-height: 1.5;
+}
+
+.alumni-opportunity-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.alumni-opportunity-tags span {
+  padding: 10px 14px;
+  border: 1px solid rgba(16, 16, 16, 0.25);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.45);
+  color: #101010;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.alumni-opportunities-image {
+  min-height: 650px;
+  background-image:
+    linear-gradient(
+      135deg,
+      rgba(0, 102, 179, 0.12),
+      rgba(0, 138, 75, 0.12)
+    ),
+    url("https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1700&q=88");
+  background-position: center;
+  background-size: cover;
+}
+
+.alumni-final-actions {
+  justify-content: center;
+}
+
+.inner-cta .alumni-final-actions .btn-secondary {
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+@media (max-width: 1100px) {
+  .alumni-benefits-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .alumni-journey-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .alumni-community,
+  .alumni-opportunities {
+    grid-template-columns: 1fr;
+  }
+
+  .alumni-community-image,
+  .alumni-opportunities-image {
+    min-height: 450px;
+  }
+}
+
+@media (max-width: 700px) {
+  .alumni-page-hero {
+    min-height: 720px;
+    padding: 160px 5vw 70px;
+  }
+
+  .alumni-page-hero h1 {
+    font-size: 54px;
+  }
+
+  .alumni-page-hero p {
+    font-size: 18px;
+  }
+
+  .alumni-benefits-grid,
+  .alumni-journey-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .alumni-benefits-grid,
+  .alumni-journey-section {
+    padding-right: 5vw;
+    padding-left: 5vw;
+  }
+
+  .alumni-benefit-image {
+    height: 240px;
+  }
+
+  .alumni-benefit-content {
+    min-height: auto;
+  }
+
+  .alumni-community-image,
+  .alumni-opportunities-image {
+    min-height: 340px;
+  }
+
+  .alumni-community-content,
+  .alumni-opportunities-content {
+    padding: 60px 6vw;
+  }
+}

@@ -1,0 +1,402 @@
+/* =========================================================
+   IBRACO EMPRESAS · IMÁGENES TEMPORALES
+   ========================================================= */
+
+.business-page-hero {
+  min-height: 790px;
+  padding: 190px 7vw 90px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  color: #ffffff;
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(16, 16, 16, 0.96) 0%,
+      rgba(16, 16, 16, 0.78) 50%,
+      rgba(0, 102, 179, 0.18) 100%
+    ),
+    url("https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=2200&q=88");
+  background-position: center;
+  background-size: cover;
+}
+
+.business-page-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      circle at 88% 25%,
+      rgba(255, 230, 0, 0.22),
+      transparent 27%
+    );
+}
+
+.business-page-hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 1050px;
+}
+
+.business-page-hero h1 {
+  max-width: 1050px;
+  margin: 24px 0 30px;
+  font-size: clamp(64px, 9vw, 132px);
+  line-height: 0.82;
+  letter-spacing: -0.08em;
+  text-transform: uppercase;
+}
+
+.business-page-hero p {
+  max-width: 740px;
+  margin-bottom: 32px;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 21px;
+  line-height: 1.52;
+}
+
+.business-hero-secondary {
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+.business-hero-trust {
+  margin-top: 34px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.business-hero-trust span {
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.09);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  backdrop-filter: blur(9px);
+}
+
+.business-introduction {
+  padding: 100px 6vw 45px;
+  background: #fff9e8;
+}
+
+.business-solutions-grid {
+  padding: 20px 6vw 110px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  background: #fff9e8;
+}
+
+.business-solution-card {
+  overflow: hidden;
+  border-radius: 30px;
+  background: #ffffff;
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.09);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.business-solution-card:hover {
+  transform: translateY(-7px);
+  box-shadow: 0 28px 74px rgba(0, 0, 0, 0.15);
+}
+
+.business-solution-image {
+  width: 100%;
+  height: 275px;
+  position: relative;
+  padding: 22px;
+  display: flex;
+  align-items: flex-end;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.business-solution-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.04),
+      rgba(0, 0, 0, 0.76)
+    );
+}
+
+.business-solution-label {
+  position: relative;
+  z-index: 2;
+  padding: 9px 13px;
+  border-radius: 999px;
+  background: #ffe600;
+  color: #101010;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.business-solution-content {
+  min-height: 285px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+}
+
+.business-solution-content h2 {
+  margin-bottom: 15px;
+  color: #101010;
+  font-size: 34px;
+  line-height: 0.95;
+  letter-spacing: -0.048em;
+  text-transform: uppercase;
+}
+
+.business-solution-content p {
+  margin-bottom: 25px;
+  color: #5c5c5c;
+  line-height: 1.52;
+  flex-grow: 1;
+}
+
+.business-connection {
+  min-height: 660px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #101010;
+  color: #ffffff;
+}
+
+.business-connection-image {
+  min-height: 660px;
+  background-image:
+    linear-gradient(
+      135deg,
+      rgba(0, 138, 75, 0.18),
+      rgba(0, 102, 179, 0.15)
+    ),
+    url("https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1700&q=88");
+  background-position: center;
+  background-size: cover;
+}
+
+.business-connection-content {
+  padding: 80px 7vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.business-connection-content h2 {
+  margin: 20px 0 24px;
+  font-size: clamp(50px, 6vw, 88px);
+  line-height: 0.86;
+  letter-spacing: -0.07em;
+  text-transform: uppercase;
+}
+
+.business-connection-content p {
+  max-width: 680px;
+  margin-bottom: 30px;
+  color: #d7d7d7;
+  font-size: 20px;
+  line-height: 1.52;
+}
+
+.business-connection-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.business-connection-content .btn-secondary {
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+.business-process-section {
+  padding: 100px 6vw;
+  background: #ffffff;
+}
+
+.business-process-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.business-process-card {
+  min-height: 330px;
+  padding: 30px;
+  border-radius: 28px;
+  display: flex;
+  flex-direction: column;
+  background: #fff9e8;
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.06);
+}
+
+.business-process-number {
+  width: fit-content;
+  margin-bottom: auto;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #101010;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.business-process-card h3 {
+  margin: 45px 0 14px;
+  color: #101010;
+  font-size: 29px;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
+}
+
+.business-process-card p {
+  color: #5c5c5c;
+  line-height: 1.5;
+}
+
+.business-objectives {
+  min-height: 650px;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  background: #ffe600;
+}
+
+.business-objectives-content {
+  padding: 80px 7vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.business-objectives-content h2 {
+  max-width: 850px;
+  margin: 20px 0 22px;
+  color: #101010;
+  font-size: clamp(52px, 7vw, 96px);
+  line-height: 0.84;
+  letter-spacing: -0.075em;
+  text-transform: uppercase;
+}
+
+.business-objectives-content > p {
+  max-width: 680px;
+  margin-bottom: 30px;
+  color: #333333;
+  font-size: 19px;
+  line-height: 1.5;
+}
+
+.business-objective-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.business-objective-tags span {
+  padding: 10px 14px;
+  border: 1px solid rgba(16, 16, 16, 0.25);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.45);
+  color: #101010;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.business-objectives-image {
+  min-height: 650px;
+  background-image:
+    linear-gradient(
+      135deg,
+      rgba(0, 102, 179, 0.12),
+      rgba(0, 138, 75, 0.12)
+    ),
+    url("https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1700&q=88");
+  background-position: center;
+  background-size: cover;
+}
+
+.business-final-actions {
+  justify-content: center;
+}
+
+.inner-cta .business-final-actions .btn-secondary {
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+@media (max-width: 1100px) {
+  .business-solutions-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .business-process-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .business-connection,
+  .business-objectives {
+    grid-template-columns: 1fr;
+  }
+
+  .business-connection-image,
+  .business-objectives-image {
+    min-height: 450px;
+  }
+}
+
+@media (max-width: 700px) {
+  .business-page-hero {
+    min-height: 720px;
+    padding: 160px 5vw 70px;
+  }
+
+  .business-page-hero h1 {
+    font-size: 54px;
+  }
+
+  .business-page-hero p {
+    font-size: 18px;
+  }
+
+  .business-solutions-grid,
+  .business-process-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .business-solutions-grid,
+  .business-process-section {
+    padding-right: 5vw;
+    padding-left: 5vw;
+  }
+
+  .business-solution-image {
+    height: 240px;
+  }
+
+  .business-solution-content {
+    min-height: auto;
+  }
+
+  .business-connection-image,
+  .business-objectives-image {
+    min-height: 340px;
+  }
+
+  .business-connection-content,
+  .business-objectives-content {
+    padding: 60px 6vw;
+  }
+}
