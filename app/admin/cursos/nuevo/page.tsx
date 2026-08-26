@@ -490,6 +490,9 @@ export default function NewCoursePage() {
                   </option>
                   <option value="Noche">
                     Noche
+                    <option value="Sábado">
+  Sábado
+</option>
                   </option>
                 </select>
               </Field>
@@ -505,18 +508,11 @@ export default function NewCoursePage() {
                     )
                   }
                 >
-                  <option value="">
-                    Seleccionar
-                  </option>
-                  <option value="Sede Centro">
-                    Sede Centro
-                  </option>
-                  <option value="Sede Norte">
-                    Sede Norte
-                  </option>
-                  <option value="Virtual">
-                    Virtual
-                  </option>
+                  <option value="">Seleccionar</option>
+<option value="Cualquier sede">Cualquier sede</option>
+<option value="Sede Centro">Sede Centro</option>
+<option value="Sede Norte">Sede Norte</option>
+<option value="Virtual">Virtual</option>
                 </select>
               </Field>
 
