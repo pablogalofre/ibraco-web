@@ -1,6 +1,7 @@
 import "./cursos.css";
 import { supabase } from "../../lib/supabase";
-
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 const WHATSAPP_URL = "https://wa.me/573125841068";
 
 type Course = {
