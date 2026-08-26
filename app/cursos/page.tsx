@@ -324,14 +324,7 @@ export default async function CursosPage() {
                 </a>
               </div>
             ) : (
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns:
-                    "repeat(auto-fit, minmax(310px, 1fr))",
-                  gap: "24px",
-                }}
-              >
+             <div className="courses-live-grid">
                 {courses.map((course) => (
                   <article
                     key={course.id}
