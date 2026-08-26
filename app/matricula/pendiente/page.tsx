@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function PagoErrorPage() {
+export default function PagoPendientePage() {
   return (
     <main
       style={{
@@ -29,22 +29,22 @@ export default function PagoErrorPage() {
             width: "56px",
             height: "56px",
             borderRadius: "50%",
-            background: "#fdecec",
-            color: "#b42318",
+            background: "#fff4cc",
+            color: "#b87900",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             margin: "0 auto 22px",
-            fontSize: "28px",
+            fontSize: "26px",
             fontWeight: 900,
           }}
         >
-          !
+          …
         </div>
 
         <div
           style={{
-            color: "#b42318",
+            color: "#b87900",
             fontWeight: 900,
             textTransform: "uppercase",
             fontSize: "13px",
@@ -52,7 +52,7 @@ export default function PagoErrorPage() {
             marginBottom: "10px",
           }}
         >
-          Pago no completado
+          Pago en proceso
         </div>
 
         <h1
@@ -63,7 +63,7 @@ export default function PagoErrorPage() {
             fontWeight: 900,
           }}
         >
-          No pudimos confirmar tu pago
+          Estamos confirmando tu pago
         </h1>
 
         <p
@@ -73,7 +73,7 @@ export default function PagoErrorPage() {
             margin: "0 0 10px",
           }}
         >
-          Tu matrícula todavía no ha sido confirmada.
+          Tu transacción está siendo procesada.
         </p>
 
         <p
@@ -85,51 +85,26 @@ export default function PagoErrorPage() {
             maxWidth: "520px",
           }}
         >
-          El pago pudo haber sido rechazado, cancelado o no completado.
-          Puedes regresar a los cursos e intentarlo nuevamente.
+          No necesitas realizar otro pago. Una vez Mercado Pago
+          confirme la transacción, tu matrícula quedará registrada
+          en IBRACO.
         </p>
 
-        <div
+        <Link
+          href="/cursos"
           style={{
-            display: "flex",
-            gap: "12px",
-            justifyContent: "center",
-            flexWrap: "wrap",
+            display: "inline-block",
+            background: "#111",
+            color: "#fff",
+            padding: "14px 24px",
+            borderRadius: "999px",
+            fontWeight: 800,
+            textDecoration: "none",
+            minWidth: "170px",
           }}
         >
-          <Link
-            href="/cursos"
-            style={{
-              display: "inline-block",
-              background: "#ffd800",
-              color: "#111",
-              padding: "14px 24px",
-              borderRadius: "999px",
-              fontWeight: 800,
-              textDecoration: "none",
-              minWidth: "170px",
-            }}
-          >
-            Intentar nuevamente
-          </Link>
-
-          <Link
-            href="/"
-            style={{
-              display: "inline-block",
-              background: "#fff",
-              color: "#111",
-              padding: "14px 24px",
-              borderRadius: "999px",
-              border: "1px solid #111",
-              fontWeight: 800,
-              textDecoration: "none",
-              minWidth: "170px",
-            }}
-          >
-            Volver al inicio
-          </Link>
-        </div>
+          Volver a cursos
+        </Link>
       </section>
     </main>
   );
