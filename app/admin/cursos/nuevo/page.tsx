@@ -489,11 +489,11 @@ export default function NewCoursePage() {
                     Tarde
                   </option>
                   <option value="Noche">
-                    Noche
-                    <option value="Sábado">
+  Noche
+</option>
+<option value="Sábado">
   Sábado
 </option>
-                  </option>
                 </select>
               </Field>
 
