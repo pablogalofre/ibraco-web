@@ -520,18 +520,19 @@ export default function NewCoursePage() {
                 </select>
               </Field>
 
-              <Field label="Nivel">
-                <input
-                  value={course.level}
-                  onChange={(e) =>
-                    updateField(
-                      "level",
-                      e.target.value
-                    )
-                  }
-                  placeholder="Ej. A1"
-                />
-              </Field>
+             <Field label="Tipo de curso *">
+  <select
+    required
+    value={course.level}
+    onChange={(e) =>
+      updateField("level", e.target.value)
+    }
+  >
+    <option value="">Seleccionar</option>
+    <option value="Intensivo">Intensivo</option>
+    <option value="Semi-intensivo">Semi-intensivo</option>
+  </select>
+</Field>
 
               <Field label="Cupos">
                 <input
