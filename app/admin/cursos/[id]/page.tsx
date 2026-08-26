@@ -225,70 +225,103 @@ export default function EditCoursePage() {
   }
 
   async function saveChanges() {
-    if (!course) return;
+  if (!course) return;
 
-    try {
-      setSaving(true);
-      setMessage("");
+  try {
+    setSaving(true);
+    setMessage("");
 
-      const { error } = await supabase
-        .from("courses")
-        .update({
-          slug: course.slug,
-          name: course.name,
-          cycle: course.cycle,
-          year: course.year,
-          shift: course.shift,
-          modality: course.modality,
-          campus: course.campus,
-          start_date: course.start_date,
-          end_date: course.end_date,
-          days: course.days,
-          start_time:
-            course.start_time || null,
-          end_time:
-            course.end_time || null,
-          level: course.level,
-          price: course.price,
-          capacity: course.capacity,
-          status: course.status,
-          image_url: course.image_url,
-          updated_at:
-            new Date().toISOString(),
-        })
-        .eq("id", course.id);
+    const inferredShift = (() => {
+      if (!course.start_time) return "";
 
-      if (error) {
-        console.error(
-          "ERROR GUARDANDO CURSO:",
-          error
-        );
-
-        setMessage(
-          "No fue posible guardar los cambios."
-        );
-
-        return;
-      }
-
-      setMessage(
-        "Cambios guardados correctamente."
+      const hour = Number(
+        course.start_time.slice(0, 2)
       );
 
-      router.refresh();
-    } catch (error) {
+      if (hour < 12) return "Mañana";
+      if (hour < 17) return "Tarde";
+      return "Noche";
+    })();
+
+    const inferredModality =
+      course.campus === "Virtual"
+        ? "Virtual"
+        : "Presencial";
+
+    const { error } = await supabase
+      .from("courses")
+      .update({
+        slug: course.slug,
+        name: course.name,
+        cycle: course.cycle,
+        year: course.year,
+
+        shift: inferredShift,
+        modality: inferredModality,
+
+        campus: course.campus,
+        start_date: course.start_date,
+        end_date: course.end_date,
+        days: course.days,
+
+        start_time:
+          course.start_time || null,
+
+        end_time:
+          course.end_time || null,
+
+        level: course.level,
+        price: course.price,
+        capacity: course.capacity,
+        status: course.status,
+        image_url: course.image_url,
+
+        updated_at:
+          new Date().toISOString(),
+      })
+      .eq("id", course.id);
+
+    if (error) {
       console.error(
-        "ERROR INESPERADO GUARDANDO CURSO:",
+        "ERROR GUARDANDO CURSO:",
         error
       );
 
       setMessage(
         "No fue posible guardar los cambios."
       );
-    } finally {
-      setSaving(false);
+
+      return;
     }
+
+    setCourse((current) => {
+      if (!current) return current;
+
+      return {
+        ...current,
+        shift: inferredShift,
+        modality: inferredModality,
+      };
+    });
+
+    setMessage(
+      "Cambios guardados correctamente."
+    );
+
+    router.refresh();
+  } catch (error) {
+    console.error(
+      "ERROR INESPERADO GUARDANDO CURSO:",
+      error
+    );
+
+    setMessage(
+      "No fue posible guardar los cambios."
+    );
+  } finally {
+    setSaving(false);
   }
+}
 
   const inputStyle = {
     width: "100%",
@@ -424,7 +457,7 @@ export default function EditCoursePage() {
               margin: 0,
             }}
           >
-            {course.name} · {course.shift}
+            {course.name} · {course.level}
           </p>
 
           <p
@@ -605,85 +638,61 @@ export default function EditCoursePage() {
             </div>
 
             <div>
-              <label style={labelStyle}>
-                Jornada
-              </label>
+  <label style={labelStyle}>
+    Tipo de curso
+  </label>
 
-              <select
-                style={inputStyle}
-                value={course.shift ?? ""}
-                onChange={(e) =>
-                  updateField(
-                    "shift",
-                    e.target.value
-                  )
-                }
-              >
-                <option value="">
-                  Seleccionar
-                </option>
-                <option value="Mañana">
-                  Mañana
-                </option>
-                <option value="Tarde">
-                  Tarde
-                </option>
-                <option value="Noche">
-                  Noche
-                </option>
-                <option value="Sábado">
-                  Sábado
-                </option>
-              </select>
-            </div>
+  <select
+    style={inputStyle}
+    value={course.level ?? ""}
+    onChange={(e) =>
+      updateField(
+        "level",
+        e.target.value
+      )
+    }
+  >
+    <option value="">
+      Seleccionar
+    </option>
+
+    <option value="Intensivo">
+      Intensivo
+    </option>
+
+    <option value="Semi-intensivo">
+      Semi-intensivo
+    </option>
+  </select>
+</div>
+
+          
 
             <div>
-              <label style={labelStyle}>
-                Modalidad
-              </label>
+  <label style={labelStyle}>
+    Sede
+  </label>
 
-              <select
-                style={inputStyle}
-                value={course.modality ?? ""}
-                onChange={(e) =>
-                  updateField(
-                    "modality",
-                    e.target.value
-                  )
-                }
-              >
-                <option value="">
-                  Seleccionar
-                </option>
-                <option value="Presencial">
-                  Presencial
-                </option>
-                <option value="Online">
-                  Online
-                </option>
-                <option value="Híbrido">
-                  Híbrido
-                </option>
-              </select>
-            </div>
+  <select
+    style={inputStyle}
+    value={course.campus ?? ""}
+    onChange={(e) => {
+      const campus = e.target.value;
 
-            <div>
-              <label style={labelStyle}>
-                Sede
-              </label>
-
-              <input
-                style={inputStyle}
-                value={course.campus ?? ""}
-                placeholder="Ej. Sede Centro"
-                onChange={(e) =>
-                  updateField(
-                    "campus",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
+      updateField("campus", campus);
+      updateField(
+        "modality",
+        campus === "Virtual" ? "Virtual" : "Presencial"
+      );
+    }}
+  >
+    <option value="">Seleccionar</option>
+    <option value="Cualquier sede">Cualquier sede</option>
+    <option value="Sede Centro">Sede Centro</option>
+    <option value="Sede Norte">Sede Norte</option>
+    <option value="Virtual">Virtual</option>
+  </select>
+</div>
 
             <div>
               <label style={labelStyle}>
@@ -775,24 +784,57 @@ export default function EditCoursePage() {
               />
             </div>
 
-            <div>
-              <label style={labelStyle}>
-                Nivel
-              </label>
+            
+<div>
+  <label style={labelStyle}>
+    Días de clase
+  </label>
 
-              <input
-                style={inputStyle}
-                value={course.level ?? ""}
-                placeholder="Ej. A1"
-                onChange={(e) =>
-                  updateField(
-                    "level",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
+  <select
+    style={inputStyle}
+    value={
+      Array.isArray(course.days) && course.days.length > 0
+        ? course.days[0]
+        : ""
+    }
+    onChange={(e) =>
+      updateField(
+        "days",
+        e.target.value
+          ? [e.target.value]
+          : []
+      )
+    }
+  >
+    <option value="">
+      Seleccionar
+    </option>
 
+    <option value="Lunes a viernes">
+      Lunes a viernes
+    </option>
+
+    <option value="Lunes a jueves">
+      Lunes a jueves
+    </option>
+
+    <option value="Lunes y miércoles">
+      Lunes y miércoles
+    </option>
+
+    <option value="Martes y jueves">
+      Martes y jueves
+    </option>
+
+    <option value="Miércoles y viernes">
+      Miércoles y viernes
+    </option>
+
+    <option value="Sábado">
+      Sábado
+    </option>
+  </select>
+</div>
             <div>
               <label style={labelStyle}>
                 Precio
@@ -865,36 +907,7 @@ export default function EditCoursePage() {
               </select>
             </div>
 
-            <div
-              style={{
-                gridColumn: "1 / -1",
-              }}
-            >
-              <label style={labelStyle}>
-                Días de clase
-              </label>
-
-              <input
-                style={inputStyle}
-                value={
-                  Array.isArray(course.days)
-                    ? course.days.join(", ")
-                    : ""
-                }
-                placeholder="Ej. Martes, Jueves"
-                onChange={(e) =>
-                  updateField(
-                    "days",
-                    e.target.value
-                      .split(",")
-                      .map((day) =>
-                        day.trim()
-                      )
-                      .filter(Boolean)
-                  )
-                }
-              />
-            </div>
+         
           </div>
 
           {message && (
