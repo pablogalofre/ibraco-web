@@ -29,7 +29,7 @@ export default function EditCoursePage() {
   const params = useParams();
   const router = useRouter();
 
-  const slug = params.id as string;
+  const routeId = String(params.id ?? "");
 
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
@@ -38,40 +38,80 @@ export default function EditCoursePage() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    async function loadCourse() {
-      const { data, error } = await supabase
-        .from("courses")
-        .select("*")
-        .eq("slug", slug)
-        .single();
+    let active = true;
 
-      if (error || !data) {
-        console.error(error);
+    async function loadCourse() {
+      setLoading(true);
+      setMessage("");
+
+      try {
+        const isNumericId = /^\d+$/.test(routeId);
+
+        let query = supabase
+          .from("courses")
+          .select("*");
+
+        if (isNumericId) {
+          query = query.eq("id", Number(routeId));
+        } else {
+          // También permite abrir el editor usando el slug.
+          query = query.eq("slug", routeId);
+        }
+
+        const { data, error } = await query.single();
+
+        if (!active) return;
+
+        if (error || !data) {
+          console.error("ERROR CARGANDO CURSO:", error);
+          setCourse(null);
+          setMessage("No fue posible cargar el curso.");
+          setLoading(false);
+          return;
+        }
+
+        setCourse(data as Course);
+        setLoading(false);
+      } catch (error) {
+        console.error("ERROR INESPERADO CARGANDO CURSO:", error);
+
+        if (!active) return;
+
+        setCourse(null);
         setMessage("No fue posible cargar el curso.");
         setLoading(false);
-        return;
       }
-
-      setCourse(data);
-      setLoading(false);
     }
 
-    loadCourse();
-  }, [slug]);
+    if (routeId) {
+      loadCourse();
+    } else {
+      setLoading(false);
+      setMessage("Identificador de curso no válido.");
+    }
+
+    return () => {
+      active = false;
+    };
+  }, [routeId]);
 
   function updateField<K extends keyof Course>(
     field: K,
     value: Course[K]
   ) {
-    if (!course) return;
+    setCourse((current) => {
+      if (!current) return current;
 
-    setCourse({
-      ...course,
-      [field]: value,
+      return {
+        ...current,
+        [field]: value,
+      };
     });
   }
 
-  async function uploadImage(event: ChangeEvent<HTMLInputElement>) {
+  async function uploadImage(
+    event: ChangeEvent<HTMLInputElement>
+  ) {
     if (!course) return;
 
     const file = event.target.files?.[0];
@@ -102,91 +142,140 @@ export default function EditCoursePage() {
       return;
     }
 
-    setUploading(true);
-    setMessage("");
+    try {
+      setUploading(true);
+      setMessage("");
 
-    const extension =
-      file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const extension =
+        file.name
+          .split(".")
+          .pop()
+          ?.toLowerCase() || "jpg";
 
-    const filePath =
-      `${course.slug}/` +
-      `course-${Date.now()}.${extension}`;
+      const filePath =
+        `${course.slug}/course-${Date.now()}.${extension}`;
 
-    const { error: uploadError } = await supabase.storage
-      .from("course-images")
-      .upload(filePath, file, {
-        cacheControl: "3600",
-        upsert: false,
-        contentType: file.type,
+      const { error: uploadError } =
+        await supabase.storage
+          .from("course-images")
+          .upload(filePath, file, {
+            cacheControl: "3600",
+            upsert: false,
+            contentType: file.type,
+          });
+
+      if (uploadError) {
+        console.error(
+          "ERROR SUBIENDO IMAGEN:",
+          uploadError
+        );
+
+        setMessage(
+          "No fue posible subir la imagen."
+        );
+
+        return;
+      }
+
+      const { data: publicUrlData } =
+        supabase.storage
+          .from("course-images")
+          .getPublicUrl(filePath);
+
+      const imageUrl =
+        publicUrlData.publicUrl;
+
+      setCourse((current) => {
+        if (!current) return current;
+
+        return {
+          ...current,
+          image_url: imageUrl,
+        };
       });
 
-    if (uploadError) {
-      console.error(uploadError);
-      setMessage("No fue posible subir la imagen.");
+      setMessage(
+        "Imagen cargada. Pulsa Guardar cambios para asignarla al curso."
+      );
+    } catch (error) {
+      console.error(
+        "ERROR INESPERADO SUBIENDO IMAGEN:",
+        error
+      );
+
+      setMessage(
+        "No fue posible subir la imagen."
+      );
+    } finally {
       setUploading(false);
       event.target.value = "";
-      return;
     }
-
-    const { data: publicUrlData } = supabase.storage
-      .from("course-images")
-      .getPublicUrl(filePath);
-
-    const imageUrl = publicUrlData.publicUrl;
-
-    setCourse({
-      ...course,
-      image_url: imageUrl,
-    });
-
-    setMessage(
-      "Imagen cargada. Pulsa Guardar cambios para asignarla al curso."
-    );
-
-    setUploading(false);
-    event.target.value = "";
   }
 
   async function saveChanges() {
     if (!course) return;
 
-    setSaving(true);
-    setMessage("");
+    try {
+      setSaving(true);
+      setMessage("");
 
-    const { error } = await supabase
-      .from("courses")
-      .update({
-        name: course.name,
-        cycle: course.cycle,
-        year: course.year,
-        shift: course.shift,
-        modality: course.modality,
-        campus: course.campus,
-        start_date: course.start_date,
-        end_date: course.end_date,
-        days: course.days,
-        start_time: course.start_time || null,
-        end_time: course.end_time || null,
-        level: course.level,
-        price: course.price,
-        capacity: course.capacity,
-        status: course.status,
-        image_url: course.image_url,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("slug", slug);
+      const { error } = await supabase
+        .from("courses")
+        .update({
+          slug: course.slug,
+          name: course.name,
+          cycle: course.cycle,
+          year: course.year,
+          shift: course.shift,
+          modality: course.modality,
+          campus: course.campus,
+          start_date: course.start_date,
+          end_date: course.end_date,
+          days: course.days,
+          start_time:
+            course.start_time || null,
+          end_time:
+            course.end_time || null,
+          level: course.level,
+          price: course.price,
+          capacity: course.capacity,
+          status: course.status,
+          image_url: course.image_url,
+          updated_at:
+            new Date().toISOString(),
+        })
+        .eq("id", course.id);
 
-    if (error) {
-      console.error(error);
-      setMessage("No fue posible guardar los cambios.");
+      if (error) {
+        console.error(
+          "ERROR GUARDANDO CURSO:",
+          error
+        );
+
+        setMessage(
+          "No fue posible guardar los cambios."
+        );
+
+        return;
+      }
+
+      setMessage(
+        "Cambios guardados correctamente."
+      );
+
+      router.refresh();
+    } catch (error) {
+      console.error(
+        "ERROR INESPERADO GUARDANDO CURSO:",
+        error
+      );
+
+      setMessage(
+        "No fue posible guardar los cambios."
+      );
+    } finally {
       setSaving(false);
-      return;
     }
-
-    setMessage("Cambios guardados correctamente.");
-    setSaving(false);
-
-    router.refresh();
   }
 
   const inputStyle = {
@@ -244,11 +333,32 @@ export default function EditCoursePage() {
             margin: "0 auto",
           }}
         >
-          Curso no encontrado.
+          <h1>Curso no encontrado.</h1>
+
+          {message && (
+            <p>{message}</p>
+          )}
+
+          <a
+            href="/admin"
+            style={{
+              display: "inline-block",
+              marginTop: "20px",
+              color: "#009c4b",
+              fontWeight: 700,
+              textDecoration: "none",
+            }}
+          >
+            ← Volver
+          </a>
         </div>
       </main>
     );
   }
+
+  const messageIsSuccess =
+    message.includes("correctamente") ||
+    message.includes("Imagen cargada");
 
   return (
     <main
@@ -304,6 +414,16 @@ export default function EditCoursePage() {
           >
             {course.name} · {course.shift}
           </p>
+
+          <p
+            style={{
+              fontSize: "13px",
+              color: "#777",
+              marginTop: "8px",
+            }}
+          >
+            ID {course.id} · {course.slug}
+          </p>
         </div>
 
         <div
@@ -313,7 +433,7 @@ export default function EditCoursePage() {
             padding: "35px",
           }}
         >
-          {/* IMAGEN DEL CURSO */}
+          {/* IMAGEN */}
 
           <div
             style={{
@@ -334,8 +454,8 @@ export default function EditCoursePage() {
                 fontSize: "14px",
               }}
             >
-              Sube una imagen JPG, PNG o WebP desde tu
-              computador. Máximo 5 MB.
+              Sube una imagen JPG, PNG o WebP.
+              Máximo 5 MB.
             </p>
 
             {course.image_url ? (
@@ -355,8 +475,8 @@ export default function EditCoursePage() {
                   style={{
                     width: "100%",
                     height: "100%",
-                   objectFit: "contain",
-background: "#f3f3f3",
+                    objectFit: "contain",
+                    background: "#f3f3f3",
                   }}
                 />
               </div>
@@ -395,8 +515,8 @@ background: "#f3f3f3",
               {uploading
                 ? "Subiendo imagen..."
                 : course.image_url
-                ? "Cambiar imagen"
-                : "Seleccionar imagen"}
+                  ? "Cambiar imagen"
+                  : "Seleccionar imagen"}
 
               <input
                 type="file"
@@ -410,7 +530,7 @@ background: "#f3f3f3",
             </label>
           </div>
 
-          {/* DATOS DEL CURSO */}
+          {/* DATOS */}
 
           <div
             style={{
@@ -429,7 +549,10 @@ background: "#f3f3f3",
                 style={inputStyle}
                 value={course.name ?? ""}
                 onChange={(e) =>
-                  updateField("name", e.target.value)
+                  updateField(
+                    "name",
+                    e.target.value
+                  )
                 }
               />
             </div>
@@ -443,7 +566,10 @@ background: "#f3f3f3",
                 style={inputStyle}
                 value={course.cycle ?? ""}
                 onChange={(e) =>
-                  updateField("cycle", e.target.value)
+                  updateField(
+                    "cycle",
+                    e.target.value
+                  )
                 }
               />
             </div>
@@ -475,25 +601,24 @@ background: "#f3f3f3",
                 style={inputStyle}
                 value={course.shift ?? ""}
                 onChange={(e) =>
-                  updateField("shift", e.target.value)
+                  updateField(
+                    "shift",
+                    e.target.value
+                  )
                 }
               >
                 <option value="">
                   Seleccionar
                 </option>
-
                 <option value="Mañana">
                   Mañana
                 </option>
-
                 <option value="Tarde">
                   Tarde
                 </option>
-
                 <option value="Noche">
                   Noche
                 </option>
-
                 <option value="Sábado">
                   Sábado
                 </option>
@@ -518,15 +643,12 @@ background: "#f3f3f3",
                 <option value="">
                   Seleccionar
                 </option>
-
                 <option value="Presencial">
                   Presencial
                 </option>
-
                 <option value="Online">
                   Online
                 </option>
-
                 <option value="Híbrido">
                   Híbrido
                 </option>
@@ -559,7 +681,9 @@ background: "#f3f3f3",
               <input
                 type="date"
                 style={inputStyle}
-                value={course.start_date ?? ""}
+                value={
+                  course.start_date ?? ""
+                }
                 onChange={(e) =>
                   updateField(
                     "start_date",
@@ -577,7 +701,9 @@ background: "#f3f3f3",
               <input
                 type="date"
                 style={inputStyle}
-                value={course.end_date ?? ""}
+                value={
+                  course.end_date ?? ""
+                }
                 onChange={(e) =>
                   updateField(
                     "end_date",
@@ -597,7 +723,10 @@ background: "#f3f3f3",
                 style={inputStyle}
                 value={
                   course.start_time
-                    ? course.start_time.slice(0, 5)
+                    ? course.start_time.slice(
+                        0,
+                        5
+                      )
                     : ""
                 }
                 onChange={(e) =>
@@ -619,7 +748,10 @@ background: "#f3f3f3",
                 style={inputStyle}
                 value={
                   course.end_time
-                    ? course.end_time.slice(0, 5)
+                    ? course.end_time.slice(
+                        0,
+                        5
+                      )
                     : ""
                 }
                 onChange={(e) =>
@@ -656,6 +788,7 @@ background: "#f3f3f3",
 
               <input
                 type="number"
+                min="0"
                 style={inputStyle}
                 value={course.price ?? 0}
                 onChange={(e) =>
@@ -674,15 +807,20 @@ background: "#f3f3f3",
 
               <input
                 type="number"
+                min="0"
                 style={inputStyle}
-                value={course.capacity ?? ""}
+                value={
+                  course.capacity ?? ""
+                }
                 placeholder="Ej. 20"
                 onChange={(e) =>
                   updateField(
                     "capacity",
                     e.target.value === ""
                       ? null
-                      : Number(e.target.value)
+                      : Number(
+                          e.target.value
+                        )
                   )
                 }
               />
@@ -737,7 +875,9 @@ background: "#f3f3f3",
                     "days",
                     e.target.value
                       .split(",")
-                      .map((day) => day.trim())
+                      .map((day) =>
+                        day.trim()
+                      )
                       .filter(Boolean)
                   )
                 }
@@ -752,23 +892,12 @@ background: "#f3f3f3",
                 padding: "14px 18px",
                 borderRadius: "12px",
                 background:
-                  message.includes(
-                    "correctamente"
-                  ) ||
-                  message.includes(
-                    "Imagen cargada"
-                  )
+                  messageIsSuccess
                     ? "#e8f7ee"
                     : "#fdecec",
-                color:
-                  message.includes(
-                    "correctamente"
-                  ) ||
-                  message.includes(
-                    "Imagen cargada"
-                  )
-                    ? "#087a3e"
-                    : "#9a1f1f",
+                color: messageIsSuccess
+                  ? "#087a3e"
+                  : "#9a1f1f",
                 fontWeight: 700,
               }}
             >
