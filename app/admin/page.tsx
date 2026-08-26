@@ -1,45 +1,62 @@
+import courses from "../../data/courses.json";
+
 export default function AdminPage() {
   return (
     <main
       style={{
         minHeight: "100vh",
-        background: "#f6f3e8",
-        padding: "40px",
+        background: "#f8f5e9",
+        padding: "50px 7%",
         fontFamily: "Arial, sans-serif",
       }}
     >
-      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+      <div
+        style={{
+          maxWidth: "1320px",
+          margin: "0 auto",
+        }}
+      >
+        {/* ENCABEZADO */}
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            marginBottom: "40px",
+            gap: "30px",
+            marginBottom: "45px",
           }}
         >
           <div>
-            <p
+            <div
               style={{
-                color: "#008c4a",
-                fontWeight: 700,
-                textTransform: "uppercase",
+                color: "#009c4b",
+                fontWeight: 800,
+                fontSize: "15px",
                 marginBottom: "8px",
+                textTransform: "uppercase",
               }}
             >
               Administración IBRACO
-            </p>
+            </div>
 
             <h1
               style={{
-                fontSize: "48px",
                 margin: 0,
-                color: "#111",
+                fontSize: "44px",
+                lineHeight: 1,
+                fontWeight: 900,
               }}
             >
-              Tienda de cursos
+              TIENDA DE CURSOS
             </h1>
 
-            <p style={{ fontSize: "18px", color: "#555" }}>
+            <p
+              style={{
+                fontSize: "18px",
+                marginTop: "10px",
+                marginBottom: 0,
+              }}
+            >
               Administra ciclos, horarios, precios y disponibilidad.
             </p>
           </div>
@@ -49,9 +66,9 @@ export default function AdminPage() {
             style={{
               background: "#111",
               color: "#fff",
-              padding: "14px 22px",
-              borderRadius: "30px",
               textDecoration: "none",
+              padding: "15px 25px",
+              borderRadius: "30px",
               fontWeight: 700,
             }}
           >
@@ -59,206 +76,233 @@ export default function AdminPage() {
           </a>
         </div>
 
-        <section
+        {/* RESUMEN */}
+        <div
           style={{
-            background: "#fff",
-            borderRadius: "20px",
-            padding: "30px",
-            marginBottom: "25px",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+            gap: "15px",
+            marginBottom: "30px",
           }}
         >
           <div
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
+              background: "#fff",
+              padding: "22px",
+              borderRadius: "20px",
             }}
           >
-            <div>
-              <p
-                style={{
-                  color: "#008c4a",
-                  fontWeight: 700,
-                  margin: 0,
-                }}
-              >
-                CICLO 7
-              </p>
-
-              <h2>Portugués Intensivo · Mañana</h2>
-
-              <p>24 de septiembre — 6 de noviembre de 2026</p>
-            </div>
-
-            <button
+            <div
               style={{
-                background: "#ffe000",
-                border: "none",
-                padding: "12px 20px",
-                borderRadius: "25px",
+                fontSize: "13px",
                 fontWeight: 700,
-                cursor: "pointer",
+                color: "#666",
               }}
             >
-              Editar
-            </button>
-          </div>
-        </section>
+              CURSOS CARGADOS
+            </div>
 
-        <section
-          style={{
-            background: "#fff",
-            borderRadius: "20px",
-            padding: "30px",
-            marginBottom: "25px",
-          }}
-        >
+            <strong style={{ fontSize: "32px" }}>{courses.length}</strong>
+          </div>
+
           <div
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
+              background: "#fff",
+              padding: "22px",
+              borderRadius: "20px",
             }}
           >
-            <div>
-              <p
-                style={{
-                  color: "#008c4a",
-                  fontWeight: 700,
-                  margin: 0,
-                }}
-              >
-                CICLO 7
-              </p>
-
-              <h2>Portugués Intensivo · Noche</h2>
-
-              <p>24 de septiembre — 9 de noviembre de 2026</p>
-            </div>
-
-            <button
+            <div
               style={{
-                background: "#ffe000",
-                border: "none",
-                padding: "12px 20px",
-                borderRadius: "25px",
+                fontSize: "13px",
                 fontWeight: 700,
-                cursor: "pointer",
+                color: "#666",
               }}
             >
-              Editar
-            </button>
-          </div>
-        </section>
+              PUBLICADOS
+            </div>
 
-        <section
-          style={{
-            background: "#fff",
-            borderRadius: "20px",
-            padding: "30px",
-            marginBottom: "25px",
-          }}
-        >
+            <strong style={{ fontSize: "32px" }}>
+              {courses.filter((course) => course.status === "published").length}
+            </strong>
+          </div>
+
           <div
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
+              background: "#fff",
+              padding: "22px",
+              borderRadius: "20px",
             }}
           >
-            <div>
-              <p
-                style={{
-                  color: "#008c4a",
-                  fontWeight: 700,
-                  margin: 0,
-                }}
-              >
-                CICLO 8
-              </p>
-
-              <h2>Portugués Intensivo · Mañana</h2>
-
-              <p>10 de noviembre — 16 de diciembre de 2026</p>
-            </div>
-
-            <button
+            <div
               style={{
-                background: "#ffe000",
-                border: "none",
-                padding: "12px 20px",
-                borderRadius: "25px",
+                fontSize: "13px",
                 fontWeight: 700,
-                cursor: "pointer",
+                color: "#666",
               }}
             >
-              Editar
-            </button>
-          </div>
-        </section>
+              BORRADORES
+            </div>
 
-        <section
+            <strong style={{ fontSize: "32px" }}>
+              {courses.filter((course) => course.status === "draft").length}
+            </strong>
+          </div>
+        </div>
+
+        {/* CURSOS */}
+        <div
           style={{
-            background: "#fff",
-            borderRadius: "20px",
-            padding: "30px",
-            marginBottom: "25px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "22px",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <div>
-              <p
-                style={{
-                  color: "#008c4a",
-                  fontWeight: 700,
-                  margin: 0,
-                }}
-              >
-                CICLO 8
-              </p>
-
-              <h2>Portugués Intensivo · Noche</h2>
-
-              <p>10 de noviembre — 16 de diciembre de 2026</p>
-            </div>
-
-            <button
+          {courses.map((course) => (
+            <article
+              key={course.id}
               style={{
-                background: "#ffe000",
-                border: "none",
-                padding: "12px 20px",
-                borderRadius: "25px",
-                fontWeight: 700,
-                cursor: "pointer",
+                background: "#fff",
+                borderRadius: "22px",
+                padding: "28px 32px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: "25px",
               }}
             >
-              Editar
-            </button>
-          </div>
-        </section>
+              <div>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    marginBottom: "6px",
+                  }}
+                >
+                  <span
+                    style={{
+                      color: "#009c4b",
+                      fontWeight: 800,
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {course.cycle}
+                  </span>
 
+                  <span
+                    style={{
+                      background:
+                        course.status === "published" ? "#dff5e8" : "#eee",
+                      color:
+                        course.status === "published" ? "#007b3d" : "#555",
+                      padding: "5px 9px",
+                      borderRadius: "20px",
+                      fontSize: "11px",
+                      fontWeight: 800,
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {course.status === "published"
+                      ? "Publicado"
+                      : "Borrador"}
+                  </span>
+                </div>
+
+                <h2
+                  style={{
+                    margin: "0 0 5px",
+                    fontSize: "27px",
+                  }}
+                >
+                  {course.name} · {course.shift}
+                </h2>
+
+                <p
+                  style={{
+                    margin: "0 0 8px",
+                    fontSize: "16px",
+                  }}
+                >
+                  {course.startDate} — {course.endDate}
+                </p>
+
+                {(course.modality || course.campus) && (
+                  <p
+                    style={{
+                      margin: "0 0 6px",
+                      color: "#555",
+                    }}
+                  >
+                    {course.modality}
+                    {course.modality && course.campus ? " · " : ""}
+                    {course.campus}
+                  </p>
+                )}
+
+                {course.days.length > 0 && (
+                  <p
+                    style={{
+                      margin: 0,
+                      color: "#555",
+                    }}
+                  >
+                    {course.days.join(" y ")} · {course.startTime} –{" "}
+                    {course.endTime}
+                  </p>
+                )}
+              </div>
+
+             <a
+  href={`/admin/cursos/${course.id}`}
+  style={{
+    background: "#ffd800",
+    color: "#000",
+    textDecoration: "none",
+    padding: "14px 25px",
+    borderRadius: "30px",
+    fontSize: "15px",
+    fontWeight: 800,
+    cursor: "pointer",
+    flexShrink: 0,
+    display: "inline-block",
+  }}
+>
+  Editar
+</a>
+            </article>
+          ))}
+        </div>
+
+        {/* CREAR */}
         <button
+          type="button"
           style={{
             width: "100%",
-            background: "#008c4a",
+            marginTop: "35px",
+            background: "#009c4b",
             color: "#fff",
             border: "none",
-            padding: "18px",
+            padding: "19px",
             borderRadius: "30px",
             fontSize: "17px",
-            fontWeight: 700,
+            fontWeight: 800,
             cursor: "pointer",
-            marginTop: "10px",
           }}
         >
           + Crear nuevo curso
         </button>
+
+        <p
+          style={{
+            textAlign: "center",
+            color: "#777",
+            fontSize: "13px",
+            marginTop: "18px",
+          }}
+        >
+          Panel administrativo · IBRACO
+        </p>
       </div>
     </main>
   );
