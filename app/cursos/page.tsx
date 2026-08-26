@@ -196,6 +196,12 @@ export default async function CursosPage() {
           <a href="/empresas">Empresas</a>
           <a href="/alumni">Alumni</a>
           <a href="/blog">Blog</a>
+          <a
+            href="/admin/login"
+            style={{ fontWeight: 800, opacity: 0.72 }}
+          >
+            Administración
+          </a>
 
           <a href="#cursos-disponibles" className="nav-cta">
             Matricúlate
