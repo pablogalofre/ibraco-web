@@ -128,9 +128,7 @@ export default function MatriculaPage() {
   ) {
     event.preventDefault();
 
-    if (!course) {
-      return;
-    }
+    if (!course) return;
 
     if (!form.acceptedPrivacy) {
       setMessage(
@@ -139,18 +137,12 @@ export default function MatriculaPage() {
       return;
     }
 
-    if (submitting) {
-      return;
-    }
+    if (submitting) return;
 
     setSubmitting(true);
     setMessage("Preparando tu matrícula...");
 
     try {
-      /*
-       * PASO 1
-       * Crear el pedido en nuestra base de datos.
-       */
       const orderResponse = await fetch("/api/orders", {
         method: "POST",
         headers: {
@@ -197,10 +189,6 @@ export default function MatriculaPage() {
         "Pedido creado. Conectando con Mercado Pago..."
       );
 
-      /*
-       * PASO 2
-       * Crear la orden de pago en Mercado Pago.
-       */
       const paymentResponse = await fetch(
         "/api/mercadopago/create-order",
         {
@@ -246,10 +234,6 @@ export default function MatriculaPage() {
         return;
       }
 
-      /*
-       * PASO 3
-       * Redirigir al estudiante a Checkout Pro.
-       */
       setMessage(
         "Todo listo. Te estamos llevando a Mercado Pago..."
       );
@@ -267,39 +251,10 @@ export default function MatriculaPage() {
     }
   }
 
-  const inputStyle = {
-    width: "100%",
-    padding: "14px 16px",
-    borderRadius: "12px",
-    border: "1px solid #d8d8d8",
-    background: "#fff",
-    fontSize: "16px",
-    boxSizing: "border-box" as const,
-  };
-
-  const labelStyle = {
-    display: "block",
-    fontWeight: 800,
-    fontSize: "14px",
-    marginBottom: "7px",
-  };
-
   if (loading) {
     return (
-      <main
-        style={{
-          minHeight: "100vh",
-          background: "#f8f5e9",
-          padding: "60px 7%",
-          fontFamily: "Arial, sans-serif",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: "1200px",
-            margin: "0 auto",
-          }}
-        >
+      <main className="matricula-page">
+        <div className="matricula-shell">
           Cargando curso...
         </div>
       </main>
@@ -308,148 +263,54 @@ export default function MatriculaPage() {
 
   if (!course) {
     return (
-      <main
-        style={{
-          minHeight: "100vh",
-          background: "#f8f5e9",
-          padding: "60px 7%",
-          fontFamily: "Arial, sans-serif",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: "900px",
-            margin: "0 auto",
-          }}
-        >
-          <a
-            href="/cursos"
-            style={{
-              color: "#009c4b",
-              fontWeight: 800,
-              textDecoration: "none",
-            }}
-          >
+      <main className="matricula-page">
+        <div className="matricula-shell">
+          <a href="/cursos" className="back-link">
             ← Volver a cursos
           </a>
 
           <h1>Curso no disponible</h1>
-
           <p>{message}</p>
         </div>
+
+        <ResponsiveStyles />
       </main>
     );
   }
 
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        background: "#f8f5e9",
-        padding: "40px 7% 80px",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: "1200px",
-          margin: "0 auto",
-        }}
-      >
-        <a
-          href="/cursos"
-          style={{
-            color: "#009c4b",
-            fontWeight: 800,
-            textDecoration: "none",
-          }}
-        >
+    <main className="matricula-page">
+      <div className="matricula-shell">
+        <a href="/cursos" className="back-link">
           ← Volver a cursos
         </a>
 
-        <div
-          style={{
-            margin: "30px 0 40px",
-          }}
-        >
-          <div
-            style={{
-              color: "#009c4b",
-              fontWeight: 900,
-              textTransform: "uppercase",
-              fontSize: "14px",
-            }}
-          >
+        <div className="matricula-heading">
+          <div className="eyebrow">
             Matrícula IBRACO
           </div>
 
-          <h1
-            style={{
-              fontSize: "44px",
-              lineHeight: 1.05,
-              margin: "8px 0 12px",
-            }}
-          >
-            Completa tus datos
-          </h1>
+          <h1>Completa tus datos</h1>
 
-          <p
-            style={{
-              fontSize: "18px",
-              margin: 0,
-              color: "#555",
-            }}
-          >
+          <p>
             Revisa el curso seleccionado y completa la
             información del estudiante.
           </p>
         </div>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns:
-              "minmax(0, 1.5fr) minmax(320px, 0.8fr)",
-            gap: "30px",
-            alignItems: "start",
-          }}
-        >
+        <div className="matricula-layout">
           {/* FORMULARIO */}
 
           <form
             onSubmit={handleSubmit}
-            style={{
-              background: "#fff",
-              borderRadius: "24px",
-              padding: "35px",
-            }}
+            className="student-form"
           >
-            <h2
-              style={{
-                fontSize: "27px",
-                marginTop: 0,
-                marginBottom: "25px",
-              }}
-            >
-              Datos del estudiante
-            </h2>
+            <h2>Datos del estudiante</h2>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns:
-                  "repeat(2, minmax(0, 1fr))",
-                gap: "22px",
-              }}
-            >
-              <div>
-                <label style={labelStyle}>
-                  Nombres *
-                </label>
-
+            <div className="form-grid">
+              <Field label="Nombres *">
                 <input
                   required
-                  style={inputStyle}
                   value={form.firstName}
                   onChange={(e) =>
                     updateField(
@@ -458,16 +319,11 @@ export default function MatriculaPage() {
                     )
                   }
                 />
-              </div>
+              </Field>
 
-              <div>
-                <label style={labelStyle}>
-                  Apellidos *
-                </label>
-
+              <Field label="Apellidos *">
                 <input
                   required
-                  style={inputStyle}
                   value={form.lastName}
                   onChange={(e) =>
                     updateField(
@@ -476,16 +332,11 @@ export default function MatriculaPage() {
                     )
                   }
                 />
-              </div>
+              </Field>
 
-              <div>
-                <label style={labelStyle}>
-                  Tipo de identificación *
-                </label>
-
+              <Field label="Tipo de identificación *">
                 <select
                   required
-                  style={inputStyle}
                   value={form.documentType}
                   onChange={(e) =>
                     updateField(
@@ -497,37 +348,27 @@ export default function MatriculaPage() {
                   <option value="">
                     Seleccionar
                   </option>
-
                   <option value="CC">
                     Cédula de ciudadanía
                   </option>
-
                   <option value="TI">
                     Tarjeta de identidad
                   </option>
-
                   <option value="CE">
                     Cédula de extranjería
                   </option>
-
                   <option value="PA">
                     Pasaporte
                   </option>
-
                   <option value="PEP">
                     PEP
                   </option>
                 </select>
-              </div>
+              </Field>
 
-              <div>
-                <label style={labelStyle}>
-                  Número de identificación *
-                </label>
-
+              <Field label="Número de identificación *">
                 <input
                   required
-                  style={inputStyle}
                   value={form.documentNumber}
                   onChange={(e) =>
                     updateField(
@@ -536,17 +377,12 @@ export default function MatriculaPage() {
                     )
                   }
                 />
-              </div>
+              </Field>
 
-              <div>
-                <label style={labelStyle}>
-                  Fecha de nacimiento *
-                </label>
-
+              <Field label="Fecha de nacimiento *">
                 <input
                   required
                   type="date"
-                  style={inputStyle}
                   value={form.birthDate}
                   onChange={(e) =>
                     updateField(
@@ -555,16 +391,11 @@ export default function MatriculaPage() {
                     )
                   }
                 />
-              </div>
+              </Field>
 
-              <div>
-                <label style={labelStyle}>
-                  Sexo *
-                </label>
-
+              <Field label="Sexo *">
                 <select
                   required
-                  style={inputStyle}
                   value={form.gender}
                   onChange={(e) =>
                     updateField(
@@ -576,26 +407,19 @@ export default function MatriculaPage() {
                   <option value="">
                     Seleccionar
                   </option>
-
                   <option value="M">
                     Masculino
                   </option>
-
                   <option value="F">
                     Femenino
                   </option>
                 </select>
-              </div>
+              </Field>
 
-              <div>
-                <label style={labelStyle}>
-                  Correo electrónico *
-                </label>
-
+              <Field label="Correo electrónico *">
                 <input
                   required
                   type="email"
-                  style={inputStyle}
                   value={form.email}
                   onChange={(e) =>
                     updateField(
@@ -604,17 +428,12 @@ export default function MatriculaPage() {
                     )
                   }
                 />
-              </div>
+              </Field>
 
-              <div>
-                <label style={labelStyle}>
-                  Celular *
-                </label>
-
+              <Field label="Celular *">
                 <input
                   required
                   type="tel"
-                  style={inputStyle}
                   placeholder="Ej. 3125841068"
                   value={form.phone}
                   onChange={(e) =>
@@ -624,16 +443,11 @@ export default function MatriculaPage() {
                     )
                   }
                 />
-              </div>
+              </Field>
 
-              <div>
-                <label style={labelStyle}>
-                  Ciudad *
-                </label>
-
+              <Field label="Ciudad *">
                 <input
                   required
-                  style={inputStyle}
                   placeholder="Ej. Bogotá"
                   value={form.city}
                   onChange={(e) =>
@@ -643,16 +457,11 @@ export default function MatriculaPage() {
                     )
                   }
                 />
-              </div>
+              </Field>
 
-              <div>
-                <label style={labelStyle}>
-                  Dirección *
-                </label>
-
+              <Field label="Dirección *">
                 <input
                   required
-                  style={inputStyle}
                   value={form.address}
                   onChange={(e) =>
                     updateField(
@@ -661,19 +470,10 @@ export default function MatriculaPage() {
                     )
                   }
                 />
-              </div>
+              </Field>
             </div>
 
-            <label
-              style={{
-                display: "flex",
-                alignItems: "flex-start",
-                gap: "10px",
-                marginTop: "28px",
-                fontSize: "14px",
-                lineHeight: 1.5,
-              }}
-            >
+            <label className="privacy-row">
               <input
                 type="checkbox"
                 checked={form.acceptedPrivacy}
@@ -683,11 +483,6 @@ export default function MatriculaPage() {
                     e.target.checked
                   )
                 }
-                style={{
-                  marginTop: "3px",
-                  width: "18px",
-                  height: "18px",
-                }}
               />
 
               <span>
@@ -698,17 +493,7 @@ export default function MatriculaPage() {
             </label>
 
             {message && (
-              <div
-                style={{
-                  marginTop: "25px",
-                  padding: "15px 18px",
-                  borderRadius: "12px",
-                  background: "#eef7f1",
-                  color: "#087a3e",
-                  fontWeight: 700,
-                  lineHeight: 1.4,
-                }}
-              >
+              <div className="status-message">
                 {message}
               </div>
             )}
@@ -716,21 +501,7 @@ export default function MatriculaPage() {
             <button
               type="submit"
               disabled={submitting}
-              style={{
-                width: "100%",
-                marginTop: "28px",
-                padding: "17px 25px",
-                borderRadius: "30px",
-                border: "none",
-                background: "#ffd800",
-                color: "#111",
-                fontWeight: 900,
-                fontSize: "16px",
-                cursor: submitting
-                  ? "not-allowed"
-                  : "pointer",
-                opacity: submitting ? 0.7 : 1,
-              }}
+              className="pay-button"
             >
               {submitting
                 ? "Preparando pago..."
@@ -740,87 +511,34 @@ export default function MatriculaPage() {
 
           {/* RESUMEN */}
 
-          <aside
-            style={{
-              background: "#fff",
-              borderRadius: "24px",
-              overflow: "hidden",
-              position: "sticky",
-              top: "25px",
-            }}
-          >
+          <aside className="course-summary">
             {course.image_url && (
-              <div
-                style={{
-                  padding: "20px",
-                  background: "#f1f1f1",
-                }}
-              >
+              <div className="course-image-wrap">
                 <img
                   src={course.image_url}
                   alt={course.name}
-                  style={{
-                    width: "100%",
-                    height: "auto",
-                    display: "block",
-                    borderRadius: "14px",
-                  }}
+                  className="course-image"
                 />
               </div>
             )}
 
-            <div
-              style={{
-                padding: "28px",
-              }}
-            >
-              <div
-                style={{
-                  color: "#009c4b",
-                  fontWeight: 900,
-                  fontSize: "13px",
-                  textTransform: "uppercase",
-                }}
-              >
+            <div className="course-summary-content">
+              <div className="course-cycle">
                 {course.cycle}
               </div>
 
-              <h2
-                style={{
-                  margin: "7px 0 5px",
-                  fontSize: "27px",
-                }}
-              >
-                {course.name}
-              </h2>
+              <h2>{course.name}</h2>
 
               {course.shift && (
-                <p
-                  style={{
-                    marginTop: 0,
-                    fontWeight: 700,
-                  }}
-                >
+                <p className="course-shift">
                   Jornada {course.shift}
                 </p>
               )}
 
-              <div
-                style={{
-                  borderTop: "1px solid #eee",
-                  borderBottom: "1px solid #eee",
-                  padding: "20px 0",
-                  margin: "20px 0",
-                  display: "grid",
-                  gap: "10px",
-                  fontSize: "14px",
-                }}
-              >
+              <div className="course-details">
                 {course.modality && (
                   <div>
-                    <strong>
-                      Modalidad:
-                    </strong>{" "}
+                    <strong>Modalidad:</strong>{" "}
                     {course.modality}
                   </div>
                 )}
@@ -843,9 +561,7 @@ export default function MatriculaPage() {
 
                 {course.end_date && (
                   <div>
-                    <strong>
-                      Finaliza:
-                    </strong>{" "}
+                    <strong>Finaliza:</strong>{" "}
                     {formatDate(
                       course.end_date
                     )}
@@ -863,9 +579,7 @@ export default function MatriculaPage() {
                 {(course.start_time ||
                   course.end_time) && (
                   <div>
-                    <strong>
-                      Horario:
-                    </strong>{" "}
+                    <strong>Horario:</strong>{" "}
                     {formatTime(
                       course.start_time
                     )}
@@ -882,29 +596,399 @@ export default function MatriculaPage() {
                 )}
               </div>
 
-              <div
-                style={{
-                  fontSize: "13px",
-                  fontWeight: 700,
-                  color: "#666",
-                }}
-              >
+              <div className="total-label">
                 TOTAL
               </div>
 
-              <div
-                style={{
-                  fontSize: "30px",
-                  fontWeight: 900,
-                  marginTop: "3px",
-                }}
-              >
+              <div className="total-price">
                 {formatPrice(course.price)}
               </div>
             </div>
           </aside>
         </div>
       </div>
+
+      <ResponsiveStyles />
     </main>
+  );
+}
+
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="field">
+      <label>{label}</label>
+      {children}
+    </div>
+  );
+}
+
+function ResponsiveStyles() {
+  return (
+    <style>{`
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+
+      .matricula-page {
+        min-height: 100vh;
+        background: #f8f5e9;
+        padding: 40px 7% 80px;
+        font-family: Arial, sans-serif;
+        color: #111;
+      }
+
+      .matricula-shell {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .back-link {
+        color: #009c4b;
+        font-weight: 800;
+        text-decoration: none;
+      }
+
+      .matricula-heading {
+        margin: 30px 0 40px;
+      }
+
+      .eyebrow {
+        color: #009c4b;
+        font-weight: 900;
+        text-transform: uppercase;
+        font-size: 14px;
+      }
+
+      .matricula-heading h1 {
+        font-size: clamp(36px, 5vw, 44px);
+        line-height: 1.05;
+        margin: 8px 0 12px;
+      }
+
+      .matricula-heading p {
+        font-size: 18px;
+        margin: 0;
+        color: #555;
+        max-width: 700px;
+      }
+
+      .matricula-layout {
+        display: grid;
+        grid-template-columns:
+          minmax(0, 1.5fr)
+          minmax(300px, 0.8fr);
+        gap: 30px;
+        align-items: start;
+        width: 100%;
+      }
+
+      .student-form,
+      .course-summary {
+        min-width: 0;
+      }
+
+      .student-form {
+        background: #fff;
+        border-radius: 24px;
+        padding: 35px;
+        width: 100%;
+      }
+
+      .student-form h2 {
+        font-size: 27px;
+        margin-top: 0;
+        margin-bottom: 25px;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr));
+        gap: 22px;
+        width: 100%;
+      }
+
+      .field {
+        min-width: 0;
+      }
+
+      .field label {
+        display: block;
+        font-weight: 800;
+        font-size: 14px;
+        margin-bottom: 7px;
+      }
+
+      .field input,
+      .field select {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        padding: 14px 16px;
+        border-radius: 12px;
+        border: 1px solid #d8d8d8;
+        background: #fff;
+        font-size: 16px;
+        color: #111;
+      }
+
+      .privacy-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-top: 28px;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .privacy-row input {
+        flex: 0 0 18px;
+        width: 18px;
+        height: 18px;
+        margin-top: 3px;
+      }
+
+      .privacy-row span {
+        min-width: 0;
+      }
+
+      .status-message {
+        margin-top: 25px;
+        padding: 15px 18px;
+        border-radius: 12px;
+        background: #eef7f1;
+        color: #087a3e;
+        font-weight: 700;
+        line-height: 1.4;
+      }
+
+      .pay-button {
+        display: block;
+        width: 100%;
+        margin-top: 28px;
+        padding: 17px 25px;
+        border-radius: 30px;
+        border: none;
+        background: #ffd800;
+        color: #111;
+        font-weight: 900;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      .pay-button:disabled {
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+
+      .course-summary {
+        background: #fff;
+        border-radius: 24px;
+        overflow: hidden;
+        position: sticky;
+        top: 25px;
+        width: 100%;
+      }
+
+      .course-image-wrap {
+        padding: 20px;
+        background: #f1f1f1;
+      }
+
+      .course-image {
+        width: 100%;
+        height: auto;
+        max-width: 100%;
+        display: block;
+        border-radius: 14px;
+      }
+
+      .course-summary-content {
+        padding: 28px;
+      }
+
+      .course-cycle {
+        color: #009c4b;
+        font-weight: 900;
+        font-size: 13px;
+        text-transform: uppercase;
+      }
+
+      .course-summary h2 {
+        margin: 7px 0 5px;
+        font-size: 27px;
+        line-height: 1.1;
+        overflow-wrap: anywhere;
+      }
+
+      .course-shift {
+        margin-top: 0;
+        font-weight: 700;
+      }
+
+      .course-details {
+        border-top: 1px solid #eee;
+        border-bottom: 1px solid #eee;
+        padding: 20px 0;
+        margin: 20px 0;
+        display: grid;
+        gap: 10px;
+        font-size: 14px;
+      }
+
+      .total-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #666;
+      }
+
+      .total-price {
+        font-size: 30px;
+        font-weight: 900;
+        margin-top: 3px;
+      }
+
+      @media (max-width: 900px) {
+        .matricula-page {
+          padding:
+            28px 24px
+            calc(60px + env(safe-area-inset-bottom));
+        }
+
+        .matricula-layout {
+          grid-template-columns: 1fr;
+          gap: 24px;
+        }
+
+        .course-summary {
+          position: static;
+          order: -1;
+        }
+
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .matricula-heading {
+          margin: 24px 0 28px;
+        }
+
+        .student-form {
+          padding: 26px;
+        }
+
+        .course-summary-content {
+          padding: 24px;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .matricula-page {
+          padding:
+            22px 16px
+            calc(50px + env(safe-area-inset-bottom));
+        }
+
+        .matricula-heading h1 {
+          font-size: 34px;
+          line-height: 1;
+        }
+
+        .matricula-heading p {
+          font-size: 16px;
+          line-height: 1.45;
+        }
+
+        .student-form {
+          border-radius: 20px;
+          padding: 20px 16px 22px;
+        }
+
+        .student-form h2 {
+          font-size: 23px;
+          margin-bottom: 22px;
+        }
+
+        .form-grid {
+          gap: 18px;
+        }
+
+        .field input,
+        .field select {
+          font-size: 16px;
+          padding: 14px 13px;
+        }
+
+        .course-summary {
+          border-radius: 20px;
+        }
+
+        .course-image-wrap {
+          padding: 12px;
+        }
+
+        .course-summary-content {
+          padding: 22px 18px 24px;
+        }
+
+        .course-summary h2 {
+          font-size: 27px;
+        }
+
+        .total-price {
+          font-size: 36px;
+        }
+
+        .privacy-row {
+          font-size: 13px;
+        }
+
+        .pay-button {
+          min-height: 54px;
+          border-radius: 28px;
+          padding: 15px 18px;
+          font-size: 17px;
+          white-space: normal;
+        }
+      }
+
+      @media (max-width: 380px) {
+        .matricula-page {
+          padding-left: 12px;
+          padding-right: 12px;
+        }
+
+        .matricula-heading h1 {
+          font-size: 31px;
+        }
+
+        .student-form {
+          padding-left: 14px;
+          padding-right: 14px;
+        }
+
+        .course-summary h2 {
+          font-size: 24px;
+        }
+
+        .total-price {
+          font-size: 32px;
+        }
+      }
+    `}</style>
   );
 }
