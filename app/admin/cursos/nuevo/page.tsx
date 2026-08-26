@@ -3,6 +3,7 @@
 import {
   ChangeEvent,
   FormEvent,
+  useEffect,
   useState,
   type ReactNode,
 } from "react";
@@ -70,7 +71,19 @@ function inferShift(startTime: string) {
 
 export default function NewCoursePage() {
   const router = useRouter();
+  useEffect(() => {
+    async function checkSession() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
+      if (!session) {
+        router.replace("/admin/login");
+      }
+    }
+
+    checkSession();
+  }, [router]);
   const [course, setCourse] =
     useState<NewCourse>(initialCourse);
 

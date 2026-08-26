@@ -28,7 +28,19 @@ type Course = {
 export default function EditCoursePage() {
   const params = useParams();
   const router = useRouter();
+  useEffect(() => {
+    async function checkSession() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
+      if (!session) {
+        router.replace("/admin/login");
+      }
+    }
+
+    checkSession();
+  }, [router]);
   const routeId = String(params.id ?? "");
 
   const [course, setCourse] = useState<Course | null>(null);
