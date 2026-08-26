@@ -1,11 +1,15 @@
 "use client";
 
-import { ChangeEvent, FormEvent, useState } from "react";
+import {
+  ChangeEvent,
+  FormEvent,
+  useState,
+  type ReactNode,
+} from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../../../lib/supabase";
 
 type NewCourse = {
-  slug: string;
   name: string;
   cycle: string;
   year: number;
@@ -23,7 +27,6 @@ type NewCourse = {
 };
 
 const initialCourse: NewCourse = {
-  slug: "",
   name: "",
   cycle: "",
   year: 2026,
@@ -57,7 +60,9 @@ export default function NewCoursePage() {
 
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+
   const [message, setMessage] = useState("");
+
   const [messageType, setMessageType] =
     useState<"success" | "error">("success");
 
@@ -71,14 +76,6 @@ export default function NewCoursePage() {
     }));
   }
 
-  function updateName(value: string) {
-    setCourse((current) => ({
-      ...current,
-      name: value,
-      slug: current.slug || makeSlug(value),
-    }));
-  }
-
   function showError(text: string) {
     setMessageType("error");
     setMessage(text);
@@ -88,6 +85,38 @@ export default function NewCoursePage() {
     setMessageType("success");
     setMessage(text);
   }
+
+  /*
+   * Convierte la combinación elegida por el administrador
+   * en los dos campos que ya existen en Supabase:
+   *
+   * shift = Jornada
+   * level = Tipo de curso
+   */
+  function handleCourseFormat(value: string) {
+    if (!value) {
+      setCourse((current) => ({
+        ...current,
+        shift: "",
+        level: "",
+      }));
+
+      return;
+    }
+
+    const [shift, level] = value.split("|");
+
+    setCourse((current) => ({
+      ...current,
+      shift,
+      level,
+    }));
+  }
+
+  const courseFormat =
+    course.shift && course.level
+      ? `${course.shift}|${course.level}`
+      : "";
 
   async function uploadImage(
     event: ChangeEvent<HTMLInputElement>
@@ -106,6 +135,7 @@ export default function NewCoursePage() {
       showError(
         "La imagen debe estar en formato JPG, PNG o WebP."
       );
+
       event.target.value = "";
       return;
     }
@@ -114,6 +144,7 @@ export default function NewCoursePage() {
       showError(
         "La imagen no puede pesar más de 5 MB."
       );
+
       event.target.value = "";
       return;
     }
@@ -129,9 +160,7 @@ export default function NewCoursePage() {
           ?.toLowerCase() || "jpg";
 
       const baseSlug =
-        course.slug ||
-        makeSlug(course.name) ||
-        "curso";
+        makeSlug(course.name) || "curso";
 
       const filePath =
         `${baseSlug}/course-${Date.now()}.${extension}`;
@@ -190,7 +219,7 @@ export default function NewCoursePage() {
     if (saving) return;
 
     const cleanName = course.name.trim();
-    const cleanSlug = course.slug.trim();
+    const cleanCycle = course.cycle.trim();
 
     if (!cleanName) {
       showError(
@@ -199,20 +228,15 @@ export default function NewCoursePage() {
       return;
     }
 
-    if (!cleanSlug) {
-      showError(
-        "Debes definir el identificador del curso."
-      );
-      return;
-    }
-
-    if (!course.cycle.trim()) {
+    if (!cleanCycle) {
       showError("Debes indicar el ciclo.");
       return;
     }
 
-    if (!course.shift) {
-      showError("Debes seleccionar la jornada.");
+    if (!course.shift || !course.level) {
+      showError(
+        "Debes seleccionar la jornada y el tipo de curso."
+      );
       return;
     }
 
@@ -236,8 +260,6 @@ export default function NewCoursePage() {
     }
 
     if (
-      course.end_date &&
-      course.start_date &&
       course.end_date < course.start_date
     ) {
       showError(
@@ -253,42 +275,64 @@ export default function NewCoursePage() {
       return;
     }
 
+    /*
+     * El identificador ya NO lo administra la persona.
+     * Se genera automáticamente usando los datos del curso.
+     *
+     * Ejemplo:
+     * portugues-semi-intensivo-ciclo-7-sabado-sede-centro-2026-09-24
+     */
+    const generatedSlug = makeSlug(
+      [
+        cleanName,
+        cleanCycle,
+        course.shift,
+        course.level,
+        course.campus,
+        course.year,
+        course.start_date,
+      ].join("-")
+    );
+
+    const inferredModality =
+      course.campus === "Virtual"
+        ? "Virtual"
+        : "Presencial";
+
     try {
       setSaving(true);
       setMessage("");
 
-      /*
-       * Aunque ya no mostramos Modalidad ni Días de clase,
-       * conservamos las columnas existentes en Supabase para
-       * no romper la estructura actual de la tabla.
-       *
-       * Sede Virtual => modality = Virtual
-       * Sede física => modality = Presencial
-       */
-      const inferredModality =
-        course.campus === "Virtual"
-          ? "Virtual"
-          : "Presencial";
-
       const { data, error } = await supabase
         .from("courses")
         .insert({
-          slug: cleanSlug,
+          slug: generatedSlug,
           name: cleanName,
-          cycle: course.cycle.trim(),
+          cycle: cleanCycle,
           year: course.year,
+
+          // Se guardan separados en Supabase
           shift: course.shift,
+          level: course.level,
+
           modality: inferredModality,
           campus: course.campus,
+
           start_date: course.start_date,
           end_date: course.end_date,
+
+          /*
+           * Ya no pedimos días de clase al administrador,
+           * pero mantenemos el campo para compatibilidad.
+           */
           days: [],
+
           start_time:
             course.start_time || null,
+
           end_time:
             course.end_time || null,
-          level:
-            course.level.trim() || null,
+
           price: course.price,
           capacity: course.capacity,
           status: course.status,
@@ -309,7 +353,7 @@ export default function NewCoursePage() {
             .includes("duplicate")
         ) {
           showError(
-            "Ya existe un curso con ese identificador. Cambia el slug e inténtalo nuevamente."
+            "Ya existe un curso con estos datos. Revisa ciclo, jornada, sede o fecha."
           );
         } else {
           showError(
@@ -412,28 +456,12 @@ export default function NewCoursePage() {
                   required
                   value={course.name}
                   onChange={(e) =>
-                    updateName(e.target.value)
-                  }
-                  placeholder="Ej. Portugués Intensivo"
-                />
-              </Field>
-
-              <Field
-                label="Identificador"
-                helper="Se genera automáticamente y se usa en la dirección web."
-              >
-                <input
-                  required
-                  value={course.slug}
-                  onChange={(e) =>
                     updateField(
-                      "slug",
-                      makeSlug(
-                        e.target.value
-                      )
+                      "name",
+                      e.target.value
                     )
                   }
-                  placeholder="portugues-intensivo"
+                  placeholder="Ej. Portugués"
                 />
               </Field>
 
@@ -468,13 +496,12 @@ export default function NewCoursePage() {
                 />
               </Field>
 
-              <Field label="Jornada *">
+              <Field label="Jornada y tipo de curso *">
                 <select
                   required
-                  value={course.shift}
+                  value={courseFormat}
                   onChange={(e) =>
-                    updateField(
-                      "shift",
+                    handleCourseFormat(
                       e.target.value
                     )
                   }
@@ -482,18 +509,34 @@ export default function NewCoursePage() {
                   <option value="">
                     Seleccionar
                   </option>
-                  <option value="Mañana">
-                    Mañana
+
+                  <option value="Mañana|Intensivo">
+                    Mañana · Intensivo
                   </option>
-                  <option value="Tarde">
-                    Tarde
+
+                  <option value="Mañana|Semi-intensivo">
+                    Mañana · Semi-intensivo
                   </option>
-                  <option value="Noche">
-  Noche
-</option>
-<option value="Sábado">
-  Sábado
-</option>
+
+                  <option value="Tarde|Intensivo">
+                    Tarde · Intensivo
+                  </option>
+
+                  <option value="Tarde|Semi-intensivo">
+                    Tarde · Semi-intensivo
+                  </option>
+
+                  <option value="Noche|Intensivo">
+                    Noche · Intensivo
+                  </option>
+
+                  <option value="Noche|Semi-intensivo">
+                    Noche · Semi-intensivo
+                  </option>
+
+                  <option value="Sábado|Semi-intensivo">
+                    Sábado · Semi-intensivo
+                  </option>
                 </select>
               </Field>
 
@@ -508,27 +551,27 @@ export default function NewCoursePage() {
                     )
                   }
                 >
-                  <option value="">Seleccionar</option>
-<option value="Cualquier sede">Cualquier sede</option>
-<option value="Sede Centro">Sede Centro</option>
-<option value="Sede Norte">Sede Norte</option>
-<option value="Virtual">Virtual</option>
+                  <option value="">
+                    Seleccionar
+                  </option>
+
+                  <option value="Cualquier sede">
+                    Cualquier sede
+                  </option>
+
+                  <option value="Sede Centro">
+                    Sede Centro
+                  </option>
+
+                  <option value="Sede Norte">
+                    Sede Norte
+                  </option>
+
+                  <option value="Virtual">
+                    Virtual
+                  </option>
                 </select>
               </Field>
-
-             <Field label="Tipo de curso *">
-  <select
-    required
-    value={course.level}
-    onChange={(e) =>
-      updateField("level", e.target.value)
-    }
-  >
-    <option value="">Seleccionar</option>
-    <option value="Intensivo">Intensivo</option>
-    <option value="Semi-intensivo">Semi-intensivo</option>
-  </select>
-</Field>
 
               <Field label="Cupos">
                 <input
@@ -936,7 +979,7 @@ function Field({
 }: {
   label: string;
   helper?: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <div className="field">
