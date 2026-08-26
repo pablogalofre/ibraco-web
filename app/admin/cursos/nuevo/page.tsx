@@ -13,13 +13,13 @@ type NewCourse = {
   name: string;
   cycle: string;
   year: number;
-  shift: string;
   campus: string;
+  days: string;
   start_date: string;
   end_date: string;
   start_time: string;
   end_time: string;
-  level: string;
+  course_type: string;
   price: number;
   capacity: number | null;
   status: "draft" | "published";
@@ -30,13 +30,13 @@ const initialCourse: NewCourse = {
   name: "",
   cycle: "",
   year: 2026,
-  shift: "",
   campus: "",
+  days: "",
   start_date: "",
   end_date: "",
   start_time: "",
   end_time: "",
-  level: "",
+  course_type: "",
   price: 0,
   capacity: null,
   status: "draft",
@@ -52,6 +52,22 @@ function makeSlug(value: string) {
     .replace(/^-+|-+$/g, "");
 }
 
+/*
+ * Conservamos "shift" en Supabase por compatibilidad
+ * con el resto de la tienda, pero ya no se lo pedimos
+ * al administrador.
+ */
+function inferShift(startTime: string) {
+  if (!startTime) return "";
+
+  const hour = Number(startTime.split(":")[0]);
+
+  if (hour < 12) return "Mañana";
+  if (hour < 17) return "Tarde";
+
+  return "Noche";
+}
+
 export default function NewCoursePage() {
   const router = useRouter();
 
@@ -60,7 +76,6 @@ export default function NewCoursePage() {
 
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-
   const [message, setMessage] = useState("");
 
   const [messageType, setMessageType] =
@@ -85,38 +100,6 @@ export default function NewCoursePage() {
     setMessageType("success");
     setMessage(text);
   }
-
-  /*
-   * Convierte la combinación elegida por el administrador
-   * en los dos campos que ya existen en Supabase:
-   *
-   * shift = Jornada
-   * level = Tipo de curso
-   */
-  function handleCourseFormat(value: string) {
-    if (!value) {
-      setCourse((current) => ({
-        ...current,
-        shift: "",
-        level: "",
-      }));
-
-      return;
-    }
-
-    const [shift, level] = value.split("|");
-
-    setCourse((current) => ({
-      ...current,
-      shift,
-      level,
-    }));
-  }
-
-  const courseFormat =
-    course.shift && course.level
-      ? `${course.shift}|${course.level}`
-      : "";
 
   async function uploadImage(
     event: ChangeEvent<HTMLInputElement>
@@ -233,9 +216,16 @@ export default function NewCoursePage() {
       return;
     }
 
-    if (!course.shift || !course.level) {
+    if (!course.course_type) {
       showError(
-        "Debes seleccionar la jornada y el tipo de curso."
+        "Debes seleccionar el tipo de curso."
+      );
+      return;
+    }
+
+    if (!course.days) {
+      showError(
+        "Debes seleccionar los días de clase."
       );
       return;
     }
@@ -259,11 +249,30 @@ export default function NewCoursePage() {
       return;
     }
 
-    if (
-      course.end_date < course.start_date
-    ) {
+    if (course.end_date < course.start_date) {
       showError(
         "La fecha de finalización no puede ser anterior a la fecha de inicio."
+      );
+      return;
+    }
+
+    if (!course.start_time) {
+      showError(
+        "Debes seleccionar la hora de inicio."
+      );
+      return;
+    }
+
+    if (!course.end_time) {
+      showError(
+        "Debes seleccionar la hora de finalización."
+      );
+      return;
+    }
+
+    if (course.end_time <= course.start_time) {
+      showError(
+        "La hora de finalización debe ser posterior a la hora de inicio."
       );
       return;
     }
@@ -275,20 +284,14 @@ export default function NewCoursePage() {
       return;
     }
 
-    /*
-     * El identificador ya NO lo administra la persona.
-     * Se genera automáticamente usando los datos del curso.
-     *
-     * Ejemplo:
-     * portugues-semi-intensivo-ciclo-7-sabado-sede-centro-2026-09-24
-     */
     const generatedSlug = makeSlug(
       [
         cleanName,
         cleanCycle,
-        course.shift,
-        course.level,
+        course.course_type,
+        course.days,
         course.campus,
+        course.start_time,
         course.year,
         course.start_date,
       ].join("-")
@@ -298,6 +301,9 @@ export default function NewCoursePage() {
       course.campus === "Virtual"
         ? "Virtual"
         : "Presencial";
+
+    const inferredShift =
+      inferShift(course.start_time);
 
     try {
       setSaving(true);
@@ -311,27 +317,27 @@ export default function NewCoursePage() {
           cycle: cleanCycle,
           year: course.year,
 
-          // Se guardan separados en Supabase
-          shift: course.shift,
-          level: course.level,
+          /*
+           * Campos existentes de Supabase:
+           * level = Tipo de curso
+           * shift = calculado por hora
+           */
+          level: course.course_type,
+          shift: inferredShift,
 
           modality: inferredModality,
           campus: course.campus,
 
+          /*
+           * Guardamos days como arreglo para mantener
+           * compatibilidad con la estructura existente.
+           */
+          days: [course.days],
+
           start_date: course.start_date,
           end_date: course.end_date,
-
-          /*
-           * Ya no pedimos días de clase al administrador,
-           * pero mantenemos el campo para compatibilidad.
-           */
-          days: [],
-
-          start_time:
-            course.start_time || null,
-
-          end_time:
-            course.end_time || null,
+          start_time: course.start_time,
+          end_time: course.end_time,
 
           price: course.price,
           capacity: course.capacity,
@@ -353,7 +359,7 @@ export default function NewCoursePage() {
             .includes("duplicate")
         ) {
           showError(
-            "Ya existe un curso con estos datos. Revisa ciclo, jornada, sede o fecha."
+            "Ya existe un curso con estos datos. Revisa ciclo, días, sede, horario o fecha."
           );
         } else {
           showError(
@@ -398,9 +404,9 @@ export default function NewCoursePage() {
             <h1>Crear nuevo curso</h1>
 
             <p>
-              Completa la información del curso.
-              Puedes dejarlo en borrador y
-              publicarlo cuando esté listo.
+              Crea una nueva apertura indicando
+              tipo de curso, días, sede, fechas
+              y horario.
             </p>
           </header>
 
@@ -488,20 +494,19 @@ export default function NewCoursePage() {
                   onChange={(e) =>
                     updateField(
                       "year",
-                      Number(
-                        e.target.value
-                      )
+                      Number(e.target.value)
                     )
                   }
                 />
               </Field>
 
-              <Field label="Jornada y tipo de curso *">
+              <Field label="Tipo de curso *">
                 <select
                   required
-                  value={courseFormat}
+                  value={course.course_type}
                   onChange={(e) =>
-                    handleCourseFormat(
+                    updateField(
+                      "course_type",
                       e.target.value
                     )
                   }
@@ -510,32 +515,53 @@ export default function NewCoursePage() {
                     Seleccionar
                   </option>
 
-                  <option value="Mañana|Intensivo">
-                    Mañana · Intensivo
+                  <option value="Intensivo">
+                    Intensivo
                   </option>
 
-                  <option value="Mañana|Semi-intensivo">
-                    Mañana · Semi-intensivo
+                  <option value="Semi-intensivo">
+                    Semi-intensivo
+                  </option>
+                </select>
+              </Field>
+
+              <Field label="Días de clase *">
+                <select
+                  required
+                  value={course.days}
+                  onChange={(e) =>
+                    updateField(
+                      "days",
+                      e.target.value
+                    )
+                  }
+                >
+                  <option value="">
+                    Seleccionar
                   </option>
 
-                  <option value="Tarde|Intensivo">
-                    Tarde · Intensivo
+                  <option value="Lunes a viernes">
+                    Lunes a viernes
                   </option>
 
-                  <option value="Tarde|Semi-intensivo">
-                    Tarde · Semi-intensivo
+                  <option value="Lunes a jueves">
+                    Lunes a jueves
                   </option>
 
-                  <option value="Noche|Intensivo">
-                    Noche · Intensivo
+                  <option value="Lunes y miércoles">
+                    Lunes y miércoles
                   </option>
 
-                  <option value="Noche|Semi-intensivo">
-                    Noche · Semi-intensivo
+                  <option value="Martes y jueves">
+                    Martes y jueves
                   </option>
 
-                  <option value="Sábado|Semi-intensivo">
-                    Sábado · Semi-intensivo
+                  <option value="Miércoles y viernes">
+                    Miércoles y viernes
+                  </option>
+
+                  <option value="Sábado">
+                    Sábado
                   </option>
                 </select>
               </Field>
@@ -622,8 +648,9 @@ export default function NewCoursePage() {
                 />
               </Field>
 
-              <Field label="Hora de inicio">
+              <Field label="Hora de inicio *">
                 <input
+                  required
                   type="time"
                   value={course.start_time}
                   onChange={(e) =>
@@ -635,8 +662,9 @@ export default function NewCoursePage() {
                 />
               </Field>
 
-              <Field label="Hora de finalización">
+              <Field label="Hora de finalización *">
                 <input
+                  required
                   type="time"
                   value={course.end_time}
                   onChange={(e) =>
@@ -658,9 +686,7 @@ export default function NewCoursePage() {
                   onChange={(e) =>
                     updateField(
                       "price",
-                      Number(
-                        e.target.value
-                      )
+                      Number(e.target.value)
                     )
                   }
                 />
