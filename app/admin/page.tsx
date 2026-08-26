@@ -1,6 +1,16 @@
-import courses from "../../data/courses.json";
+import { supabase } from "../../lib/supabase";
 
-export default function AdminPage() {
+export default async function AdminPage() {
+  const { data, error } = await supabase
+    .from("courses")
+    .select("*")
+    .order("start_date", { ascending: true });
+
+  const courses = error ? [] : data ?? [];
+
+  if (error) {
+    console.error("Error cargando cursos:", error);
+  }
   return (
     <main
       style={{
@@ -224,7 +234,7 @@ export default function AdminPage() {
                     fontSize: "16px",
                   }}
                 >
-                  {course.startDate} — {course.endDate}
+                 {course.start_date} — {course.end_date}
                 </p>
 
                 {(course.modality || course.campus) && (
@@ -247,8 +257,8 @@ export default function AdminPage() {
                       color: "#555",
                     }}
                   >
-                    {course.days.join(" y ")} · {course.startTime} –{" "}
-                    {course.endTime}
+                  {course.days?.join(" y ")} · {course.start_time || ""} –{" "}
+{course.end_time || ""}
                   </p>
                 )}
               </div>
@@ -275,23 +285,27 @@ export default function AdminPage() {
         </div>
 
         {/* CREAR */}
-        <button
-          type="button"
-          style={{
-            width: "100%",
-            marginTop: "35px",
-            background: "#009c4b",
-            color: "#fff",
-            border: "none",
-            padding: "19px",
-            borderRadius: "30px",
-            fontSize: "17px",
-            fontWeight: 800,
-            cursor: "pointer",
-          }}
-        >
-          + Crear nuevo curso
-        </button>
+        <a
+  href="/admin/cursos/nuevo"
+  style={{
+    display: "block",
+    width: "100%",
+    marginTop: "35px",
+    background: "#009c4b",
+    color: "#fff",
+    textDecoration: "none",
+    textAlign: "center",
+    padding: "19px",
+    borderRadius: "30px",
+    fontSize: "17px",
+    fontWeight: 800,
+    cursor: "pointer",
+    boxSizing: "border-box",
+  }}
+>
+  + Crear nuevo curso
+</a>
+         
 
         <p
           style={{
