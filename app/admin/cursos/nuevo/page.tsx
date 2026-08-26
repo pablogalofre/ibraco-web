@@ -445,7 +445,7 @@ export default function NewCoursePage() {
                 <option value="Mañana">Mañana</option>
                 <option value="Tarde">Tarde</option>
                 <option value="Noche">Noche</option>
-                <option value="Sábado">Sábado</option>
+                
               </select>
             </div>
 
@@ -465,8 +465,8 @@ export default function NewCoursePage() {
                 <option value="Presencial">
                   Presencial
                 </option>
-                <option value="Online">Online</option>
-                <option value="Híbrido">Híbrido</option>
+                <option value="Virtual">Virtual</option>
+               <option value="Virtual">Virtual</option>
               </select>
             </div>
 
@@ -594,31 +594,13 @@ export default function NewCoursePage() {
               />
             </div>
 
-            <div
-              style={{
-                gridColumn: "1 / -1",
-              }}
-            >
-              <label style={labelStyle}>
-                Días de clase
-              </label>
-
-              <input
-                style={inputStyle}
-                placeholder="Ej. Martes, Jueves"
-                value={course.days.join(", ")}
-                onChange={(e) =>
-                  updateField(
-                    "days",
-                    e.target.value
-                      .split(",")
-                      .map((day) => day.trim())
-                      .filter(Boolean)
-                  )
-                }
-              />
-            </div>
-
+           <div
+  style={{
+    gridColumn: "1 / -1",
+  }}
+>
+ 
+</div>
             <div>
               <label style={labelStyle}>Estado</label>
               <select
