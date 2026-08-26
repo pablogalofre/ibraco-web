@@ -10,17 +10,15 @@ type NewCourse = {
   cycle: string;
   year: number;
   shift: string;
-  modality: string;
   campus: string;
   start_date: string;
   end_date: string;
-  days: string[];
   start_time: string;
   end_time: string;
   level: string;
   price: number;
   capacity: number | null;
-  status: string;
+  status: "draft" | "published";
   image_url: string | null;
 };
 
@@ -30,11 +28,9 @@ const initialCourse: NewCourse = {
   cycle: "",
   year: 2026,
   shift: "",
-  modality: "",
   campus: "",
   start_date: "",
   end_date: "",
-  days: [],
   start_time: "",
   end_time: "",
   level: "",
@@ -56,10 +52,14 @@ function makeSlug(value: string) {
 export default function NewCoursePage() {
   const router = useRouter();
 
-  const [course, setCourse] = useState<NewCourse>(initialCourse);
+  const [course, setCourse] =
+    useState<NewCourse>(initialCourse);
+
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] =
+    useState<"success" | "error">("success");
 
   function updateField<K extends keyof NewCourse>(
     field: K,
@@ -79,6 +79,16 @@ export default function NewCoursePage() {
     }));
   }
 
+  function showError(text: string) {
+    setMessageType("error");
+    setMessage(text);
+  }
+
+  function showSuccess(text: string) {
+    setMessageType("success");
+    setMessage(text);
+  }
+
   async function uploadImage(
     event: ChangeEvent<HTMLInputElement>
   ) {
@@ -93,13 +103,17 @@ export default function NewCoursePage() {
     ];
 
     if (!allowedTypes.includes(file.type)) {
-      setMessage("La imagen debe ser JPG, PNG o WebP.");
+      showError(
+        "La imagen debe estar en formato JPG, PNG o WebP."
+      );
       event.target.value = "";
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      setMessage("La imagen no puede pesar más de 5 MB.");
+      showError(
+        "La imagen no puede pesar más de 5 MB."
+      );
       event.target.value = "";
       return;
     }
@@ -109,25 +123,38 @@ export default function NewCoursePage() {
       setMessage("");
 
       const extension =
-        file.name.split(".").pop()?.toLowerCase() || "jpg";
+        file.name
+          .split(".")
+          .pop()
+          ?.toLowerCase() || "jpg";
 
       const baseSlug =
-        course.slug || makeSlug(course.name) || "curso";
+        course.slug ||
+        makeSlug(course.name) ||
+        "curso";
 
       const filePath =
         `${baseSlug}/course-${Date.now()}.${extension}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from("course-images")
-        .upload(filePath, file, {
-          cacheControl: "3600",
-          upsert: false,
-          contentType: file.type,
-        });
+      const { error: uploadError } =
+        await supabase.storage
+          .from("course-images")
+          .upload(filePath, file, {
+            cacheControl: "3600",
+            upsert: false,
+            contentType: file.type,
+          });
 
       if (uploadError) {
-        console.error("ERROR SUBIENDO IMAGEN:", uploadError);
-        setMessage("No fue posible subir la imagen.");
+        console.error(
+          "ERROR SUBIENDO IMAGEN:",
+          uploadError
+        );
+
+        showError(
+          "No fue posible subir la imagen."
+        );
+
         return;
       }
 
@@ -140,10 +167,15 @@ export default function NewCoursePage() {
         image_url: data.publicUrl,
       }));
 
-      setMessage("Imagen cargada correctamente.");
+      showSuccess(
+        "Imagen cargada correctamente."
+      );
     } catch (error) {
       console.error(error);
-      setMessage("No fue posible subir la imagen.");
+
+      showError(
+        "No fue posible subir la imagen."
+      );
     } finally {
       setUploading(false);
       event.target.value = "";
@@ -155,13 +187,69 @@ export default function NewCoursePage() {
   ) {
     event.preventDefault();
 
-    if (!course.name.trim()) {
-      setMessage("Debes escribir el nombre del curso.");
+    if (saving) return;
+
+    const cleanName = course.name.trim();
+    const cleanSlug = course.slug.trim();
+
+    if (!cleanName) {
+      showError(
+        "Debes escribir el nombre del curso."
+      );
       return;
     }
 
-    if (!course.slug.trim()) {
-      setMessage("Debes definir el slug del curso.");
+    if (!cleanSlug) {
+      showError(
+        "Debes definir el identificador del curso."
+      );
+      return;
+    }
+
+    if (!course.cycle.trim()) {
+      showError("Debes indicar el ciclo.");
+      return;
+    }
+
+    if (!course.shift) {
+      showError("Debes seleccionar la jornada.");
+      return;
+    }
+
+    if (!course.campus) {
+      showError("Debes seleccionar la sede.");
+      return;
+    }
+
+    if (!course.start_date) {
+      showError(
+        "Debes seleccionar la fecha de inicio."
+      );
+      return;
+    }
+
+    if (!course.end_date) {
+      showError(
+        "Debes seleccionar la fecha de finalización."
+      );
+      return;
+    }
+
+    if (
+      course.end_date &&
+      course.start_date &&
+      course.end_date < course.start_date
+    ) {
+      showError(
+        "La fecha de finalización no puede ser anterior a la fecha de inicio."
+      );
+      return;
+    }
+
+    if (course.price < 0) {
+      showError(
+        "El precio no puede ser negativo."
+      );
       return;
     }
 
@@ -169,22 +257,38 @@ export default function NewCoursePage() {
       setSaving(true);
       setMessage("");
 
+      /*
+       * Aunque ya no mostramos Modalidad ni Días de clase,
+       * conservamos las columnas existentes en Supabase para
+       * no romper la estructura actual de la tabla.
+       *
+       * Sede Virtual => modality = Virtual
+       * Sede física => modality = Presencial
+       */
+      const inferredModality =
+        course.campus === "Virtual"
+          ? "Virtual"
+          : "Presencial";
+
       const { data, error } = await supabase
         .from("courses")
         .insert({
-          slug: course.slug,
-          name: course.name,
-          cycle: course.cycle || null,
+          slug: cleanSlug,
+          name: cleanName,
+          cycle: course.cycle.trim(),
           year: course.year,
-          shift: course.shift || null,
-          modality: course.modality || null,
-          campus: course.campus || null,
-          start_date: course.start_date || null,
-          end_date: course.end_date || null,
-          days: course.days,
-          start_time: course.start_time || null,
-          end_time: course.end_time || null,
-          level: course.level || null,
+          shift: course.shift,
+          modality: inferredModality,
+          campus: course.campus,
+          start_date: course.start_date,
+          end_date: course.end_date,
+          days: [],
+          start_time:
+            course.start_time || null,
+          end_time:
+            course.end_time || null,
+          level:
+            course.level.trim() || null,
           price: course.price,
           capacity: course.capacity,
           status: course.status,
@@ -194,498 +298,662 @@ export default function NewCoursePage() {
         .single();
 
       if (error || !data) {
-        console.error("ERROR CREANDO CURSO:", error);
-        setMessage(
-          error?.message ||
-            "No fue posible crear el curso."
+        console.error(
+          "ERROR CREANDO CURSO:",
+          error
         );
+
+        if (
+          error?.message
+            ?.toLowerCase()
+            .includes("duplicate")
+        ) {
+          showError(
+            "Ya existe un curso con ese identificador. Cambia el slug e inténtalo nuevamente."
+          );
+        } else {
+          showError(
+            error?.message ||
+              "No fue posible crear el curso."
+          );
+        }
+
         return;
       }
 
-      router.push(`/admin/cursos/${data.id}`);
+      router.push(
+        `/admin/cursos/${data.id}`
+      );
     } catch (error) {
       console.error(error);
-      setMessage("No fue posible crear el curso.");
+
+      showError(
+        "No fue posible crear el curso."
+      );
     } finally {
       setSaving(false);
     }
   }
 
-  const inputStyle = {
-    width: "100%",
-    padding: "14px 16px",
-    borderRadius: "12px",
-    border: "1px solid #d8d8d8",
-    background: "#fff",
-    fontSize: "16px",
-    boxSizing: "border-box" as const,
-  };
-
-  const labelStyle = {
-    display: "block",
-    fontWeight: 800,
-    fontSize: "14px",
-    marginBottom: "7px",
-  };
-
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        background: "#f8f5e9",
-        padding: "50px 7%",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: "1000px",
-          margin: "0 auto",
-        }}
-      >
-        <a
-          href="/admin"
-          style={{
-            color: "#009c4b",
-            fontWeight: 800,
-            textDecoration: "none",
-          }}
-        >
-          ← Volver al administrador
-        </a>
-
-        <div style={{ margin: "30px 0" }}>
-          <div
-            style={{
-              color: "#009c4b",
-              fontWeight: 900,
-              textTransform: "uppercase",
-              fontSize: "14px",
-            }}
+    <>
+      <main className="new-course-page">
+        <div className="new-course-shell">
+          <a
+            href="/admin"
+            className="back-link"
           >
-            Administración IBRACO
-          </div>
+            ← Volver al administrador
+          </a>
 
-          <h1
-            style={{
-              margin: "7px 0 10px",
-              fontSize: "42px",
-              lineHeight: 1,
-            }}
+          <header className="page-heading">
+            <div className="eyebrow">
+              Administración IBRACO
+            </div>
+
+            <h1>Crear nuevo curso</h1>
+
+            <p>
+              Completa la información del curso.
+              Puedes dejarlo en borrador y
+              publicarlo cuando esté listo.
+            </p>
+          </header>
+
+          <form
+            onSubmit={handleSubmit}
+            className="course-form"
           >
-            Crear nuevo curso
-          </h1>
+            {/* IMAGEN */}
 
-          <p
-            style={{
-              margin: 0,
-              color: "#555",
-              fontSize: "17px",
-            }}
-          >
-            Completa la información y publícalo cuando esté listo.
-          </p>
-        </div>
+            <section className="image-section">
+              <label className="field-label">
+                Imagen del curso
+              </label>
 
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            background: "#fff",
-            borderRadius: "24px",
-            padding: "35px",
-          }}
-        >
-          <div
-            style={{
-              marginBottom: "35px",
-              paddingBottom: "35px",
-              borderBottom: "1px solid #eee",
-            }}
-          >
-            <label style={labelStyle}>Imagen del curso</label>
+              <p className="field-help">
+                JPG, PNG o WebP. Máximo 5 MB.
+              </p>
 
-            {course.image_url ? (
-              <div
-                style={{
-                  width: "100%",
-                  height: "320px",
-                  background: "#f3f3f3",
-                  borderRadius: "20px",
-                  overflow: "hidden",
-                  marginBottom: "18px",
-                }}
-              >
-                <img
-                  src={course.image_url}
-                  alt="Imagen del curso"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "contain",
-                  }}
+              {course.image_url ? (
+                <div className="image-preview">
+                  <img
+                    src={course.image_url}
+                    alt="Imagen del curso"
+                  />
+                </div>
+              ) : (
+                <div className="empty-image">
+                  Sin imagen
+                </div>
+              )}
+
+              <label className="upload-button">
+                {uploading
+                  ? "Subiendo imagen..."
+                  : course.image_url
+                    ? "Cambiar imagen"
+                    : "Seleccionar imagen"}
+
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={uploadImage}
+                  disabled={uploading}
                 />
-              </div>
-            ) : (
-              <div
-                style={{
-                  width: "100%",
-                  height: "220px",
-                  background: "#f3f3f3",
-                  borderRadius: "20px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "#777",
-                  fontWeight: 700,
-                  marginBottom: "18px",
-                }}
+              </label>
+            </section>
+
+            {/* DATOS */}
+
+            <div className="form-grid">
+              <Field label="Nombre del curso *">
+                <input
+                  required
+                  value={course.name}
+                  onChange={(e) =>
+                    updateName(e.target.value)
+                  }
+                  placeholder="Ej. Portugués Intensivo"
+                />
+              </Field>
+
+              <Field
+                label="Identificador"
+                helper="Se genera automáticamente y se usa en la dirección web."
               >
-                Sin imagen
+                <input
+                  required
+                  value={course.slug}
+                  onChange={(e) =>
+                    updateField(
+                      "slug",
+                      makeSlug(
+                        e.target.value
+                      )
+                    )
+                  }
+                  placeholder="portugues-intensivo"
+                />
+              </Field>
+
+              <Field label="Ciclo *">
+                <input
+                  required
+                  value={course.cycle}
+                  onChange={(e) =>
+                    updateField(
+                      "cycle",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Ej. Ciclo 7"
+                />
+              </Field>
+
+              <Field label="Año *">
+                <input
+                  required
+                  type="number"
+                  min="2026"
+                  value={course.year}
+                  onChange={(e) =>
+                    updateField(
+                      "year",
+                      Number(
+                        e.target.value
+                      )
+                    )
+                  }
+                />
+              </Field>
+
+              <Field label="Jornada *">
+                <select
+                  required
+                  value={course.shift}
+                  onChange={(e) =>
+                    updateField(
+                      "shift",
+                      e.target.value
+                    )
+                  }
+                >
+                  <option value="">
+                    Seleccionar
+                  </option>
+                  <option value="Mañana">
+                    Mañana
+                  </option>
+                  <option value="Tarde">
+                    Tarde
+                  </option>
+                  <option value="Noche">
+                    Noche
+                  </option>
+                </select>
+              </Field>
+
+              <Field label="Sede *">
+                <select
+                  required
+                  value={course.campus}
+                  onChange={(e) =>
+                    updateField(
+                      "campus",
+                      e.target.value
+                    )
+                  }
+                >
+                  <option value="">
+                    Seleccionar
+                  </option>
+                  <option value="Sede Centro">
+                    Sede Centro
+                  </option>
+                  <option value="Sede Norte">
+                    Sede Norte
+                  </option>
+                  <option value="Virtual">
+                    Virtual
+                  </option>
+                </select>
+              </Field>
+
+              <Field label="Nivel">
+                <input
+                  value={course.level}
+                  onChange={(e) =>
+                    updateField(
+                      "level",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Ej. A1"
+                />
+              </Field>
+
+              <Field label="Cupos">
+                <input
+                  type="number"
+                  min="0"
+                  value={
+                    course.capacity ?? ""
+                  }
+                  onChange={(e) =>
+                    updateField(
+                      "capacity",
+                      e.target.value === ""
+                        ? null
+                        : Number(
+                            e.target.value
+                          )
+                    )
+                  }
+                  placeholder="Ej. 20"
+                />
+              </Field>
+
+              <Field label="Fecha de inicio *">
+                <input
+                  required
+                  type="date"
+                  value={course.start_date}
+                  onChange={(e) =>
+                    updateField(
+                      "start_date",
+                      e.target.value
+                    )
+                  }
+                />
+              </Field>
+
+              <Field label="Fecha de finalización *">
+                <input
+                  required
+                  type="date"
+                  value={course.end_date}
+                  onChange={(e) =>
+                    updateField(
+                      "end_date",
+                      e.target.value
+                    )
+                  }
+                />
+              </Field>
+
+              <Field label="Hora de inicio">
+                <input
+                  type="time"
+                  value={course.start_time}
+                  onChange={(e) =>
+                    updateField(
+                      "start_time",
+                      e.target.value
+                    )
+                  }
+                />
+              </Field>
+
+              <Field label="Hora de finalización">
+                <input
+                  type="time"
+                  value={course.end_time}
+                  onChange={(e) =>
+                    updateField(
+                      "end_time",
+                      e.target.value
+                    )
+                  }
+                />
+              </Field>
+
+              <Field label="Precio COP *">
+                <input
+                  required
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={course.price}
+                  onChange={(e) =>
+                    updateField(
+                      "price",
+                      Number(
+                        e.target.value
+                      )
+                    )
+                  }
+                />
+              </Field>
+
+              <Field
+                label="Estado"
+                helper="Borrador no aparece en la tienda. Publicado sí aparece."
+              >
+                <select
+                  value={course.status}
+                  onChange={(e) =>
+                    updateField(
+                      "status",
+                      e.target.value as
+                        | "draft"
+                        | "published"
+                    )
+                  }
+                >
+                  <option value="draft">
+                    Borrador
+                  </option>
+
+                  <option value="published">
+                    Publicado
+                  </option>
+                </select>
+              </Field>
+            </div>
+
+            {message && (
+              <div
+                className={`message ${
+                  messageType === "error"
+                    ? "message-error"
+                    : "message-success"
+                }`}
+              >
+                {message}
               </div>
             )}
 
-            <label
-              style={{
-                display: "inline-block",
-                background: "#ffd800",
-                color: "#111",
-                padding: "14px 24px",
-                borderRadius: "999px",
-                fontWeight: 800,
-                cursor: uploading ? "wait" : "pointer",
-              }}
-            >
-              {uploading
-                ? "Subiendo..."
-                : course.image_url
-                  ? "Cambiar imagen"
-                  : "Seleccionar imagen"}
-
-              <input
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                onChange={uploadImage}
-                disabled={uploading}
-                style={{ display: "none" }}
-              />
-            </label>
-          </div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns:
-                "repeat(2, minmax(0, 1fr))",
-              gap: "22px",
-            }}
-          >
-            <div>
-              <label style={labelStyle}>Nombre *</label>
-              <input
-                required
-                style={inputStyle}
-                value={course.name}
-                onChange={(e) =>
-                  updateName(e.target.value)
-                }
-              />
-            </div>
-
-            <div>
-              <label style={labelStyle}>Slug *</label>
-              <input
-                required
-                style={inputStyle}
-                value={course.slug}
-                onChange={(e) =>
-                  updateField(
-                    "slug",
-                    makeSlug(e.target.value)
-                  )
-                }
-              />
-            </div>
-
-            <div>
-              <label style={labelStyle}>Ciclo</label>
-              <input
-                style={inputStyle}
-                value={course.cycle}
-                onChange={(e) =>
-                  updateField("cycle", e.target.value)
-                }
-              />
-            </div>
-
-            <div>
-              <label style={labelStyle}>Año</label>
-              <input
-                type="number"
-                style={inputStyle}
-                value={course.year}
-                onChange={(e) =>
-                  updateField(
-                    "year",
-                    Number(e.target.value)
-                  )
-                }
-              />
-            </div>
-
-            <div>
-              <label style={labelStyle}>Jornada</label>
-              <select
-                style={inputStyle}
-                value={course.shift}
-                onChange={(e) =>
-                  updateField("shift", e.target.value)
-                }
+            <div className="form-actions">
+              <a
+                href="/admin"
+                className="cancel-button"
               >
-                <option value="">Seleccionar</option>
-                <option value="Mañana">Mañana</option>
-                <option value="Tarde">Tarde</option>
-                <option value="Noche">Noche</option>
-                
-              </select>
-            </div>
+                Cancelar
+              </a>
 
-            <div>
-              <label style={labelStyle}>Modalidad</label>
-              <select
-                style={inputStyle}
-                value={course.modality}
-                onChange={(e) =>
-                  updateField(
-                    "modality",
-                    e.target.value
-                  )
-                }
-              >
-                <option value="">Seleccionar</option>
-                <option value="Presencial">
-                  Presencial
-                </option>
-                <option value="Virtual">Virtual</option>
-               <option value="Virtual">Virtual</option>
-              </select>
-            </div>
-
-            <div>
-              <label style={labelStyle}>Sede</label>
-              <input
-                style={inputStyle}
-                value={course.campus}
-                onChange={(e) =>
-                  updateField("campus", e.target.value)
-                }
-              />
-            </div>
-
-            <div>
-              <label style={labelStyle}>Nivel</label>
-              <input
-                style={inputStyle}
-                value={course.level}
-                onChange={(e) =>
-                  updateField("level", e.target.value)
-                }
-              />
-            </div>
-
-            <div>
-              <label style={labelStyle}>
-                Fecha de inicio
-              </label>
-              <input
-                type="date"
-                style={inputStyle}
-                value={course.start_date}
-                onChange={(e) =>
-                  updateField(
-                    "start_date",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
-
-            <div>
-              <label style={labelStyle}>
-                Fecha de finalización
-              </label>
-              <input
-                type="date"
-                style={inputStyle}
-                value={course.end_date}
-                onChange={(e) =>
-                  updateField(
-                    "end_date",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
-
-            <div>
-              <label style={labelStyle}>
-                Hora de inicio
-              </label>
-              <input
-                type="time"
-                style={inputStyle}
-                value={course.start_time}
-                onChange={(e) =>
-                  updateField(
-                    "start_time",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
-
-            <div>
-              <label style={labelStyle}>
-                Hora de finalización
-              </label>
-              <input
-                type="time"
-                style={inputStyle}
-                value={course.end_time}
-                onChange={(e) =>
-                  updateField(
-                    "end_time",
-                    e.target.value
-                  )
-                }
-              />
-            </div>
-
-            <div>
-              <label style={labelStyle}>Precio</label>
-              <input
-                type="number"
-                min="0"
-                style={inputStyle}
-                value={course.price}
-                onChange={(e) =>
-                  updateField(
-                    "price",
-                    Number(e.target.value)
-                  )
-                }
-              />
-            </div>
-
-            <div>
-              <label style={labelStyle}>Cupos</label>
-              <input
-                type="number"
-                min="0"
-                style={inputStyle}
-                value={course.capacity ?? ""}
-                onChange={(e) =>
-                  updateField(
-                    "capacity",
-                    e.target.value === ""
-                      ? null
-                      : Number(e.target.value)
-                  )
-                }
-              />
-            </div>
-
-           <div
-  style={{
-    gridColumn: "1 / -1",
-  }}
->
- 
-</div>
-            <div>
-              <label style={labelStyle}>Estado</label>
-              <select
-                style={inputStyle}
-                value={course.status}
-                onChange={(e) =>
-                  updateField("status", e.target.value)
-                }
-              >
-                <option value="draft">
-                  Borrador
-                </option>
-                <option value="published">
-                  Publicado
-                </option>
-              </select>
-            </div>
-          </div>
-
-          {message && (
-            <div
-              style={{
-                marginTop: "24px",
-                padding: "14px 18px",
-                borderRadius: "12px",
-                background: "#eef7f1",
-                color: "#087a3e",
-                fontWeight: 700,
-              }}
-            >
-              {message}
-            </div>
-          )}
-
-          <div
-            style={{
-              borderTop: "1px solid #eee",
-              marginTop: "35px",
-              paddingTop: "25px",
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "12px",
-              flexWrap: "wrap",
-            }}
-          >
-            <a
-              href="/admin"
-              style={{
-                padding: "15px 25px",
-                borderRadius: "999px",
-                border: "1px solid #ccc",
-                color: "#111",
-                textDecoration: "none",
-                fontWeight: 700,
-              }}
-            >
-              Cancelar
-            </a>
-
-            <button
-              type="submit"
-              disabled={saving || uploading}
-              style={{
-                background: "#009c4b",
-                color: "#fff",
-                border: "none",
-                padding: "15px 28px",
-                borderRadius: "999px",
-                fontWeight: 800,
-                fontSize: "15px",
-                cursor:
+              <button
+                type="submit"
+                disabled={
                   saving || uploading
-                    ? "wait"
-                    : "pointer",
-                opacity:
-                  saving || uploading ? 0.7 : 1,
-              }}
-            >
-              {saving
-                ? "Creando curso..."
-                : "Crear curso"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </main>
+                }
+                className="save-button"
+              >
+                {saving
+                  ? "Creando curso..."
+                  : course.status ===
+                      "published"
+                    ? "Crear y publicar"
+                    : "Guardar borrador"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </main>
+
+      <style>{`
+        * {
+          box-sizing: border-box;
+        }
+
+        .new-course-page {
+          min-height: 100vh;
+          background: #f8f5e9;
+          padding: 50px 7%;
+          font-family: Arial, sans-serif;
+          color: #111;
+        }
+
+        .new-course-shell {
+          width: 100%;
+          max-width: 1000px;
+          margin: 0 auto;
+        }
+
+        .back-link {
+          color: #009c4b;
+          font-weight: 800;
+          text-decoration: none;
+        }
+
+        .page-heading {
+          margin: 30px 0;
+        }
+
+        .eyebrow {
+          color: #009c4b;
+          font-weight: 900;
+          text-transform: uppercase;
+          font-size: 14px;
+        }
+
+        .page-heading h1 {
+          margin: 7px 0 10px;
+          font-size: 42px;
+          line-height: 1;
+        }
+
+        .page-heading p {
+          margin: 0;
+          color: #555;
+          font-size: 17px;
+          line-height: 1.5;
+          max-width: 650px;
+        }
+
+        .course-form {
+          background: #fff;
+          border-radius: 24px;
+          padding: 35px;
+        }
+
+        .image-section {
+          margin-bottom: 35px;
+          padding-bottom: 35px;
+          border-bottom: 1px solid #eee;
+        }
+
+        .field-label {
+          display: block;
+          font-weight: 800;
+          font-size: 14px;
+          margin-bottom: 7px;
+        }
+
+        .field-help {
+          margin: 0 0 15px;
+          color: #777;
+          font-size: 13px;
+          line-height: 1.4;
+        }
+
+        .image-preview,
+        .empty-image {
+          width: 100%;
+          height: 320px;
+          background: #f3f3f3;
+          border-radius: 20px;
+          margin-bottom: 18px;
+        }
+
+        .image-preview {
+          overflow: hidden;
+        }
+
+        .image-preview img {
+          width: 100%;
+          height: 100%;
+          display: block;
+          object-fit: contain;
+        }
+
+        .empty-image {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #777;
+          font-weight: 700;
+        }
+
+        .upload-button {
+          display: inline-block;
+          background: #ffd800;
+          color: #111;
+          padding: 14px 24px;
+          border-radius: 999px;
+          font-weight: 800;
+          cursor: pointer;
+        }
+
+        .upload-button input {
+          display: none;
+        }
+
+        .form-grid {
+          display: grid;
+          grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+          gap: 22px;
+        }
+
+        .field {
+          min-width: 0;
+        }
+
+        .field input,
+        .field select {
+          width: 100%;
+          min-width: 0;
+          padding: 14px 16px;
+          border-radius: 12px;
+          border: 1px solid #d8d8d8;
+          background: #fff;
+          color: #111;
+          font-size: 16px;
+        }
+
+        .field input:focus,
+        .field select:focus {
+          outline: 2px solid
+            rgba(0, 156, 75, 0.16);
+          border-color: #009c4b;
+        }
+
+        .message {
+          margin-top: 24px;
+          padding: 14px 18px;
+          border-radius: 12px;
+          font-weight: 700;
+          line-height: 1.45;
+        }
+
+        .message-success {
+          background: #eef7f1;
+          color: #087a3e;
+        }
+
+        .message-error {
+          background: #fdecec;
+          color: #a2251b;
+        }
+
+        .form-actions {
+          border-top: 1px solid #eee;
+          margin-top: 35px;
+          padding-top: 25px;
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+
+        .cancel-button {
+          padding: 15px 25px;
+          border-radius: 999px;
+          border: 1px solid #ccc;
+          color: #111;
+          text-decoration: none;
+          font-weight: 700;
+        }
+
+        .save-button {
+          background: #009c4b;
+          color: #fff;
+          border: none;
+          padding: 15px 28px;
+          border-radius: 999px;
+          font-weight: 800;
+          font-size: 15px;
+          cursor: pointer;
+        }
+
+        .save-button:disabled {
+          opacity: 0.65;
+          cursor: wait;
+        }
+
+        @media (max-width: 700px) {
+          .new-course-page {
+            padding: 28px 16px 50px;
+          }
+
+          .page-heading h1 {
+            font-size: 34px;
+          }
+
+          .course-form {
+            padding: 22px 16px;
+            border-radius: 20px;
+          }
+
+          .form-grid {
+            grid-template-columns: 1fr;
+            gap: 18px;
+          }
+
+          .image-preview,
+          .empty-image {
+            height: 220px;
+          }
+
+          .form-actions {
+            flex-direction: column-reverse;
+          }
+
+          .cancel-button,
+          .save-button {
+            width: 100%;
+            text-align: center;
+          }
+        }
+      `}</style>
+    </>
+  );
+}
+
+function Field({
+  label,
+  helper,
+  children,
+}: {
+  label: string;
+  helper?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="field">
+      <label className="field-label">
+        {label}
+      </label>
+
+      {helper && (
+        <p className="field-help">
+          {helper}
+        </p>
+      )}
+
+      {children}
+    </div>
   );
 }
