@@ -58,7 +58,29 @@ export default function AdminPage() {
 
     loadAdmin();
   }, [router]);
+async function toggleCourseStatus(course: Course) {
+  const newStatus =
+    course.status === "published" ? "draft" : "published";
 
+  const { error } = await supabase
+    .from("courses")
+    .update({ status: newStatus })
+    .eq("id", course.id);
+
+  if (error) {
+    console.error("Error actualizando estado del curso:", error);
+    alert("No fue posible cambiar el estado del curso.");
+    return;
+  }
+
+  setCourses((currentCourses) =>
+    currentCourses.map((item) =>
+      item.id === course.id
+        ? { ...item, status: newStatus }
+        : item
+    )
+  );
+}
   async function handleLogout() {
     await supabase.auth.signOut();
 
