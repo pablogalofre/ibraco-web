@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import * as XLSX from "xlsx";
 import { supabase } from "../../../lib/supabase";
-
-
 
 type Order = {
   id: number;
@@ -12,6 +11,9 @@ type Order = {
   first_name: string | null;
   last_name: string | null;
   email: string | null;
+  phone: string | null;
+  document_type: string | null;
+  document_number: string | null;
   course_name: string | null;
   amount: number | null;
   currency: string | null;
@@ -22,8 +24,6 @@ type Order = {
 };
 
 export default function ContabilidadPage() {
- 
-
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -43,6 +43,9 @@ export default function ContabilidadPage() {
           first_name,
           last_name,
           email,
+          phone,
+          document_type,
+          document_number,
           course_name,
           amount,
           currency,
@@ -127,6 +130,59 @@ export default function ContabilidadPage() {
     return "Pendiente";
   }
 
+  function downloadExcel() {
+    const rows = orders.map((order) => ({
+      Fecha: date(order.created_at),
+      Pedido: order.order_number,
+      Nombre: order.first_name || "",
+      Apellido: order.last_name || "",
+      "Tipo documento": order.document_type || "",
+      Documento: order.document_number || "",
+      Email: order.email || "",
+      Teléfono: order.phone || "",
+      Curso: order.course_name || "",
+      Valor: Number(order.amount || 0),
+      Moneda: order.currency || "COP",
+      "Estado del pago": paymentLabel(order.payment_status),
+      "Referencia Mercado Pago": order.payment_reference || "",
+      "Estado Q10": q10Label(order.q10_status),
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+
+    worksheet["!cols"] = [
+      { wch: 22 },
+      { wch: 25 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 30 },
+      { wch: 18 },
+      { wch: 30 },
+      { wch: 16 },
+      { wch: 10 },
+      { wch: 18 },
+      { wch: 32 },
+      { wch: 18 },
+    ];
+
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      "Contabilidad"
+    );
+
+    const today = new Date().toISOString().slice(0, 10);
+
+    XLSX.writeFile(
+      workbook,
+      `IBRACO_Contabilidad_${today}.xlsx`
+    );
+  }
+
   return (
     <main
       style={{
@@ -158,12 +214,36 @@ export default function ContabilidadPage() {
         <p style={{ color: "#666", marginTop: "8px" }}>
           Control de ventas, pagos y matrículas.
         </p>
+
+        <button
+          type="button"
+          onClick={downloadExcel}
+          disabled={orders.length === 0}
+          style={{
+            marginTop: "18px",
+            background: "#009c4b",
+            color: "#fff",
+            border: "none",
+            borderRadius: "30px",
+            padding: "13px 22px",
+            fontSize: "14px",
+            fontWeight: 800,
+            cursor:
+              orders.length === 0
+                ? "not-allowed"
+                : "pointer",
+            opacity: orders.length === 0 ? 0.5 : 1,
+          }}
+        >
+          Descargar Excel
+        </button>
       </div>
 
       <section
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
+          gridTemplateColumns:
+            "repeat(auto-fit, minmax(210px, 1fr))",
           gap: "16px",
           marginBottom: "32px",
         }}
@@ -192,7 +272,9 @@ export default function ContabilidadPage() {
       {loading && <p>Cargando pagos...</p>}
 
       {errorMessage && (
-        <p style={{ color: "#b42318" }}>{errorMessage}</p>
+        <p style={{ color: "#b42318" }}>
+          {errorMessage}
+        </p>
       )}
 
       {!loading && !errorMessage && (
@@ -240,13 +322,17 @@ export default function ContabilidadPage() {
                   <Td>{date(order.created_at)}</Td>
 
                   <Td>
-                    <strong>{order.order_number}</strong>
+                    <strong>
+                      {order.order_number}
+                    </strong>
                   </Td>
 
                   <Td>
                     <strong>
-                      {order.first_name} {order.last_name}
+                      {order.first_name}{" "}
+                      {order.last_name}
                     </strong>
+
                     <div
                       style={{
                         fontSize: "12px",
@@ -258,17 +344,23 @@ export default function ContabilidadPage() {
                     </div>
                   </Td>
 
-                  <Td>{order.course_name || "—"}</Td>
+                  <Td>
+                    {order.course_name || "—"}
+                  </Td>
 
                   <Td>
                     <strong>
-                      {money(Number(order.amount || 0))}
+                      {money(
+                        Number(order.amount || 0)
+                      )}
                     </strong>
                   </Td>
 
                   <Td>
                     <StatusBadge
-                      status={order.payment_status}
+                      status={
+                        order.payment_status
+                      }
                       label={paymentLabel(
                         order.payment_status
                       )}
@@ -282,14 +374,17 @@ export default function ContabilidadPage() {
                         color: "#555",
                       }}
                     >
-                      {order.payment_reference || "—"}
+                      {order.payment_reference ||
+                        "—"}
                     </span>
                   </Td>
 
                   <Td>
                     <StatusBadge
                       status={order.q10_status}
-                      label={q10Label(order.q10_status)}
+                      label={q10Label(
+                        order.q10_status
+                      )}
                     />
                   </Td>
                 </tr>
@@ -305,7 +400,8 @@ export default function ContabilidadPage() {
                       color: "#777",
                     }}
                   >
-                    Todavía no hay ventas registradas.
+                    Todavía no hay ventas
+                    registradas.
                   </td>
                 </tr>
               )}
@@ -355,7 +451,11 @@ function StatCard({
   );
 }
 
-function Th({ children }: { children: React.ReactNode }) {
+function Th({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <th
       style={{
@@ -369,7 +469,11 @@ function Th({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Td({ children }: { children: React.ReactNode }) {
+function Td({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <td
       style={{
@@ -393,7 +497,10 @@ function StatusBadge({
   let background = "#fff3cd";
   let color = "#856404";
 
-  if (status === "paid" || status === "completed") {
+  if (
+    status === "paid" ||
+    status === "completed"
+  ) {
     background = "#e6f6ec";
     color = "#137333";
   }

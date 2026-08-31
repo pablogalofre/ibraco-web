@@ -21,9 +21,6 @@ export default function AdminLayout({
     let active = true;
 
     async function checkSession() {
-      /*
-       * El login debe permanecer público.
-       */
       if (isLoginPage) {
         if (active) {
           setCheckingSession(false);
@@ -47,11 +44,6 @@ export default function AdminLayout({
 
     checkSession();
 
-    /*
-     * También escuchamos cambios de autenticación.
-     * Si la sesión se cierra mientras estamos dentro
-     * del admin, enviamos al login inmediatamente.
-     */
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(
@@ -71,17 +63,10 @@ export default function AdminLayout({
     };
   }, [isLoginPage, pathname, router]);
 
-  /*
-   * La página de login siempre puede mostrarse.
-   */
   if (isLoginPage) {
     return <>{children}</>;
   }
 
-  /*
-   * Mientras verificamos la sesión no mostramos
-   * ninguna página administrativa.
-   */
   if (checkingSession) {
     return (
       <main
