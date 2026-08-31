@@ -18,6 +18,7 @@ type Course = {
   end_date: string | null;
   start_time: string | null;
   end_time: string | null;
+    image_url: string | null;
 };
 
 export default function AdminPage() {
@@ -246,7 +247,27 @@ export default function AdminPage() {
                 gap: "25px",
               }}
             >
-              <div>
+              <div
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "18px",
+    flex: "1",
+  }}
+>
+  {course.image_url && (
+  <img
+    src={course.image_url}
+   alt={course.name || "Curso"}
+    style={{
+      width: "110px",
+      height: "80px",
+      objectFit: "cover",
+      borderRadius: "12px",
+      flexShrink: 0,
+    }}
+  />
+)}
                 <div
                   style={{
                     display: "flex",
