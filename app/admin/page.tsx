@@ -402,7 +402,39 @@ async function toggleCourseStatus(course: Course) {
                     </p>
                   )}
               </div>
-
+              
+<div
+  style={{
+    display: "flex",
+    gap: "10px",
+    alignItems: "center",
+    flexShrink: 0,
+  }}
+>
+  <button
+  type="button"
+  onClick={() => toggleCourseStatus(course)}
+  style={{
+    background:
+      course.status === "published" ? "#fff" : "#009c4b",
+    color:
+      course.status === "published" ? "#111" : "#fff",
+    border:
+      course.status === "published"
+        ? "1px solid #ccc"
+        : "1px solid #009c4b",
+    padding: "14px 20px",
+    borderRadius: "30px",
+    fontSize: "14px",
+    fontWeight: 800,
+    cursor: "pointer",
+    flexShrink: 0,
+  }}
+>
+  {course.status === "published"
+    ? "Despublicar"
+    : "Publicar"}
+</button>
               <a
                 href={`/admin/cursos/${course.id}`}
                 style={{
@@ -419,6 +451,7 @@ async function toggleCourseStatus(course: Course) {
               >
                 Editar
               </a>
+              </div>
             </article>
           ))}
         </div>
