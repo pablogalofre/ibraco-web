@@ -1,36 +1,27 @@
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const subscriptionKey = process.env.Q10_SUBSCRIPTION_KEY;
+  const apiKey = process.env.Q10_API_KEY;
 
-  if (!subscriptionKey) {
+  if (!apiKey) {
     return NextResponse.json(
-      {
-        ok: false,
-        error: "Falta Q10_SUBSCRIPTION_KEY",
-      },
+      { ok: false, error: "Falta Q10_API_KEY" },
       { status: 500 }
     );
   }
 
   try {
-    const url = new URL(
-      "https://api.q10.com/v1/administrativos"
+    const response = await fetch(
+      "https://api.q10.com/v1/estudiantes/1000000000",
+      {
+        method: "GET",
+        headers: {
+          "Api-Key": apiKey,
+          Accept: "application/json",
+        },
+        cache: "no-store",
+      }
     );
-
-    url.searchParams.set("Limit", "1");
-    url.searchParams.set("Offset", "0");
-
-    const response = await fetch(url.toString(), {
-      method: "GET",
-      headers: {
-        "Ocp-Apim-Subscription-Key": subscriptionKey,
-        "Api-key": subscriptionKey,
-        Accept: "application/json",
-        "Cache-Control": "no-cache",
-      },
-      cache: "no-store",
-    });
 
     const text = await response.text();
 
