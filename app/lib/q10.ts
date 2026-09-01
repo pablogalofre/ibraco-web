@@ -37,6 +37,22 @@ function getQ10Headers(apiKey: string) {
   };
 }
 
+async function parseQ10Response(response: Response) {
+  const text = await response.text();
+
+  if (!response.ok) {
+    throw new Error(
+      `Q10 respondió ${response.status}: ${text}`
+    );
+  }
+
+  if (!text) {
+    return null;
+  }
+
+  return JSON.parse(text);
+}
+
 export async function getQ10StudentByIdentification(
   identification: string
 ) {
@@ -53,23 +69,33 @@ export async function getQ10StudentByIdentification(
     }
   );
 
-  const text = await response.text();
-
   if (response.status === 404) {
     return null;
   }
 
-  if (!response.ok) {
-    throw new Error(
-      `Q10 respondió ${response.status}: ${text}`
-    );
-  }
+  return parseQ10Response(response);
+}
 
-  if (!text) {
-    return null;
-  }
+export async function getQ10Periods(
+  limit = 100,
+  offset = 1
+) {
+  const apiKey = getQ10ApiKey();
 
-  return JSON.parse(text);
+  const url = new URL(
+    "https://api.q10.com/v1/periodos"
+  );
+
+  url.searchParams.set("Limit", String(limit));
+  url.searchParams.set("Offset", String(offset));
+
+  const response = await fetch(url.toString(), {
+    method: "GET",
+    headers: getQ10Headers(apiKey),
+    cache: "no-store",
+  });
+
+  return parseQ10Response(response);
 }
 
 export async function createQ10Preinscription(
@@ -90,19 +116,13 @@ export async function createQ10Preinscription(
     }
   );
 
-  const text = await response.text();
+  const result = await parseQ10Response(response);
 
-  if (!response.ok) {
-    throw new Error(
-      `Q10 respondió ${response.status}: ${text}`
-    );
-  }
-
-  if (!text) {
+  if (result === null) {
     return {
       ok: true,
     };
   }
 
-  return JSON.parse(text);
+  return result;
 }
