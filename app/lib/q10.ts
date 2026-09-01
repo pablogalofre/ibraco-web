@@ -41,9 +41,7 @@ async function parseQ10Response(response: Response) {
   const text = await response.text();
 
   if (!response.ok) {
-    throw new Error(
-      `Q10 respondió ${response.status}: ${text}`
-    );
+    throw new Error(`Q10 respondió ${response.status}: ${text}`);
   }
 
   if (!text) {
@@ -82,9 +80,7 @@ export async function getQ10Periods(
 ) {
   const apiKey = getQ10ApiKey();
 
-  const url = new URL(
-    "https://api.q10.com/v1/periodos"
-  );
+  const url = new URL("https://api.q10.com/v1/periodos");
 
   url.searchParams.set("Limit", String(limit));
   url.searchParams.set("Offset", String(offset));
@@ -122,6 +118,48 @@ export async function getQ10Preinscriptions(
   return parseQ10Response(response);
 }
 
+export async function getQ10Programs(
+  limit = 100,
+  offset = 1
+) {
+  const apiKey = getQ10ApiKey();
+
+  const url = new URL("https://api.q10.com/v1/programas");
+
+  url.searchParams.set("Limit", String(limit));
+  url.searchParams.set("Offset", String(offset));
+
+  const response = await fetch(url.toString(), {
+    method: "GET",
+    headers: getQ10Headers(apiKey),
+    cache: "no-store",
+  });
+
+  return parseQ10Response(response);
+}
+
+export async function getQ10SitesJourneys(
+  limit = 100,
+  offset = 1
+) {
+  const apiKey = getQ10ApiKey();
+
+  const url = new URL(
+    "https://api.q10.com/v1/sedesjornadas"
+  );
+
+  url.searchParams.set("Limit", String(limit));
+  url.searchParams.set("Offset", String(offset));
+
+  const response = await fetch(url.toString(), {
+    method: "GET",
+    headers: getQ10Headers(apiKey),
+    cache: "no-store",
+  });
+
+  return parseQ10Response(response);
+}
+
 export async function createQ10Preinscription(
   payload: Q10PreinscriptionPayload
 ) {
@@ -143,31 +181,8 @@ export async function createQ10Preinscription(
   const result = await parseQ10Response(response);
 
   if (result === null) {
-    return {
-      ok: true,
-    };
+    return { ok: true };
   }
 
   return result;
-}
-export async function getQ10Programs(
-  limit = 100,
-  offset = 1
-) {
-  const apiKey = getQ10ApiKey();
-
-  const url = new URL(
-    "https://api.q10.com/v1/programas"
-  );
-
-  url.searchParams.set("Limit", String(limit));
-  url.searchParams.set("Offset", String(offset));
-
-  const response = await fetch(url.toString(), {
-    method: "GET",
-    headers: getQ10Headers(apiKey),
-    cache: "no-store",
-  });
-
-  return parseQ10Response(response);
 }
