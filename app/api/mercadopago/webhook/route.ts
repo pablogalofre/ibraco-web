@@ -577,7 +577,7 @@ export async function POST(
           q10_status:
             "error",
 
-          q10_enrollment_response:
+          q10_response:
             {
               error:
                 q10Error instanceof Error
