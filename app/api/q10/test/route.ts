@@ -5,22 +5,38 @@ export async function GET() {
 
   if (!subscriptionKey) {
     return NextResponse.json(
-      { ok: false, error: "Falta Q10_SUBSCRIPTION_KEY" },
+      {
+        ok: false,
+        error: "Falta Q10_SUBSCRIPTION_KEY",
+      },
       { status: 500 }
     );
   }
 
   try {
-    const response = await fetch(
-      "https://api.q10.com/v1/administrativos?Limit=1&Offset=0",
-      {
-        method: "GET",
-        headers: {
-          "Ocp-Apim-Subscription-Key": subscriptionKey,
-          Accept: "application/json",
-        },
-      }
+    const url = new URL(
+      "https://api.q10.com/v1/administrativos"
     );
+
+    url.searchParams.set("Limit", "1");
+    url.searchParams.set("Offset", "0");
+
+    // Azure API Management también permite
+    // enviar la subscription key por query string.
+    url.searchParams.set(
+      "subscription-key",
+      subscriptionKey
+    );
+
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Ocp-Apim-Subscription-Key":
+          subscriptionKey,
+        Accept: "application/json",
+      },
+      cache: "no-store",
+    });
 
     const text = await response.text();
 
@@ -33,7 +49,10 @@ export async function GET() {
     return NextResponse.json(
       {
         ok: false,
-        error: error instanceof Error ? error.message : "Error desconocido",
+        error:
+          error instanceof Error
+            ? error.message
+            : "Error desconocido",
       },
       { status: 500 }
     );
