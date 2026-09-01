@@ -1,43 +1,52 @@
 import { NextResponse } from "next/server";
-import { getQ10SitesJourneys } from "@/app/lib/q10";
+import { getQ10Periods } from "@/app/lib/q10";
 
 export async function GET() {
   try {
-    const result = await getQ10SitesJourneys(100, 1);
+    const periods = await getQ10Periods();
 
-    const records = Array.isArray(result)
-      ? result
-      : Array.isArray(result?.Data)
-        ? result.Data
-        : Array.isArray(result?.data)
-          ? result.data
-          : [];
+    const records = Array.isArray(periods)
+      ? periods
+      : [];
 
-    const summary = records.map((item: any) => ({
-      Consecutivo:
-        item.Consecutivo ??
-        item.Consecutivo_sedejornada ??
-        null,
-      Sede:
-        item.Sede ??
-        item.Nombre_sede ??
-        null,
-      Jornada:
-        item.Jornada ??
-        item.Nombre_jornada ??
-        null,
-      Nombre:
-        item.Nombre ??
-        item.Nombre_sedejornada ??
-        null,
-      Estado:
-        item.Estado ?? null,
-    }));
+    const filtered = records
+      .filter((item: any) => {
+        const nombre = String(item.Nombre ?? "");
+        return nombre.includes("2026");
+      })
+      .sort((a: any, b: any) => {
+        const aValue =
+          a.Consecutivo ??
+          a.Ordenamiento ??
+          0;
+
+        const bValue =
+          b.Consecutivo ??
+          b.Ordenamiento ??
+          0;
+
+        return bValue - aValue;
+      })
+      .map((item: any) => ({
+        Consecutivo:
+          item.Consecutivo ?? null,
+        Ordenamiento:
+          item.Ordenamiento ?? null,
+        Nombre:
+          item.Nombre ?? null,
+        Fecha_inicio:
+          item.Fecha_inicio ?? null,
+        Fecha_fin:
+          item.Fecha_fin ?? null,
+        Estado:
+          item.Estado ?? null,
+      }));
 
     return NextResponse.json({
       ok: true,
-      cantidad: records.length,
-      sedesJornadas: summary,
+      cantidadTotal: records.length,
+      cantidad2026: filtered.length,
+      periodos2026: filtered,
     });
   } catch (error) {
     return NextResponse.json(

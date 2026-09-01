@@ -41,7 +41,9 @@ async function parseQ10Response(response: Response) {
   const text = await response.text();
 
   if (!response.ok) {
-    throw new Error(`Q10 respondió ${response.status}: ${text}`);
+    throw new Error(
+      `Q10 respondió ${response.status}: ${text}`
+    );
   }
 
   if (!text) {
@@ -49,6 +51,22 @@ async function parseQ10Response(response: Response) {
   }
 
   return JSON.parse(text);
+}
+
+function normalizeQ10Records(result: any) {
+  if (Array.isArray(result)) {
+    return result;
+  }
+
+  if (Array.isArray(result?.Data)) {
+    return result.Data;
+  }
+
+  if (Array.isArray(result?.data)) {
+    return result.data;
+  }
+
+  return [];
 }
 
 export async function getQ10StudentByIdentification(
@@ -74,24 +92,46 @@ export async function getQ10StudentByIdentification(
   return parseQ10Response(response);
 }
 
-export async function getQ10Periods(
-  limit = 100,
-  offset = 1
-) {
+export async function getQ10Periods() {
   const apiKey = getQ10ApiKey();
 
-  const url = new URL("https://api.q10.com/v1/periodos");
+  const allPeriods: any[] = [];
+  const limit = 100;
+  let offset = 1;
 
-  url.searchParams.set("Limit", String(limit));
-  url.searchParams.set("Offset", String(offset));
+  while (true) {
+    const url = new URL(
+      "https://api.q10.com/v1/periodos"
+    );
 
-  const response = await fetch(url.toString(), {
-    method: "GET",
-    headers: getQ10Headers(apiKey),
-    cache: "no-store",
-  });
+    url.searchParams.set("Limit", String(limit));
+    url.searchParams.set("Offset", String(offset));
 
-  return parseQ10Response(response);
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      headers: getQ10Headers(apiKey),
+      cache: "no-store",
+    });
+
+    const result = await parseQ10Response(response);
+    const records = normalizeQ10Records(result);
+
+    allPeriods.push(...records);
+
+    if (records.length < limit) {
+      break;
+    }
+
+    offset += 1;
+
+    if (offset > 100) {
+      throw new Error(
+        "Se alcanzó el límite de seguridad al consultar períodos Q10"
+      );
+    }
+  }
+
+  return allPeriods;
 }
 
 export async function getQ10Preinscriptions(
@@ -124,7 +164,9 @@ export async function getQ10Programs(
 ) {
   const apiKey = getQ10ApiKey();
 
-  const url = new URL("https://api.q10.com/v1/programas");
+  const url = new URL(
+    "https://api.q10.com/v1/programas"
+  );
 
   url.searchParams.set("Limit", String(limit));
   url.searchParams.set("Offset", String(offset));
@@ -181,7 +223,9 @@ export async function createQ10Preinscription(
   const result = await parseQ10Response(response);
 
   if (result === null) {
-    return { ok: true };
+    return {
+      ok: true,
+    };
   }
 
   return result;
