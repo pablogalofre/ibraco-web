@@ -98,6 +98,30 @@ export async function getQ10Periods(
   return parseQ10Response(response);
 }
 
+export async function getQ10Preinscriptions(
+  periodo: number,
+  limit = 100,
+  offset = 1
+) {
+  const apiKey = getQ10ApiKey();
+
+  const url = new URL(
+    "https://api.q10.com/v1/preinscripciones"
+  );
+
+  url.searchParams.set("Periodo", String(periodo));
+  url.searchParams.set("Limit", String(limit));
+  url.searchParams.set("Offset", String(offset));
+
+  const response = await fetch(url.toString(), {
+    method: "GET",
+    headers: getQ10Headers(apiKey),
+    cache: "no-store",
+  });
+
+  return parseQ10Response(response);
+}
+
 export async function createQ10Preinscription(
   payload: Q10PreinscriptionPayload
 ) {
