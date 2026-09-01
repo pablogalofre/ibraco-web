@@ -1,34 +1,13 @@
 import { NextResponse } from "next/server";
+import { getQ10Periods } from "@/app/lib/q10";
 
 export async function GET() {
-  const apiKey = process.env.Q10_API_KEY;
-
-  if (!apiKey) {
-    return NextResponse.json(
-      { ok: false, error: "Falta Q10_API_KEY" },
-      { status: 500 }
-    );
-  }
-
   try {
-    const response = await fetch(
-      "https://api.q10.com/v1/estudiantes/1000000000",
-      {
-        method: "GET",
-        headers: {
-          "Api-Key": apiKey,
-          Accept: "application/json",
-        },
-        cache: "no-store",
-      }
-    );
-
-    const text = await response.text();
+    const periods = await getQ10Periods(100, 1);
 
     return NextResponse.json({
-      ok: response.ok,
-      status: response.status,
-      q10Response: text,
+      ok: true,
+      periods,
     });
   } catch (error) {
     return NextResponse.json(
