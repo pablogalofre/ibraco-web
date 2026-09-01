@@ -150,3 +150,24 @@ export async function createQ10Preinscription(
 
   return result;
 }
+export async function getQ10Programs(
+  limit = 100,
+  offset = 1
+) {
+  const apiKey = getQ10ApiKey();
+
+  const url = new URL(
+    "https://api.q10.com/v1/programas"
+  );
+
+  url.searchParams.set("Limit", String(limit));
+  url.searchParams.set("Offset", String(offset));
+
+  const response = await fetch(url.toString(), {
+    method: "GET",
+    headers: getQ10Headers(apiKey),
+    cache: "no-store",
+  });
+
+  return parseQ10Response(response);
+}

@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { getQ10Preinscriptions } from "@/app/lib/q10";
+import { getQ10Programs } from "@/app/lib/q10";
 
 export async function GET() {
   try {
-    const result = await getQ10Preinscriptions(240, 100, 1);
+    const result = await getQ10Programs(100, 1);
 
     const records = Array.isArray(result)
       ? result
@@ -14,16 +14,19 @@ export async function GET() {
           : [];
 
     const summary = records.map((item: any) => ({
-      Consecutivo: item.Consecutivo ?? null,
-      Fecha_preinscripcion: item.Fecha_preinscripcion ?? null,
-      Programas: item.Programas ?? null,
+      Codigo: item.Codigo ?? item.Codigo_programa ?? null,
+      Nombre: item.Nombre ?? item.Nombre_programa ?? null,
+      Estado: item.Estado ?? null,
+      Aplica_preinscripciones:
+        item.Aplica_preinscripciones ??
+        item.Aplica_para_preinscripciones ??
+        null,
     }));
 
     return NextResponse.json({
       ok: true,
-      periodo: 240,
       cantidad: records.length,
-      preinscripciones: summary,
+      programas: summary,
     });
   } catch (error) {
     return NextResponse.json(
