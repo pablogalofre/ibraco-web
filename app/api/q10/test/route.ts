@@ -21,19 +21,13 @@ export async function GET() {
     url.searchParams.set("Limit", "1");
     url.searchParams.set("Offset", "0");
 
-    // Azure API Management también permite
-    // enviar la subscription key por query string.
-    url.searchParams.set(
-      "subscription-key",
-      subscriptionKey
-    );
-
     const response = await fetch(url.toString(), {
       method: "GET",
       headers: {
-        "Ocp-Apim-Subscription-Key":
-          subscriptionKey,
+        "Ocp-Apim-Subscription-Key": subscriptionKey,
+        "Api-key": subscriptionKey,
         Accept: "application/json",
+        "Cache-Control": "no-cache",
       },
       cache: "no-store",
     });
