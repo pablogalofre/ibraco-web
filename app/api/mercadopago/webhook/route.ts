@@ -40,7 +40,9 @@ const supabaseAdmin = createClient(
   }
 );
 
-function separarNombres(nombreCompleto: string) {
+function separarNombres(
+  nombreCompleto: string
+) {
   const partes = nombreCompleto
     .trim()
     .split(/\s+/)
@@ -55,7 +57,9 @@ function separarNombres(nombreCompleto: string) {
   };
 }
 
-function separarApellidos(apellidoCompleto: string) {
+function separarApellidos(
+  apellidoCompleto: string
+) {
   const partes = apellidoCompleto
     .trim()
     .split(/\s+/)
@@ -70,7 +74,7 @@ function separarApellidos(apellidoCompleto: string) {
   };
 }
 
-function esIntensivoCiclo6(order: any) {
+function esIntensivoCiclo7(order: any) {
   const nombre = String(
     order.course_name || ""
   ).toLowerCase();
@@ -83,15 +87,18 @@ function esIntensivoCiclo6(order: any) {
     nombre.includes("intensivo") &&
     !nombre.includes("semi") &&
     (
-      ciclo.includes("6") ||
-      nombre.includes("ciclo 6")
+      ciclo.includes("7") ||
+      nombre.includes("ciclo 7")
     )
   );
 }
 
-export async function POST(request: Request) {
+export async function POST(
+  request: Request
+) {
   try {
-    const body = await request.json();
+    const body =
+      await request.json();
 
     console.log(
       "MERCADO PAGO WEBHOOK:",
@@ -109,16 +116,19 @@ export async function POST(request: Request) {
     }
 
     // ==========================================
-    // 1. CONSULTAR ORDEN REAL EN MERCADO PAGO
+    // 1. CONSULTAR LA ORDEN REAL
+    //    DIRECTAMENTE EN MERCADO PAGO
     // ==========================================
 
     const response = await fetch(
       `https://api.mercadopago.com/v1/orders/${mercadoPagoOrderId}`,
       {
+        method: "GET",
         headers: {
           Authorization:
             `Bearer ${mercadoPagoAccessToken}`,
-          Accept: "application/json",
+          Accept:
+            "application/json",
         },
         cache: "no-store",
       }
@@ -163,10 +173,14 @@ export async function POST(request: Request) {
     // ==========================================
 
     const mpStatus =
-      mpOrder.status || "unknown";
+      mpOrder.status ||
+      "unknown";
 
-    let paymentStatus = "pending";
-    let orderStatus = "pending";
+    let paymentStatus =
+      "pending";
+
+    let orderStatus =
+      "pending";
 
     if (
       mpStatus === "processed" ||
@@ -182,32 +196,36 @@ export async function POST(request: Request) {
       mpStatus === "rejected"
     ) {
       paymentStatus = "failed";
-      orderStatus = "payment_failed";
+      orderStatus =
+        "payment_failed";
     }
 
     // ==========================================
-    // 3. ACTUALIZAR PAGO EN SUPABASE
+    // 3. ACTUALIZAR ESTADO DE PAGO
+    //    EN SUPABASE
     // ==========================================
 
-    const { error: paymentUpdateError } =
-      await supabaseAdmin
-        .from("orders")
-        .update({
-          payment_status:
-            paymentStatus,
+    const {
+      error:
+        paymentUpdateError,
+    } = await supabaseAdmin
+      .from("orders")
+      .update({
+        payment_status:
+          paymentStatus,
 
-          order_status:
-            orderStatus,
+        order_status:
+          orderStatus,
 
-          payment_reference:
-            String(
-              mercadoPagoOrderId
-            ),
-        })
-        .eq(
-          "order_number",
-          externalReference
-        );
+        payment_reference:
+          String(
+            mercadoPagoOrderId
+          ),
+      })
+      .eq(
+        "order_number",
+        externalReference
+      );
 
     if (paymentUpdateError) {
       console.error(
@@ -226,10 +244,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // Si todavía no está pagado,
-    // no hacemos nada en Q10.
+    // ==========================================
+    // 4. SI NO ESTÁ PAGADO,
+    //    NO HACEMOS NADA EN Q10
+    // ==========================================
 
-    if (paymentStatus !== "paid") {
+    if (
+      paymentStatus !== "paid"
+    ) {
       return NextResponse.json({
         received: true,
         paymentStatus,
@@ -237,7 +259,7 @@ export async function POST(request: Request) {
     }
 
     // ==========================================
-    // 4. BUSCAR PEDIDO COMPLETO EN SUPABASE
+    // 5. BUSCAR EL PEDIDO COMPLETO
     // ==========================================
 
     const {
@@ -252,7 +274,10 @@ export async function POST(request: Request) {
       )
       .single();
 
-    if (orderError || !order) {
+    if (
+      orderError ||
+      !order
+    ) {
       console.error(
         "NO SE ENCONTRÓ ORDER:",
         orderError
@@ -270,7 +295,7 @@ export async function POST(request: Request) {
     }
 
     // ==========================================
-    // 5. EVITAR PREINSCRIPCIÓN DUPLICADA
+    // 6. EVITAR DUPLICADOS EN Q10
     // ==========================================
 
     if (
@@ -285,32 +310,21 @@ export async function POST(request: Request) {
       return NextResponse.json({
         received: true,
         paymentStatus: "paid",
-        q10Status: "preinscribed",
+        q10Status:
+          "preinscribed",
       });
     }
+
+    // ==========================================
+    // 7. POR AHORA SOLO AUTOMATIZAMOS
+    //    PORTUGUÉS INTENSIVO CICLO 7
+    // ==========================================
 
     if (
-      order.q10_status ===
-      "processing"
+      !esIntensivoCiclo7(
+        order
+      )
     ) {
-      console.log(
-        "Q10 YA ESTÁ EN PROCESO:",
-        externalReference
-      );
-
-      return NextResponse.json({
-        received: true,
-        paymentStatus: "paid",
-        q10Status: "processing",
-      });
-    }
-
-    // ==========================================
-    // 6. SOLO ACTIVAMOS EL MAPEO
-    //    YA VERIFICADO EN Q10
-    // ==========================================
-
-    if (!esIntensivoCiclo6(order)) {
       console.log(
         "CURSO SIN MAPEO Q10 AUTOMÁTICO:",
         {
@@ -341,10 +355,12 @@ export async function POST(request: Request) {
     }
 
     // ==========================================
-    // 7. MARCAR COMO PROCESSING
+    // 8. BLOQUEO PARA EVITAR QUE
+    //    DOS WEBHOOKS CREEN DOS REGISTROS
     // ==========================================
 
     const {
+      data: lockedOrders,
       error:
         processingError,
     } = await supabaseAdmin
@@ -356,7 +372,16 @@ export async function POST(request: Request) {
       .eq(
         "order_number",
         externalReference
-      );
+      )
+      .in(
+        "q10_status",
+        [
+          "pending",
+          "error",
+          "pending_mapping",
+        ]
+      )
+      .select("order_number");
 
     if (processingError) {
       console.error(
@@ -375,8 +400,25 @@ export async function POST(request: Request) {
       );
     }
 
+    if (
+      !lockedOrders ||
+      lockedOrders.length === 0
+    ) {
+      console.log(
+        "Q10 YA ESTÁ SIENDO PROCESADO:",
+        externalReference
+      );
+
+      return NextResponse.json({
+        received: true,
+        paymentStatus: "paid",
+        q10Status:
+          order.q10_status,
+      });
+    }
+
     // ==========================================
-    // 8. PREPARAR DATOS DEL ESTUDIANTE
+    // 9. PREPARAR DATOS DEL ESTUDIANTE
     // ==========================================
 
     const nombres =
@@ -395,74 +437,84 @@ export async function POST(request: Request) {
         .slice(0, 10);
 
     // ==========================================
-    // 9. CREAR PREINSCRIPCIÓN EN Q10
+    // 10. CREAR PREINSCRIPCIÓN Q10
     //
-    // Mapeo verificado:
+    // MAPEO CONFIRMADO:
     //
-    // Programa 01:
-    // Portugués Intensivo
+    // Programa:
+    // 01 = Portugués Intensivo
     //
-    // Periodo 237:
-    // 2026 Intensivo Ciclo 6
+    // Periodo:
+    // 238 = 2026 Intensivo Ciclo 7
     //
-    // Sede/Jornada 14:
-    // Principal / Continua
+    // Sede/Jornada:
+    // 14 = Principal / Continua
     // ==========================================
 
     try {
       const q10Response =
-        await createQ10Preinscription({
-          Fecha_preinscripcion:
-            fechaPreinscripcion,
+        await createQ10Preinscription(
+          {
+            Fecha_preinscripcion:
+              fechaPreinscripcion,
 
-          Primer_nombre:
-            nombres.primero,
+            Primer_nombre:
+              nombres.primero,
 
-          Segundo_nombre:
-            nombres.segundo,
+            Segundo_nombre:
+              nombres.segundo,
 
-          Primer_apellido:
-            apellidos.primero,
+            Primer_apellido:
+              apellidos.primero,
 
-          Segundo_apellido:
-            apellidos.segundo,
+            Segundo_apellido:
+              apellidos.segundo,
 
-          Codigo_tipo_identificacion:
-            order.document_type,
+            Codigo_tipo_identificacion:
+              order.document_type,
 
-          Numero_identificacion:
-            String(
-              order.document_number
-            ),
+            Numero_identificacion:
+              String(
+                order.document_number
+              ),
 
-          Genero:
-            order.gender ||
-            undefined,
+            Genero:
+              order.gender ||
+              undefined,
 
-          Fecha_nacimiento:
-            order.birth_date ||
-            undefined,
+            Fecha_nacimiento:
+              order.birth_date ||
+              undefined,
 
-          Celular:
-            order.phone ||
-            undefined,
+            Telefono:
+              order.phone ||
+              undefined,
 
-          Email:
-            order.email,
+            Celular:
+              order.phone ||
+              undefined,
 
-          Direccion:
-            order.address ||
-            undefined,
+            Email:
+              order.email,
 
-          Codigo_programa:
-            "01",
+            Direccion:
+              order.address ||
+              undefined,
 
-          Consecutivo_periodo:
-            237,
+            Lugar_residencia:
+              order.city_name ||
+              undefined,
 
-          Consecutivo_sedejornada:
-            14,
-        });
+            Codigo_programa:
+              "01",
+
+            Consecutivo_periodo:
+              238,
+
+            Consecutivo_sedejornada:
+              14,
+          }
+        );
 
       console.log(
         "Q10 PREINSCRIPCIÓN EXITOSA:",
@@ -470,7 +522,7 @@ export async function POST(request: Request) {
       );
 
       // ========================================
-      // 10. GUARDAR RESULTADO Q10
+      // 11. GUARDAR RESPUESTA DE Q10
       // ========================================
 
       const {
@@ -495,6 +547,16 @@ export async function POST(request: Request) {
           "Q10 CREADO PERO ERROR GUARDANDO RESPUESTA:",
           q10UpdateError
         );
+
+        return NextResponse.json(
+          {
+            error:
+              "Q10 creó la preinscripción, pero no fue posible guardar la respuesta.",
+          },
+          {
+            status: 500,
+          }
+        );
       }
 
       return NextResponse.json({
@@ -514,6 +576,14 @@ export async function POST(request: Request) {
         .update({
           q10_status:
             "error",
+
+          q10_enrollment_response:
+            {
+              error:
+                q10Error instanceof Error
+                  ? q10Error.message
+                  : "Error desconocido Q10",
+            },
         })
         .eq(
           "order_number",
