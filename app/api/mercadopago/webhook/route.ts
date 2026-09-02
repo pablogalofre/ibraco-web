@@ -528,8 +528,7 @@ export async function POST(
               undefined,
 
             Lugar_residencia:
-              order.city_name ||
-              undefined,
+  "11001",
 
             Codigo_programa:
               "01",
