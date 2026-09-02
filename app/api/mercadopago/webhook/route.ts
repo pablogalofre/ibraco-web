@@ -93,6 +93,24 @@ function esIntensivoCiclo7(order: any) {
   );
 }
 
+function getQ10DocumentType(
+  documentType: string
+) {
+  const type = String(
+    documentType || ""
+  )
+    .trim()
+    .toUpperCase();
+
+  if (type === "CC") {
+    return "1";
+  }
+
+  throw new Error(
+    `Tipo de identificación sin mapeo Q10: ${type}`
+  );
+}
+
 export async function POST(
   request: Request
 ) {
@@ -471,7 +489,9 @@ export async function POST(
               apellidos.segundo,
 
             Codigo_tipo_identificacion:
-              order.document_type,
+  getQ10DocumentType(
+    order.document_type
+  ),
 
             Numero_identificacion:
               String(
