@@ -12,21 +12,15 @@ const mercadoPagoAccessToken =
   process.env.MERCADOPAGO_ACCESS_TOKEN;
 
 if (!supabaseUrl) {
-  throw new Error(
-    "Falta NEXT_PUBLIC_SUPABASE_URL"
-  );
+  throw new Error("Falta NEXT_PUBLIC_SUPABASE_URL");
 }
 
 if (!supabaseServiceKey) {
-  throw new Error(
-    "Falta SUPABASE_SERVICE_ROLE_KEY"
-  );
+  throw new Error("Falta SUPABASE_SERVICE_ROLE_KEY");
 }
 
 if (!mercadoPagoAccessToken) {
-  throw new Error(
-    "Falta MERCADOPAGO_ACCESS_TOKEN"
-  );
+  throw new Error("Falta MERCADOPAGO_ACCESS_TOKEN");
 }
 
 const supabaseAdmin = createClient(
@@ -40,10 +34,8 @@ const supabaseAdmin = createClient(
   }
 );
 
-function separarNombres(
-  nombreCompleto: string
-) {
-  const partes = nombreCompleto
+function separarNombres(nombreCompleto: string) {
+  const partes = String(nombreCompleto || "")
     .trim()
     .split(/\s+/)
     .filter(Boolean);
@@ -57,10 +49,8 @@ function separarNombres(
   };
 }
 
-function separarApellidos(
-  apellidoCompleto: string
-) {
-  const partes = apellidoCompleto
+function separarApellidos(apellidoCompleto: string) {
+  const partes = String(apellidoCompleto || "")
     .trim()
     .split(/\s+/)
     .filter(Boolean);
@@ -74,34 +64,12 @@ function separarApellidos(
   };
 }
 
-function esIntensivoCiclo7(order: any) {
-  const nombre = String(
-    order.course_name || ""
-  ).toLowerCase();
-
-  const ciclo = String(
-    order.cycle || ""
-  ).toLowerCase();
-
-  return (
-    nombre.includes("intensivo") &&
-    !nombre.includes("semi") &&
-    (
-      ciclo.includes("7") ||
-      nombre.includes("ciclo 7")
-    )
-  );
-}
-
-function getQ10DocumentType(
-  documentType: string
-) {
-  const type = String(
-    documentType || ""
-  )
+function getQ10DocumentType(documentType: string) {
+  const type = String(documentType || "")
     .trim()
     .toUpperCase();
 
+  // Confirmado con API Q10
   if (type === "CC") {
     return "1";
   }
@@ -111,12 +79,95 @@ function getQ10DocumentType(
   );
 }
 
-export async function POST(
-  request: Request
-) {
+function getQ10ResidenceCode(cityName: string) {
+  const city = String(cityName || "")
+    .trim()
+    .toLowerCase();
+
+  // Confirmado con API Q10
+  if (
+    city === "bogotá" ||
+    city === "bogota" ||
+    city.includes("bogotá") ||
+    city.includes("bogota")
+  ) {
+    return "11001";
+  }
+
+  throw new Error(
+    `Ciudad sin mapeo Q10: ${cityName}`
+  );
+}
+
+async function getCourseForOrder(order: any) {
+  if (order.course_id) {
+    const {
+      data: courseById,
+      error: courseByIdError,
+    } = await supabaseAdmin
+      .from("courses")
+      .select(
+        `
+        id,
+        slug,
+        name,
+        cycle,
+        campus,
+        modality,
+        q10_program_code,
+        q10_period_id,
+        q10_site_journey_id
+        `
+      )
+      .eq("id", order.course_id)
+      .maybeSingle();
+
+    if (courseByIdError) {
+      throw courseByIdError;
+    }
+
+    if (courseById) {
+      return courseById;
+    }
+  }
+
+  if (order.course_slug) {
+    const {
+      data: courseBySlug,
+      error: courseBySlugError,
+    } = await supabaseAdmin
+      .from("courses")
+      .select(
+        `
+        id,
+        slug,
+        name,
+        cycle,
+        campus,
+        modality,
+        q10_program_code,
+        q10_period_id,
+        q10_site_journey_id
+        `
+      )
+      .eq("slug", order.course_slug)
+      .maybeSingle();
+
+    if (courseBySlugError) {
+      throw courseBySlugError;
+    }
+
+    if (courseBySlug) {
+      return courseBySlug;
+    }
+  }
+
+  return null;
+}
+
+export async function POST(request: Request) {
   try {
-    const body =
-      await request.json();
+    const body = await request.json();
 
     console.log(
       "MERCADO PAGO WEBHOOK:",
@@ -134,8 +185,7 @@ export async function POST(
     }
 
     // ==========================================
-    // 1. CONSULTAR LA ORDEN REAL
-    //    DIRECTAMENTE EN MERCADO PAGO
+    // 1. CONSULTAR LA ORDEN REAL EN MERCADO PAGO
     // ==========================================
 
     const response = await fetch(
@@ -145,8 +195,7 @@ export async function POST(
         headers: {
           Authorization:
             `Bearer ${mercadoPagoAccessToken}`,
-          Accept:
-            "application/json",
+          Accept: "application/json",
         },
         cache: "no-store",
       }
@@ -191,14 +240,10 @@ export async function POST(
     // ==========================================
 
     const mpStatus =
-      mpOrder.status ||
-      "unknown";
+      mpOrder.status || "unknown";
 
-    let paymentStatus =
-      "pending";
-
-    let orderStatus =
-      "pending";
+    let paymentStatus = "pending";
+    let orderStatus = "pending";
 
     if (
       mpStatus === "processed" ||
@@ -214,18 +259,15 @@ export async function POST(
       mpStatus === "rejected"
     ) {
       paymentStatus = "failed";
-      orderStatus =
-        "payment_failed";
+      orderStatus = "payment_failed";
     }
 
     // ==========================================
-    // 3. ACTUALIZAR ESTADO DE PAGO
-    //    EN SUPABASE
+    // 3. ACTUALIZAR PAGO EN SUPABASE
     // ==========================================
 
     const {
-      error:
-        paymentUpdateError,
+      error: paymentUpdateError,
     } = await supabaseAdmin
       .from("orders")
       .update({
@@ -236,9 +278,7 @@ export async function POST(
           orderStatus,
 
         payment_reference:
-          String(
-            mercadoPagoOrderId
-          ),
+          String(mercadoPagoOrderId),
       })
       .eq(
         "order_number",
@@ -263,13 +303,10 @@ export async function POST(
     }
 
     // ==========================================
-    // 4. SI NO ESTÁ PAGADO,
-    //    NO HACEMOS NADA EN Q10
+    // 4. SI NO ESTÁ PAGADO, NO TOCAR Q10
     // ==========================================
 
-    if (
-      paymentStatus !== "paid"
-    ) {
+    if (paymentStatus !== "paid") {
       return NextResponse.json({
         received: true,
         paymentStatus,
@@ -277,7 +314,7 @@ export async function POST(
     }
 
     // ==========================================
-    // 5. BUSCAR EL PEDIDO COMPLETO
+    // 5. BUSCAR PEDIDO COMPLETO
     // ==========================================
 
     const {
@@ -292,10 +329,7 @@ export async function POST(
       )
       .single();
 
-    if (
-      orderError ||
-      !order
-    ) {
+    if (orderError || !order) {
       console.error(
         "NO SE ENCONTRÓ ORDER:",
         orderError
@@ -313,7 +347,7 @@ export async function POST(
     }
 
     // ==========================================
-    // 6. EVITAR DUPLICADOS EN Q10
+    // 6. EVITAR DUPLICADOS
     // ==========================================
 
     if (
@@ -334,22 +368,39 @@ export async function POST(
     }
 
     // ==========================================
-    // 7. POR AHORA SOLO AUTOMATIZAMOS
-    //    PORTUGUÉS INTENSIVO CICLO 7
+    // 7. BUSCAR CONFIGURACIÓN Q10 DEL CURSO
     // ==========================================
 
-    if (
-      !esIntensivoCiclo7(
-        order
-      )
-    ) {
-      console.log(
-        "CURSO SIN MAPEO Q10 AUTOMÁTICO:",
+    let course;
+
+    try {
+      course =
+        await getCourseForOrder(order);
+    } catch (courseError) {
+      console.error(
+        "ERROR BUSCANDO CURSO:",
+        courseError
+      );
+
+      return NextResponse.json(
         {
-          course:
-            order.course_name,
-          cycle:
-            order.cycle,
+          error:
+            "Pago aprobado, pero no fue posible consultar la configuración del curso.",
+        },
+        {
+          status: 500,
+        }
+      );
+    }
+
+    if (!course) {
+      console.error(
+        "CURSO NO ENCONTRADO PARA ORDER:",
+        {
+          course_id:
+            order.course_id,
+          course_slug:
+            order.course_slug,
         }
       );
 
@@ -369,18 +420,80 @@ export async function POST(
         paymentStatus: "paid",
         q10Status:
           "pending_mapping",
+        reason:
+          "course_not_found",
       });
     }
 
     // ==========================================
-    // 8. BLOQUEO PARA EVITAR QUE
-    //    DOS WEBHOOKS CREEN DOS REGISTROS
+    // 8. VERIFICAR SI EL CURSO TIENE MAPEO Q10
+    // ==========================================
+
+    const q10ProgramCode =
+      course.q10_program_code;
+
+    const q10PeriodId =
+      course.q10_period_id;
+
+    const q10SiteJourneyId =
+      course.q10_site_journey_id;
+
+    const hasQ10Mapping =
+      Boolean(q10ProgramCode) &&
+      q10PeriodId !== null &&
+      q10PeriodId !== undefined &&
+      q10SiteJourneyId !== null &&
+      q10SiteJourneyId !== undefined;
+
+    if (!hasQ10Mapping) {
+      console.log(
+        "CURSO VENDIDO SIN MAPEO Q10:",
+        {
+          course_id:
+            course.id,
+          course:
+            course.name,
+          cycle:
+            course.cycle,
+          campus:
+            course.campus,
+          modality:
+            course.modality,
+        }
+      );
+
+      await supabaseAdmin
+        .from("orders")
+        .update({
+          q10_status:
+            "pending_mapping",
+        })
+        .eq(
+          "order_number",
+          externalReference
+        );
+
+      // IMPORTANTE:
+      // La compra queda pagada.
+      // No rompemos la tienda si Q10 todavía
+      // no tiene creada esa oferta académica.
+      return NextResponse.json({
+        received: true,
+        paymentStatus: "paid",
+        q10Status:
+          "pending_mapping",
+        reason:
+          "course_without_q10_mapping",
+      });
+    }
+
+    // ==========================================
+    // 9. BLOQUEO CONTRA WEBHOOKS DUPLICADOS
     // ==========================================
 
     const {
       data: lockedOrders,
-      error:
-        processingError,
+      error: processingError,
     } = await supabaseAdmin
       .from("orders")
       .update({
@@ -436,7 +549,7 @@ export async function POST(
     }
 
     // ==========================================
-    // 9. PREPARAR DATOS DEL ESTUDIANTE
+    // 10. PREPARAR DATOS DEL ESTUDIANTE
     // ==========================================
 
     const nombres =
@@ -450,29 +563,26 @@ export async function POST(
       );
 
     const fechaPreinscripcion =
-  new Intl.DateTimeFormat(
-    "en-CA",
-    {
-      timeZone: "America/Bogota",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }
-  ).format(new Date());
+      new Intl.DateTimeFormat(
+        "en-CA",
+        {
+          timeZone:
+            "America/Bogota",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }
+      ).format(new Date());
 
     // ==========================================
-    // 10. CREAR PREINSCRIPCIÓN Q10
+    // 11. CREAR PREINSCRIPCIÓN EN Q10
     //
-    // MAPEO CONFIRMADO:
+    // EL MAPEO YA NO ESTÁ QUEMADO AQUÍ.
+    // VIENE DEL CURSO EN SUPABASE:
     //
-    // Programa:
-    // 01 = Portugués Intensivo
-    //
-    // Periodo:
-    // 238 = 2026 Intensivo Ciclo 7
-    //
-    // Sede/Jornada:
-    // 14 = Principal / Continua
+    // q10_program_code
+    // q10_period_id
+    // q10_site_journey_id
     // ==========================================
 
     try {
@@ -495,9 +605,9 @@ export async function POST(
               apellidos.segundo,
 
             Codigo_tipo_identificacion:
-  getQ10DocumentType(
-    order.document_type
-  ),
+              getQ10DocumentType(
+                order.document_type
+              ),
 
             Numero_identificacion:
               String(
@@ -528,31 +638,44 @@ export async function POST(
               undefined,
 
             Lugar_residencia:
-  "11001",
+              getQ10ResidenceCode(
+                order.city_name
+              ),
 
             Codigo_programa:
-              "01",
+              String(q10ProgramCode),
 
             Consecutivo_periodo:
-              238,
+              Number(q10PeriodId),
 
             Consecutivo_sedejornada:
-  9,
+              Number(
+                q10SiteJourneyId
+              ),
           }
         );
 
       console.log(
         "Q10 PREINSCRIPCIÓN EXITOSA:",
-        q10Response
+        {
+          order:
+            externalReference,
+          course:
+            course.name,
+          q10ProgramCode,
+          q10PeriodId,
+          q10SiteJourneyId,
+          response:
+            q10Response,
+        }
       );
 
       // ========================================
-      // 11. GUARDAR RESPUESTA DE Q10
+      // 12. GUARDAR RESPUESTA DE Q10
       // ========================================
 
       const {
-        error:
-          q10UpdateError,
+        error: q10UpdateError,
       } = await supabaseAdmin
         .from("orders")
         .update({
@@ -586,7 +709,8 @@ export async function POST(
 
       return NextResponse.json({
         received: true,
-        paymentStatus: "paid",
+        paymentStatus:
+          "paid",
         q10Status:
           "preinscribed",
       });
@@ -602,7 +726,7 @@ export async function POST(
           q10_status:
             "error",
 
-          q10_response:
+          q10_enrollment_response:
             {
               error:
                 q10Error instanceof Error
