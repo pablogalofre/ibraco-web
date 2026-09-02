@@ -30,6 +30,17 @@ type NewCourse = {
   q10_site_journey_id: number | null;
 };
 
+type Q10Option = {
+  value: string;
+  label: string;
+};
+
+type Q10Catalogs = {
+  programs: Q10Option[];
+  periods: Q10Option[];
+  sitesJourneys: Q10Option[];
+};
+
 const initialCourse: NewCourse = {
   name: "",
   cycle: "",
@@ -99,6 +110,61 @@ export default function NewCoursePage() {
 
   const [messageType, setMessageType] =
     useState<"success" | "error">("success");
+
+  const [q10Catalogs, setQ10Catalogs] =
+    useState<Q10Catalogs>({
+      programs: [],
+      periods: [],
+      sitesJourneys: [],
+    });
+  const [loadingQ10, setLoadingQ10] = useState(true);
+  const [q10Error, setQ10Error] = useState("");
+
+  async function loadQ10Catalogs() {
+    try {
+      setLoadingQ10(true);
+      setQ10Error("");
+
+      const response = await fetch("/api/q10/catalogos", {
+        method: "GET",
+        cache: "no-store",
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result?.ok) {
+        throw new Error(
+          result?.error ||
+            "No fue posible consultar los catálogos de Q10."
+        );
+      }
+
+      setQ10Catalogs({
+        programs: Array.isArray(result.programs)
+          ? result.programs
+          : [],
+        periods: Array.isArray(result.periods)
+          ? result.periods
+          : [],
+        sitesJourneys: Array.isArray(result.sitesJourneys)
+          ? result.sitesJourneys
+          : [],
+      });
+    } catch (error) {
+      console.error("ERROR CARGANDO Q10:", error);
+      setQ10Error(
+        error instanceof Error
+          ? error.message
+          : "No fue posible consultar Q10."
+      );
+    } finally {
+      setLoadingQ10(false);
+    }
+  }
+
+  useEffect(() => {
+    loadQ10Catalogs();
+  }, []);
 
   function updateField<K extends keyof NewCourse>(
     field: K,
@@ -724,9 +790,9 @@ export default function NewCoursePage() {
 
               <Field
                 label="Programa Q10"
-                helper="Opcional. Código del programa en Q10, por ejemplo 01. Puede completarse después."
+                helper="Opcional. Selecciona el programa por nombre. El código interno se guarda automáticamente."
               >
-                <input
+                <select
                   value={course.q10_program_code}
                   onChange={(e) =>
                     updateField(
@@ -734,18 +800,35 @@ export default function NewCoursePage() {
                       e.target.value
                     )
                   }
-                  placeholder="Ej. 01"
-                />
+                  disabled={loadingQ10 || !!q10Error}
+                >
+                  <option value="">
+                    {loadingQ10
+                      ? "Cargando programas Q10..."
+                      : "Sin configurar"}
+                  </option>
+
+                  {q10Catalogs.programs.map((option) => (
+                    <option
+                      key={option.value}
+                      value={option.value}
+                    >
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
               </Field>
 
               <Field
                 label="Período Q10"
-                helper="Opcional. Consecutivo del período en Q10, no el número de ordenamiento."
+                helper="Opcional. Selecciona el período por nombre. El consecutivo correcto se guarda automáticamente."
               >
-                <input
-                  type="number"
-                  min="1"
-                  value={course.q10_period_id ?? ""}
+                <select
+                  value={
+                    course.q10_period_id === null
+                      ? ""
+                      : String(course.q10_period_id)
+                  }
                   onChange={(e) =>
                     updateField(
                       "q10_period_id",
@@ -754,19 +837,34 @@ export default function NewCoursePage() {
                         : Number(e.target.value)
                     )
                   }
-                  placeholder="Ej. 238"
-                />
+                  disabled={loadingQ10 || !!q10Error}
+                >
+                  <option value="">
+                    {loadingQ10
+                      ? "Cargando períodos Q10..."
+                      : "Sin configurar"}
+                  </option>
+
+                  {q10Catalogs.periods.map((option) => (
+                    <option
+                      key={option.value}
+                      value={option.value}
+                    >
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
               </Field>
 
               <Field
                 label="Sede-Jornada Q10"
-                helper="Opcional. Consecutivo de sede-jornada en Q10. Puede completarse cuando la apertura esté configurada."
+                helper="Opcional. Selecciona la sede-jornada por nombre. El consecutivo se guarda automáticamente."
               >
-                <input
-                  type="number"
-                  min="1"
+                <select
                   value={
-                    course.q10_site_journey_id ?? ""
+                    course.q10_site_journey_id === null
+                      ? ""
+                      : String(course.q10_site_journey_id)
                   }
                   onChange={(e) =>
                     updateField(
@@ -776,9 +874,37 @@ export default function NewCoursePage() {
                         : Number(e.target.value)
                     )
                   }
-                  placeholder="Ej. 9"
-                />
+                  disabled={loadingQ10 || !!q10Error}
+                >
+                  <option value="">
+                    {loadingQ10
+                      ? "Cargando sedes Q10..."
+                      : "Sin configurar"}
+                  </option>
+
+                  {q10Catalogs.sitesJourneys.map((option) => (
+                    <option
+                      key={option.value}
+                      value={option.value}
+                    >
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
               </Field>
+
+              {q10Error && (
+                <div className="q10-error">
+                  <strong>No fue posible cargar Q10.</strong>
+                  <span>{q10Error}</span>
+                  <button
+                    type="button"
+                    onClick={loadQ10Catalogs}
+                  >
+                    Reintentar
+                  </button>
+                </div>
+              )}
 
               <Field
                 label="Estado"
@@ -991,6 +1117,29 @@ export default function NewCoursePage() {
           outline: 2px solid
             rgba(0, 156, 75, 0.16);
           border-color: #009c4b;
+        }
+
+        .q10-error {
+          grid-column: 1 / -1;
+          display: flex;
+          gap: 10px;
+          align-items: center;
+          flex-wrap: wrap;
+          padding: 14px 16px;
+          border-radius: 12px;
+          background: #fdecec;
+          color: #a2251b;
+          font-size: 14px;
+        }
+
+        .q10-error button {
+          border: 0;
+          border-radius: 999px;
+          padding: 9px 14px;
+          background: #111;
+          color: #fff;
+          font-weight: 800;
+          cursor: pointer;
         }
 
         .message {
