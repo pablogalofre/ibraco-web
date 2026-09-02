@@ -25,6 +25,9 @@ type NewCourse = {
   capacity: number | null;
   status: "draft" | "published";
   image_url: string | null;
+  q10_program_code: string;
+  q10_period_id: number | null;
+  q10_site_journey_id: number | null;
 };
 
 const initialCourse: NewCourse = {
@@ -42,6 +45,9 @@ const initialCourse: NewCourse = {
   capacity: null,
   status: "draft",
   image_url: null,
+  q10_program_code: "",
+  q10_period_id: null,
+  q10_site_journey_id: null,
 };
 
 function makeSlug(value: string) {
@@ -356,6 +362,17 @@ export default function NewCoursePage() {
           capacity: course.capacity,
           status: course.status,
           image_url: course.image_url,
+
+          /*
+           * Mapeo Q10. Es opcional al crear el borrador.
+           * Si todavía no existe la configuración en Q10,
+           * se guarda en null y puede completarse después.
+           */
+          q10_program_code:
+            course.q10_program_code.trim() || null,
+          q10_period_id: course.q10_period_id,
+          q10_site_journey_id:
+            course.q10_site_journey_id,
         })
         .select("id")
         .single();
@@ -702,6 +719,64 @@ export default function NewCoursePage() {
                       Number(e.target.value)
                     )
                   }
+                />
+              </Field>
+
+              <Field
+                label="Programa Q10"
+                helper="Opcional. Código del programa en Q10, por ejemplo 01. Puede completarse después."
+              >
+                <input
+                  value={course.q10_program_code}
+                  onChange={(e) =>
+                    updateField(
+                      "q10_program_code",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Ej. 01"
+                />
+              </Field>
+
+              <Field
+                label="Período Q10"
+                helper="Opcional. Consecutivo del período en Q10, no el número de ordenamiento."
+              >
+                <input
+                  type="number"
+                  min="1"
+                  value={course.q10_period_id ?? ""}
+                  onChange={(e) =>
+                    updateField(
+                      "q10_period_id",
+                      e.target.value === ""
+                        ? null
+                        : Number(e.target.value)
+                    )
+                  }
+                  placeholder="Ej. 238"
+                />
+              </Field>
+
+              <Field
+                label="Sede-Jornada Q10"
+                helper="Opcional. Consecutivo de sede-jornada en Q10. Puede completarse cuando la apertura esté configurada."
+              >
+                <input
+                  type="number"
+                  min="1"
+                  value={
+                    course.q10_site_journey_id ?? ""
+                  }
+                  onChange={(e) =>
+                    updateField(
+                      "q10_site_journey_id",
+                      e.target.value === ""
+                        ? null
+                        : Number(e.target.value)
+                    )
+                  }
+                  placeholder="Ej. 9"
                 />
               </Field>
 
