@@ -1,52 +1,44 @@
 import { NextResponse } from "next/server";
-import { getQ10Periods } from "@/app/lib/q10";
 
 export async function GET() {
   try {
-    const periods = await getQ10Periods();
+    const apiKey = process.env.Q10_API_KEY;
 
-    const records = Array.isArray(periods)
-      ? periods
-      : [];
+    if (!apiKey) {
+      throw new Error("Falta Q10_API_KEY");
+    }
 
-    const filtered = records
-      .filter((item: any) => {
-        const nombre = String(item.Nombre ?? "");
-        return nombre.includes("2026");
-      })
-      .sort((a: any, b: any) => {
-        const aValue =
-          a.Consecutivo ??
-          a.Ordenamiento ??
-          0;
+    const posiblesEndpoints = [
+      "https://api.q10.com/v1/tiposidentificacion",
+      "https://api.q10.com/v1/tipos-identificacion",
+      "https://api.q10.com/v1/tiposidentificaciones",
+    ];
 
-        const bValue =
-          b.Consecutivo ??
-          b.Ordenamiento ??
-          0;
+    const resultados = [];
 
-        return bValue - aValue;
-      })
-      .map((item: any) => ({
-        Consecutivo:
-          item.Consecutivo ?? null,
-        Ordenamiento:
-          item.Ordenamiento ?? null,
-        Nombre:
-          item.Nombre ?? null,
-        Fecha_inicio:
-          item.Fecha_inicio ?? null,
-        Fecha_fin:
-          item.Fecha_fin ?? null,
-        Estado:
-          item.Estado ?? null,
-      }));
+    for (const url of posiblesEndpoints) {
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Api-Key": apiKey,
+          "Ocp-Apim-Subscription-Key": apiKey,
+          Accept: "application/json",
+        },
+        cache: "no-store",
+      });
+
+      const text = await response.text();
+
+      resultados.push({
+        url,
+        status: response.status,
+        respuesta: text,
+      });
+    }
 
     return NextResponse.json({
       ok: true,
-      cantidadTotal: records.length,
-      cantidad2026: filtered.length,
-      periodos2026: filtered,
+      resultados,
     });
   } catch (error) {
     return NextResponse.json(
