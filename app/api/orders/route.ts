@@ -305,8 +305,7 @@ async function createEventOrder(body: any) {
       address,
       price,
       capacity,
-      status,
-      registration_type
+      status
       `
     )
     .eq("id", eventId)
@@ -315,13 +314,20 @@ async function createEventOrder(body: any) {
   if (eventError) {
     console.error(
       "EVENT LOOKUP ERROR:",
-      eventError
+      {
+        code: eventError.code,
+        message: eventError.message,
+        details: eventError.details,
+        hint: eventError.hint,
+      }
     );
 
     return NextResponse.json(
       {
         error:
           "No fue posible consultar el evento.",
+        code: eventError.code,
+        details: eventError.details,
       },
       {
         status: 500,
@@ -353,17 +359,16 @@ async function createEventOrder(body: any) {
     );
   }
 
+  /*
+    Para eventos pagos usamos siempre
+    el precio real almacenado en Supabase.
+  */
   const unitPrice =
-    realEvent.registration_type === "free"
-      ? 0
-      : Number(realEvent.price);
+    Number(realEvent.price);
 
   if (
-    realEvent.registration_type !== "free" &&
-    (
-      !Number.isFinite(unitPrice) ||
-      unitPrice <= 0
-    )
+    !Number.isFinite(unitPrice) ||
+    unitPrice <= 0
   ) {
     return NextResponse.json(
       {
@@ -426,7 +431,12 @@ async function createEventOrder(body: any) {
   if (activeOrdersError) {
     console.error(
       "EVENT CAPACITY LOOKUP ERROR:",
-      activeOrdersError
+      {
+        code: activeOrdersError.code,
+        message: activeOrdersError.message,
+        details: activeOrdersError.details,
+        hint: activeOrdersError.hint,
+      }
     );
 
     return NextResponse.json(
@@ -554,9 +564,8 @@ async function createEventOrder(body: any) {
     payment_status: "pending",
 
     /*
-      Desde el nacimiento de la orden dejamos
-      explícito que Q10 no aplica a eventos.
-      El webhook vuelve a confirmarlo al pagar.
+      Los eventos no deben generar
+      preinscripción académica en Q10.
     */
     q10_status: "not_applicable",
 
@@ -619,7 +628,7 @@ export async function POST(
       Mantiene compatibilidad total con el
       checkout actual de cursos.
 
-      Para eventos el frontend enviará:
+      Para eventos el frontend envía:
       productType: "event"
     */
     if (
