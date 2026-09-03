@@ -4,53 +4,12 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 
-type Course = {
-  id: number;
-  name: string;
-  cycle: string | null;
-  status: string | null;
-  shift: string | null;
-  level: string | null;
-  modality: string | null;
-  campus: string | null;
-  days: string[] | null;
-  start_date: string | null;
-  end_date: string | null;
-  start_time: string | null;
-  end_time: string | null;
-  image_url: string | null;
-};
-
-function normalizeCourseName(name: string | null) {
-  if (!name) return "Portugués";
-
-  return name
-    .replace(/Português/gi, "Portugués")
-    .replace(/Portugues/gi, "Portugués");
-}
-
-function buildCourseTitle(course: Course) {
-  const parts = [
-    normalizeCourseName(course.name),
-    course.modality,
-    course.campus,
-    course.shift,
-  ].filter(
-    (value): value is string =>
-      typeof value === "string" && value.trim().length > 0
-  );
-
-  return parts.join(" · ");
-}
-
-export default function AdminPage() {
+export default function AdminDashboardPage() {
   const router = useRouter();
-
-  const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadAdmin() {
+    async function checkSession() {
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -60,102 +19,11 @@ export default function AdminPage() {
         return;
       }
 
-      const { data, error } = await supabase
-        .from("courses")
-        .select("*")
-        .order("start_date", {
-          ascending: true,
-        });
-
-      if (error) {
-        console.error("Error cargando cursos:", error);
-      }
-
-      setCourses(data ?? []);
       setLoading(false);
     }
 
-    loadAdmin();
+    checkSession();
   }, [router]);
-
-  async function toggleCourseStatus(course: Course) {
-    const newStatus =
-      course.status === "published" ? "draft" : "published";
-
-    const { error } = await supabase
-      .from("courses")
-      .update({ status: newStatus })
-      .eq("id", course.id);
-
-    if (error) {
-      console.error("Error actualizando estado del curso:", error);
-      alert("No fue posible cambiar el estado del curso.");
-      return;
-    }
-
-    setCourses((currentCourses) =>
-      currentCourses.map((item) =>
-        item.id === course.id
-          ? { ...item, status: newStatus }
-          : item
-      )
-    );
-  }
-
-  async function deleteCourse(course: Course) {
-    if (course.status === "published") {
-      alert(
-        "Primero debes despublicar este curso antes de eliminarlo."
-      );
-      return;
-    }
-
-    const confirmed = window.confirm(
-      `¿Seguro que quieres eliminar "${normalizeCourseName(
-        course.name
-      )}"?\n\nEsta acción no se puede deshacer.`
-    );
-
-    if (!confirmed) return;
-
-    const { count, error: ordersError } = await supabase
-      .from("orders")
-      .select("id", { count: "exact", head: true })
-      .eq("course_id", course.id);
-
-    if (ordersError) {
-      console.error(
-        "Error verificando órdenes del curso:",
-        ordersError
-      );
-      alert(
-        "No fue posible verificar si el curso tiene compras. No se eliminó nada."
-      );
-      return;
-    }
-
-    if ((count ?? 0) > 0) {
-      alert(
-        "Este curso ya tiene una compra u orden asociada y no se puede eliminar."
-      );
-      return;
-    }
-
-    const { error } = await supabase
-      .from("courses")
-      .delete()
-      .eq("id", course.id);
-
-    if (error) {
-      console.error("Error eliminando curso:", error);
-      alert("No fue posible eliminar el curso.");
-      return;
-    }
-
-    setCourses((currentCourses) =>
-      currentCourses.filter((item) => item.id !== course.id)
-    );
-  }
 
   async function handleLogout() {
     await supabase.auth.signOut();
@@ -186,7 +54,7 @@ export default function AdminPage() {
       style={{
         minHeight: "100vh",
         background: "#f8f5e9",
-        padding: "50px 7%",
+        padding: "55px 7%",
         fontFamily: "Arial, sans-serif",
       }}
     >
@@ -202,10 +70,10 @@ export default function AdminPage() {
           style={{
             display: "flex",
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: "flex-start",
             flexWrap: "wrap",
             gap: "30px",
-            marginBottom: "45px",
+            marginBottom: "50px",
           }}
         >
           <div>
@@ -214,8 +82,9 @@ export default function AdminPage() {
                 color: "#009c4b",
                 fontWeight: 800,
                 fontSize: "15px",
-                marginBottom: "8px",
+                marginBottom: "10px",
                 textTransform: "uppercase",
+                letterSpacing: "0.03em",
               }}
             >
               Administración IBRACO
@@ -224,385 +93,322 @@ export default function AdminPage() {
             <h1
               style={{
                 margin: 0,
-                fontSize: "44px",
+                fontSize: "48px",
                 lineHeight: 1,
                 fontWeight: 900,
+                maxWidth: "800px",
               }}
             >
-              TIENDA DE CURSOS
+              CENTRO DE ADMINISTRACIÓN
             </h1>
 
             <p
               style={{
-                fontSize: "18px",
-                marginTop: "10px",
+                fontSize: "19px",
+                marginTop: "14px",
                 marginBottom: 0,
+                maxWidth: "720px",
+                lineHeight: 1.5,
+                color: "#333",
               }}
             >
-              Administra ciclos, horarios, precios y disponibilidad.
+              Gestiona la operación comercial de IBRACO desde un solo lugar.
             </p>
           </div>
 
-          <div
+          <button
+            type="button"
+            onClick={handleLogout}
             style={{
-              display: "flex",
-              gap: "12px",
-              flexWrap: "wrap",
+              background: "#fff",
+              color: "#111",
+              border: "1px solid #ccc",
+              padding: "15px 25px",
+              borderRadius: "30px",
+              fontWeight: 700,
+              cursor: "pointer",
             }}
           >
-            <a
-              href="/cursos"
-              style={{
-                background: "#111",
-                color: "#fff",
-                textDecoration: "none",
-                padding: "15px 25px",
-                borderRadius: "30px",
-                fontWeight: 700,
-              }}
-            >
-              Ver tienda
-            </a>
-
-            <button
-              type="button"
-              onClick={handleLogout}
-              style={{
-                background: "#fff",
-                color: "#111",
-                border: "1px solid #ccc",
-                padding: "15px 25px",
-                borderRadius: "30px",
-                fontWeight: 700,
-                cursor: "pointer",
-              }}
-            >
-              Cerrar sesión
-            </button>
-          </div>
+            Cerrar sesión
+          </button>
         </div>
 
-        {/* RESUMEN */}
+        {/* MÓDULOS PRINCIPALES */}
 
-        <div
+        <section
           style={{
             display: "grid",
             gridTemplateColumns:
-              "repeat(auto-fit, minmax(180px, 1fr))",
-            gap: "15px",
-            marginBottom: "30px",
+              "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: "24px",
+            marginBottom: "52px",
           }}
         >
-          <SummaryCard
-            label="CURSOS CARGADOS"
-            value={courses.length}
+          <AdminCard
+            eyebrow="OFERTA ACADÉMICA"
+            title="Cursos"
+            description="Administra cursos, horarios, modalidades, sedes, precios, publicación y configuración académica."
+            href="/admin/cursos"
+            buttonText="Administrar cursos"
+            accent="#009c4b"
           />
 
-          <SummaryCard
-            label="PUBLICADOS"
-            value={
-              courses.filter(
-                (course) => course.status === "published"
-              ).length
-            }
+          <AdminCard
+            eyebrow="AGENDA CULTURAL"
+            title="Eventos"
+            description="Crea y administra eventos, fechas, cupos, imágenes, precios y disponibilidad para la Agenda Cultural."
+            href="/admin/eventos"
+            buttonText="Administrar eventos"
+            accent="#ffd800"
           />
 
-          <SummaryCard
-            label="BORRADORES"
-            value={
-              courses.filter(
-                (course) => course.status === "draft"
-              ).length
-            }
+          <AdminCard
+            eyebrow="VENTAS Y PAGOS"
+            title="Contabilidad"
+            description="Consulta órdenes, ventas, pagos, clientes y reportes financieros de cursos y eventos."
+            href="/admin/contabilidad"
+            buttonText="Ir a contabilidad"
+            accent="#111111"
           />
-        </div>
+        </section>
 
-        {/* CURSOS */}
+        {/* ACCESOS PÚBLICOS */}
 
-        <div
+        <section
           style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "22px",
+            background: "#fff",
+            borderRadius: "28px",
+            padding: "34px",
+            marginBottom: "52px",
           }}
         >
-          {courses.map((course) => {
-            const courseTitle = buildCourseTitle(course);
-
-            return (
-              <article
-                key={course.id}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: "25px",
+              flexWrap: "wrap",
+            }}
+          >
+            <div>
+              <div
                 style={{
-                  background: "#fff",
-                  borderRadius: "22px",
-                  padding: "28px 32px",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  flexWrap: "wrap",
-                  gap: "25px",
+                  color: "#009c4b",
+                  fontWeight: 800,
+                  fontSize: "13px",
+                  textTransform: "uppercase",
+                  marginBottom: "7px",
                 }}
               >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "18px",
-                    flex: "1",
-                  }}
-                >
-                  {course.image_url && (
-                    <img
-                      src={course.image_url}
-                      alt={courseTitle || "Curso"}
-                      style={{
-                        width: "110px",
-                        height: "80px",
-                        objectFit: "cover",
-                        borderRadius: "12px",
-                        flexShrink: 0,
-                      }}
-                    />
-                  )}
+                Vista pública
+              </div>
 
-                  <div style={{ flex: 1 }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        flexWrap: "wrap",
-                        gap: "10px",
-                        marginBottom: "6px",
-                      }}
-                    >
-                      <span
-                        style={{
-                          color: "#009c4b",
-                          fontWeight: 800,
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        {course.cycle}
-                      </span>
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: "28px",
+                  fontWeight: 900,
+                }}
+              >
+                Revisa lo que están viendo tus clientes
+              </h2>
+            </div>
 
-                      <span
-                        style={{
-                          background:
-                            course.status === "published"
-                              ? "#dff5e8"
-                              : "#eee",
-                          color:
-                            course.status === "published"
-                              ? "#007b3d"
-                              : "#555",
-                          padding: "5px 9px",
-                          borderRadius: "20px",
-                          fontSize: "11px",
-                          fontWeight: 800,
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        {course.status === "published"
-                          ? "Publicado"
-                          : "Borrador"}
-                      </span>
-                    </div>
+            <div
+              style={{
+                display: "flex",
+                gap: "12px",
+                flexWrap: "wrap",
+              }}
+            >
+              <a
+                href="/cursos"
+                style={{
+                  background: "#009c4b",
+                  color: "#fff",
+                  textDecoration: "none",
+                  padding: "14px 22px",
+                  borderRadius: "30px",
+                  fontWeight: 800,
+                }}
+              >
+                Ver tienda de cursos
+              </a>
 
-                    <h2
-                      style={{
-                        margin: "0 0 8px",
-                        fontSize: "27px",
-                        lineHeight: 1.15,
-                      }}
-                    >
-                      {courseTitle}
-                    </h2>
+              <a
+                href="/agenda-cultural"
+                style={{
+                  background: "#ffd800",
+                  color: "#111",
+                  textDecoration: "none",
+                  padding: "14px 22px",
+                  borderRadius: "30px",
+                  fontWeight: 800,
+                }}
+              >
+                Ver Agenda Cultural
+              </a>
 
-                    {course.level && (
-                      <p
-                        style={{
-                          margin: "0 0 6px",
-                          fontWeight: 700,
-                        }}
-                      >
-                        {course.level}
-                      </p>
-                    )}
+              <a
+                href="/"
+                style={{
+                  background: "#111",
+                  color: "#fff",
+                  textDecoration: "none",
+                  padding: "14px 22px",
+                  borderRadius: "30px",
+                  fontWeight: 800,
+                }}
+              >
+                Ver sitio IBRACO
+              </a>
+            </div>
+          </div>
+        </section>
 
-                    <p
-                      style={{
-                        margin: "0 0 6px",
-                        fontSize: "16px",
-                      }}
-                    >
-                      {course.start_date || "—"} —{" "}
-                      {course.end_date || "—"}
-                    </p>
+        {/* FUTUROS INDICADORES */}
 
-                    {course.days &&
-                      course.days.length > 0 && (
-                        <p
-                          style={{
-                            margin: 0,
-                            color: "#555",
-                          }}
-                        >
-                          {course.days.join(", ")}
-                          {" · "}
-                          {course.start_time || ""}
-                          {" – "}
-                          {course.end_time || ""}
-                        </p>
-                      )}
-                  </div>
-                </div>
-
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "10px",
-                    alignItems: "center",
-                    flexShrink: 0,
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <button
-                    type="button"
-                    onClick={() =>
-                      toggleCourseStatus(course)
-                    }
-                    style={{
-                      background:
-                        course.status === "published"
-                          ? "#fff"
-                          : "#009c4b",
-                      color:
-                        course.status === "published"
-                          ? "#111"
-                          : "#fff",
-                      border:
-                        course.status === "published"
-                          ? "1px solid #ccc"
-                          : "1px solid #009c4b",
-                      padding: "14px 20px",
-                      borderRadius: "30px",
-                      fontSize: "14px",
-                      fontWeight: 800,
-                      cursor: "pointer",
-                      flexShrink: 0,
-                    }}
-                  >
-                    {course.status === "published"
-                      ? "Despublicar"
-                      : "Publicar"}
-                  </button>
-
-                  <a
-                    href={`/admin/cursos/${course.id}`}
-                    style={{
-                      background: "#ffd800",
-                      color: "#000",
-                      textDecoration: "none",
-                      padding: "14px 25px",
-                      borderRadius: "30px",
-                      fontSize: "15px",
-                      fontWeight: 800,
-                      flexShrink: 0,
-                      display: "inline-block",
-                    }}
-                  >
-                    Editar
-                  </a>
-
-                  <button
-                    type="button"
-                    onClick={() => deleteCourse(course)}
-                    style={{
-                      background: "#fff",
-                      color: "#c62828",
-                      border: "1px solid #c62828",
-                      padding: "14px 20px",
-                      borderRadius: "30px",
-                      fontSize: "14px",
-                      fontWeight: 800,
-                      cursor: "pointer",
-                      flexShrink: 0,
-                    }}
-                  >
-                    Eliminar
-                  </button>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-
-        {/* CREAR */}
-
-        <a
-          href="/admin/cursos/nuevo"
+        <section
           style={{
-            display: "block",
-            width: "100%",
-            marginTop: "35px",
-            background: "#009c4b",
-            color: "#fff",
-            textDecoration: "none",
-            textAlign: "center",
-            padding: "19px",
-            borderRadius: "30px",
-            fontSize: "17px",
-            fontWeight: 800,
-            boxSizing: "border-box",
+            border: "2px dashed #d8d3c4",
+            borderRadius: "28px",
+            padding: "36px",
           }}
         >
-          + Crear nuevo curso
-        </a>
+          <div
+            style={{
+              color: "#777",
+              fontSize: "13px",
+              fontWeight: 800,
+              textTransform: "uppercase",
+              marginBottom: "8px",
+            }}
+          >
+            Próxima etapa
+          </div>
+
+          <h2
+            style={{
+              margin: "0 0 12px",
+              fontSize: "30px",
+              fontWeight: 900,
+            }}
+          >
+            Indicadores comerciales
+          </h2>
+
+          <p
+            style={{
+              margin: 0,
+              color: "#555",
+              fontSize: "17px",
+              lineHeight: 1.6,
+              maxWidth: "850px",
+            }}
+          >
+            Este espacio queda preparado para integrar más adelante Google
+            Analytics, Meta, Mercado Pago y otros indicadores de ventas,
+            tráfico, campañas y conversión.
+          </p>
+        </section>
 
         <p
           style={{
             textAlign: "center",
             color: "#777",
             fontSize: "13px",
-            marginTop: "18px",
+            marginTop: "28px",
           }}
         >
-          Panel administrativo · IBRACO
+          Centro de Administración · IBRACO
         </p>
       </div>
     </main>
   );
 }
 
-function SummaryCard({
-  label,
-  value,
+function AdminCard({
+  eyebrow,
+  title,
+  description,
+  href,
+  buttonText,
+  accent,
 }: {
-  label: string;
-  value: number;
+  eyebrow: string;
+  title: string;
+  description: string;
+  href: string;
+  buttonText: string;
+  accent: string;
 }) {
+  const darkButton = accent === "#111111";
+
   return (
-    <div
+    <article
       style={{
         background: "#fff",
-        padding: "22px",
-        borderRadius: "20px",
+        borderRadius: "28px",
+        padding: "34px",
+        minHeight: "330px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        borderTop: `7px solid ${accent}`,
       }}
     >
-      <div
-        style={{
-          fontSize: "13px",
-          fontWeight: 700,
-          color: "#666",
-          marginBottom: "5px",
-        }}
-      >
-        {label}
+      <div>
+        <div
+          style={{
+            color: accent === "#ffd800" ? "#777" : accent,
+            fontWeight: 800,
+            fontSize: "13px",
+            textTransform: "uppercase",
+            marginBottom: "14px",
+          }}
+        >
+          {eyebrow}
+        </div>
+
+        <h2
+          style={{
+            margin: "0 0 15px",
+            fontSize: "34px",
+            fontWeight: 900,
+          }}
+        >
+          {title}
+        </h2>
+
+        <p
+          style={{
+            margin: 0,
+            fontSize: "17px",
+            lineHeight: 1.55,
+            color: "#444",
+          }}
+        >
+          {description}
+        </p>
       </div>
 
-      <strong style={{ fontSize: "32px" }}>
-        {value}
-      </strong>
-    </div>
+      <a
+        href={href}
+        style={{
+          display: "block",
+          marginTop: "30px",
+          background: accent,
+          color: darkButton ? "#fff" : "#111",
+          textDecoration: "none",
+          padding: "15px 20px",
+          borderRadius: "30px",
+          fontWeight: 800,
+          textAlign: "center",
+        }}
+      >
+        {buttonText}
+      </a>
+    </article>
   );
 }
