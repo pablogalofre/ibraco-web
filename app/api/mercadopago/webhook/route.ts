@@ -347,6 +347,58 @@ export async function POST(request: Request) {
     }
 
     // ==========================================
+    // EVENTOS: QUEDAN PAGADOS Y NO PASAN A Q10
+    // ==========================================
+
+    if (order.product_type === "event") {
+      console.log(
+        "EVENTO PAGADO - NO SE ENVÍA A Q10:",
+        {
+          order: externalReference,
+          event_id: order.event_id,
+          event_name: order.event_name,
+          quantity: order.quantity,
+          amount: order.amount,
+        }
+      );
+
+      const { error: eventQ10StatusError } =
+        await supabaseAdmin
+          .from("orders")
+          .update({
+            q10_status: "not_applicable",
+          })
+          .eq(
+            "order_number",
+            externalReference
+          );
+
+      if (eventQ10StatusError) {
+        console.error(
+          "EVENTO PAGADO PERO ERROR MARCANDO Q10 COMO NO APLICABLE:",
+          eventQ10StatusError
+        );
+
+        return NextResponse.json(
+          {
+            error:
+              "El pago del evento fue aprobado, pero no fue posible finalizar su registro interno.",
+          },
+          {
+            status: 500,
+          }
+        );
+      }
+
+      return NextResponse.json({
+        received: true,
+        paymentStatus: "paid",
+        productType: "event",
+        q10Status: "not_applicable",
+      });
+    }
+
+    // ==========================================
     // 6. EVITAR DUPLICADOS
     // ==========================================
 
