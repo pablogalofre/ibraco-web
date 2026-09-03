@@ -48,7 +48,7 @@ export default function Home() {
           <a href="/cursos">Cursos</a>
           <a href="/sedes">Sedes</a>
           <a href="/cultura">Cultura</a>
-          <a href="/eventos/feijoada-da-independencia">Agenda cultural</a>
+          <a href="/eventos">Agenda cultural</a>
           <a href="/empresas">Empresas</a>
           <a href="/alumni">Alumni</a>
           <a href="/blog">Blog</a>
