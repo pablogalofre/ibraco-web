@@ -69,6 +69,7 @@ export default function AdminEventosPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const editingEvent = useMemo(
     () => events.find((event) => event.id === editingId) ?? null,
@@ -112,6 +113,78 @@ export default function AdminEventosPage() {
     }));
   }
 
+  async function handleImageUpload(
+    event: React.ChangeEvent<HTMLInputElement>
+  ) {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      alert("La imagen debe ser JPG, PNG o WebP.");
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("La imagen no puede superar 5 MB.");
+      event.target.value = "";
+      return;
+    }
+
+    setUploadingImage(true);
+
+    try {
+      const extension =
+        file.name.split(".").pop()?.toLowerCase() || "jpg";
+
+      const baseName =
+        slugify(form.name || "evento") || "evento";
+
+      const fileName =
+        `${baseName}-${Date.now()}.${extension}`;
+
+      const { error: uploadError } =
+        await supabase.storage
+          .from("event-images")
+          .upload(fileName, file, {
+            cacheControl: "3600",
+            upsert: false,
+          });
+
+      if (uploadError) {
+        console.error(
+          "Error subiendo imagen:",
+          uploadError
+        );
+        alert("No fue posible subir la imagen.");
+        return;
+      }
+
+      const { data: publicUrlData } =
+        supabase.storage
+          .from("event-images")
+          .getPublicUrl(fileName);
+
+      const publicUrl =
+        publicUrlData.publicUrl;
+
+      setForm((current) => ({
+        ...current,
+        image_url: publicUrl,
+      }));
+    } finally {
+      setUploadingImage(false);
+      event.target.value = "";
+    }
+  }
+
   function resetForm() {
     setForm(emptyForm);
     setEditingId(null);
@@ -125,16 +198,20 @@ export default function AdminEventosPage() {
       category: event.category ?? "Cultura",
       description: event.description ?? "",
       event_date: event.event_date ?? "",
-      start_time: event.start_time?.slice(0, 5) ?? "",
-      end_time: event.end_time?.slice(0, 5) ?? "",
+      start_time:
+        event.start_time?.slice(0, 5) ?? "",
+      end_time:
+        event.end_time?.slice(0, 5) ?? "",
       venue: event.venue ?? "",
       address: event.address ?? "",
       price: String(event.price ?? 0),
       capacity: String(event.capacity ?? 100),
       image_url: event.image_url ?? "",
-      registration_type: event.registration_type ?? "paid",
+      registration_type:
+        event.registration_type ?? "paid",
       organizer: event.organizer ?? "",
-      contact_email: event.contact_email ?? "",
+      contact_email:
+        event.contact_email ?? "",
       status: event.status ?? "draft",
     });
 
@@ -144,16 +221,22 @@ export default function AdminEventosPage() {
     });
   }
 
-  async function saveEvent(event: React.FormEvent) {
+  async function saveEvent(
+    event: React.FormEvent
+  ) {
     event.preventDefault();
 
     if (!form.name.trim()) {
-      alert("Debes escribir el nombre del evento.");
+      alert(
+        "Debes escribir el nombre del evento."
+      );
       return;
     }
 
     if (!form.event_date) {
-      alert("Debes seleccionar la fecha del evento.");
+      alert(
+        "Debes seleccionar la fecha del evento."
+      );
       return;
     }
 
@@ -164,34 +247,53 @@ export default function AdminEventosPage() {
 
     const capacity = Number(form.capacity);
 
-    if (!Number.isFinite(price) || price < 0) {
+    if (
+      !Number.isFinite(price) ||
+      price < 0
+    ) {
       alert("El precio no es válido.");
       return;
     }
 
-    if (!Number.isFinite(capacity) || capacity <= 0) {
-      alert("La capacidad debe ser mayor que 0.");
+    if (
+      !Number.isFinite(capacity) ||
+      capacity <= 0
+    ) {
+      alert(
+        "La capacidad debe ser mayor que 0."
+      );
       return;
     }
 
     setSaving(true);
 
     const payload = {
-      slug: editingEvent?.slug || slugify(form.name),
+      slug:
+        editingEvent?.slug ||
+        slugify(form.name),
       name: form.name.trim(),
       category: form.category,
-      description: form.description.trim() || null,
+      description:
+        form.description.trim() || null,
       event_date: form.event_date,
-      start_time: form.start_time || null,
-      end_time: form.end_time || null,
-      venue: form.venue.trim() || null,
-      address: form.address.trim() || null,
+      start_time:
+        form.start_time || null,
+      end_time:
+        form.end_time || null,
+      venue:
+        form.venue.trim() || null,
+      address:
+        form.address.trim() || null,
       price,
       capacity,
-      image_url: form.image_url.trim() || null,
-      registration_type: form.registration_type,
-      organizer: form.organizer.trim() || null,
-      contact_email: form.contact_email.trim() || null,
+      image_url:
+        form.image_url.trim() || null,
+      registration_type:
+        form.registration_type,
+      organizer:
+        form.organizer.trim() || null,
+      contact_email:
+        form.contact_email.trim() || null,
       status: form.status,
     };
 
@@ -215,7 +317,10 @@ export default function AdminEventosPage() {
     setSaving(false);
 
     if (error) {
-      console.error("Error guardando evento:", error);
+      console.error(
+        "Error guardando evento:",
+        error
+      );
 
       if (error.code === "23505") {
         alert(
@@ -224,7 +329,9 @@ export default function AdminEventosPage() {
         return;
       }
 
-      alert("No fue posible guardar el evento.");
+      alert(
+        "No fue posible guardar el evento."
+      );
       return;
     }
 
@@ -232,9 +339,13 @@ export default function AdminEventosPage() {
     await loadEvents();
   }
 
-  async function toggleStatus(event: EventRow) {
+  async function toggleStatus(
+    event: EventRow
+  ) {
     const newStatus =
-      event.status === "published" ? "draft" : "published";
+      event.status === "published"
+        ? "draft"
+        : "published";
 
     const { error } = await supabase
       .from("events")
@@ -244,17 +355,26 @@ export default function AdminEventosPage() {
       .eq("id", event.id);
 
     if (error) {
-      console.error("Error cambiando estado:", error);
-      alert("No fue posible cambiar el estado.");
+      console.error(
+        "Error cambiando estado:",
+        error
+      );
+      alert(
+        "No fue posible cambiar el estado."
+      );
       return;
     }
 
     await loadEvents();
   }
 
-  async function deleteEvent(event: EventRow) {
+  async function deleteEvent(
+    event: EventRow
+  ) {
     if (event.status === "published") {
-      alert("Primero debes despublicar el evento.");
+      alert(
+        "Primero debes despublicar el evento."
+      );
       return;
     }
 
@@ -264,7 +384,10 @@ export default function AdminEventosPage() {
 
     if (!confirmed) return;
 
-    const { count, error: ordersError } = await supabase
+    const {
+      count,
+      error: ordersError,
+    } = await supabase
       .from("orders")
       .select("id", {
         count: "exact",
@@ -298,8 +421,13 @@ export default function AdminEventosPage() {
       .eq("id", event.id);
 
     if (error) {
-      console.error("Error eliminando evento:", error);
-      alert("No fue posible eliminar el evento.");
+      console.error(
+        "Error eliminando evento:",
+        error
+      );
+      alert(
+        "No fue posible eliminar el evento."
+      );
       return;
     }
 
@@ -312,7 +440,8 @@ export default function AdminEventosPage() {
         minHeight: "100vh",
         background: "#f8f5e9",
         padding: "40px 24px 80px",
-        fontFamily: "Arial, Helvetica, sans-serif",
+        fontFamily:
+          "Arial, Helvetica, sans-serif",
       }}
     >
       <div
@@ -324,7 +453,8 @@ export default function AdminEventosPage() {
         <div
           style={{
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent:
+              "space-between",
             alignItems: "flex-start",
             gap: "20px",
             marginBottom: "35px",
@@ -361,7 +491,8 @@ export default function AdminEventosPage() {
                 fontSize: "17px",
               }}
             >
-              Crea y administra la agenda cultural de IBRACO.
+              Crea y administra la agenda
+              cultural de IBRACO.
             </p>
           </div>
 
@@ -387,7 +518,8 @@ export default function AdminEventosPage() {
             borderRadius: "28px",
             padding: "30px",
             marginBottom: "45px",
-            boxShadow: "0 8px 30px rgba(0,0,0,0.05)",
+            boxShadow:
+              "0 8px 30px rgba(0,0,0,0.05)",
           }}
         >
           <h2
@@ -398,7 +530,10 @@ export default function AdminEventosPage() {
             }}
           >
             {editingId
-              ? `Editar: ${editingEvent?.name ?? "evento"}`
+              ? `Editar: ${
+                  editingEvent?.name ??
+                  "evento"
+                }`
               : "Nuevo evento"}
           </h2>
 
@@ -429,28 +564,31 @@ export default function AdminEventosPage() {
                   onChange={handleChange}
                   style={inputStyle}
                 >
-                  {categories.map((category) => (
-                    <option
-                      value={category}
-                      key={category}
-                    >
-                      {category}
-                    </option>
-                  ))}
+                  {categories.map(
+                    (category) => (
+                      <option
+                        value={category}
+                        key={category}
+                      >
+                        {category}
+                      </option>
+                    )
+                  )}
                 </select>
               </Field>
 
               <Field label="Tipo de inscripción">
                 <select
                   name="registration_type"
-                  value={form.registration_type}
+                  value={
+                    form.registration_type
+                  }
                   onChange={handleChange}
                   style={inputStyle}
                 >
                   <option value="paid">
                     Evento pago
                   </option>
-
                   <option value="free">
                     Inscripción gratuita
                   </option>
@@ -467,7 +605,6 @@ export default function AdminEventosPage() {
                   <option value="draft">
                     Borrador
                   </option>
-
                   <option value="published">
                     Publicado
                   </option>
@@ -523,13 +660,15 @@ export default function AdminEventosPage() {
                   min="0"
                   value={form.price}
                   disabled={
-                    form.registration_type === "free"
+                    form.registration_type ===
+                    "free"
                   }
                   onChange={handleChange}
                   style={{
                     ...inputStyle,
                     opacity:
-                      form.registration_type === "free"
+                      form.registration_type ===
+                      "free"
                         ? 0.5
                         : 1,
                   }}
@@ -570,19 +709,123 @@ export default function AdminEventosPage() {
                 <input
                   name="contact_email"
                   type="email"
-                  value={form.contact_email}
+                  value={
+                    form.contact_email
+                  }
                   onChange={handleChange}
                   placeholder="cultural@ibraco.org.co"
                   style={inputStyle}
                 />
               </Field>
 
-              <Field label="URL de imagen">
+              <Field label="Imagen del evento">
+                <div
+                  style={{
+                    display: "grid",
+                    gap: "10px",
+                  }}
+                >
+                  <label
+                    style={{
+                      display:
+                        "inline-flex",
+                      alignItems: "center",
+                      justifyContent:
+                        "center",
+                      minHeight: "48px",
+                      borderRadius: "14px",
+                      background: "#ffd600",
+                      color: "#111",
+                      fontWeight: 900,
+                      cursor:
+                        uploadingImage
+                          ? "wait"
+                          : "pointer",
+                      padding:
+                        "0 18px",
+                    }}
+                  >
+                    {uploadingImage
+                      ? "Subiendo..."
+                      : form.image_url
+                      ? "Cambiar imagen"
+                      : "Seleccionar imagen"}
+
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={
+                        handleImageUpload
+                      }
+                      disabled={
+                        uploadingImage
+                      }
+                      style={{
+                        display: "none",
+                      }}
+                    />
+                  </label>
+
+                  {form.image_url && (
+                    <>
+                      <img
+                        src={
+                          form.image_url
+                        }
+                        alt="Vista previa del evento"
+                        style={{
+                          width: "100%",
+                          maxHeight:
+                            "180px",
+                          objectFit:
+                            "cover",
+                          borderRadius:
+                            "14px",
+                          border:
+                            "1px solid #eee",
+                        }}
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setForm(
+                            (current) => ({
+                              ...current,
+                              image_url:
+                                "",
+                            })
+                          )
+                        }
+                        style={{
+                          border:
+                            "1px solid #ddd",
+                          background:
+                            "#fff",
+                          color: "#555",
+                          borderRadius:
+                            "12px",
+                          padding:
+                            "10px 12px",
+                          cursor:
+                            "pointer",
+                          fontWeight:
+                            800,
+                        }}
+                      >
+                        Quitar imagen
+                      </button>
+                    </>
+                  )}
+                </div>
+              </Field>
+
+              <Field label="URL de imagen (opcional)">
                 <input
                   name="image_url"
                   value={form.image_url}
                   onChange={handleChange}
-                  placeholder="https://..."
+                  placeholder="También puedes pegar una URL"
                   style={inputStyle}
                 />
               </Field>
@@ -618,7 +861,10 @@ export default function AdminEventosPage() {
             >
               <button
                 type="submit"
-                disabled={saving}
+                disabled={
+                  saving ||
+                  uploadingImage
+                }
                 style={{
                   background: "#009c4b",
                   color: "#fff",
@@ -628,6 +874,11 @@ export default function AdminEventosPage() {
                   fontWeight: 900,
                   fontSize: "15px",
                   cursor: "pointer",
+                  opacity:
+                    saving ||
+                    uploadingImage
+                      ? 0.6
+                      : 1,
                 }}
               >
                 {saving
@@ -645,8 +896,10 @@ export default function AdminEventosPage() {
                     background: "#eee",
                     color: "#111",
                     border: 0,
-                    padding: "15px 26px",
-                    borderRadius: "30px",
+                    padding:
+                      "15px 26px",
+                    borderRadius:
+                      "30px",
                     fontWeight: 800,
                     cursor: "pointer",
                   }}
@@ -669,9 +922,13 @@ export default function AdminEventosPage() {
           </h2>
 
           {loading ? (
-            <div>Cargando eventos...</div>
+            <div>
+              Cargando eventos...
+            </div>
           ) : events.length === 0 ? (
-            <div>No hay eventos creados.</div>
+            <div>
+              No hay eventos creados.
+            </div>
           ) : (
             <div
               style={{
@@ -679,150 +936,242 @@ export default function AdminEventosPage() {
                 gap: "20px",
               }}
             >
-              {events.map((event) => (
-                <article
-                  key={event.id}
-                  style={{
-                    background: "#fff",
-                    borderRadius: "24px",
-                    padding: "24px",
-                    display: "grid",
-                    gridTemplateColumns:
-                      "minmax(0, 1fr) auto",
-                    gap: "20px",
-                    alignItems: "center",
-                  }}
-                >
-                  <div>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "8px",
-                        flexWrap: "wrap",
-                        marginBottom: "10px",
-                      }}
-                    >
-                      <span
-                        style={{
-                          background:
-                            event.status === "published"
-                              ? "#dff5e6"
-                              : "#eee",
-                          color:
-                            event.status === "published"
-                              ? "#087d3b"
-                              : "#555",
-                          padding: "6px 10px",
-                          borderRadius: "20px",
-                          fontWeight: 900,
-                          fontSize: "12px",
-                        }}
-                      >
-                        {event.status === "published"
-                          ? "PUBLICADO"
-                          : "BORRADOR"}
-                      </span>
-
-                      <span
-                        style={{
-                          background: "#fff5c2",
-                          padding: "6px 10px",
-                          borderRadius: "20px",
-                          fontWeight: 800,
-                          fontSize: "12px",
-                        }}
-                      >
-                        {event.category ?? "Cultura"}
-                      </span>
-                    </div>
-
-                    <h3
-                      style={{
-                        margin: "0 0 8px",
-                        fontSize: "25px",
-                      }}
-                    >
-                      {event.name}
-                    </h3>
-
-                    <div
-                      style={{
-                        color: "#555",
-                        lineHeight: 1.6,
-                      }}
-                    >
-                      {event.event_date} ·{" "}
-                      {event.start_time
-                        ? event.start_time.slice(0, 5)
-                        : "--:--"}
-                      {event.end_time
-                        ? ` – ${event.end_time.slice(
-                            0,
-                            5
-                          )}`
-                        : ""}
-                      <br />
-
-                      {event.venue ?? "Sin lugar"} ·{" "}
-                      {event.capacity ?? 0} cupos ·{" "}
-
-                      {event.registration_type ===
-                      "free"
-                        ? "Gratuito"
-                        : `$${Number(
-                            event.price ?? 0
-                          ).toLocaleString("es-CO")}`}
-                    </div>
-                  </div>
-
-                  <div
+              {events.map(
+                (event) => (
+                  <article
+                    key={event.id}
                     style={{
-                      display: "flex",
-                      gap: "10px",
-                      flexWrap: "wrap",
-                      justifyContent: "flex-end",
+                      background:
+                        "#fff",
+                      borderRadius:
+                        "24px",
+                      padding: "24px",
+                      display: "grid",
+                      gridTemplateColumns:
+                        "minmax(0, 1fr) auto",
+                      gap: "20px",
+                      alignItems:
+                        "center",
                     }}
                   >
-                    <button
-                      type="button"
-                      onClick={() =>
-                        toggleStatus(event)
-                      }
-                      style={actionButton}
-                    >
-                      {event.status === "published"
-                        ? "Despublicar"
-                        : "Publicar"}
-                    </button>
+                    <div>
+                      <div
+                        style={{
+                          display:
+                            "flex",
+                          gap: "8px",
+                          flexWrap:
+                            "wrap",
+                          marginBottom:
+                            "10px",
+                        }}
+                      >
+                        <span
+                          style={{
+                            background:
+                              event.status ===
+                              "published"
+                                ? "#dff5e6"
+                                : "#eee",
+                            color:
+                              event.status ===
+                              "published"
+                                ? "#087d3b"
+                                : "#555",
+                            padding:
+                              "6px 10px",
+                            borderRadius:
+                              "20px",
+                            fontWeight:
+                              900,
+                            fontSize:
+                              "12px",
+                          }}
+                        >
+                          {event.status ===
+                          "published"
+                            ? "PUBLICADO"
+                            : "BORRADOR"}
+                        </span>
 
-                    <button
-                      type="button"
-                      onClick={() => startEdit(event)}
+                        <span
+                          style={{
+                            background:
+                              "#fff5c2",
+                            padding:
+                              "6px 10px",
+                            borderRadius:
+                              "20px",
+                            fontWeight:
+                              800,
+                            fontSize:
+                              "12px",
+                          }}
+                        >
+                          {event.category ??
+                            "Cultura"}
+                        </span>
+                      </div>
+
+                      <div
+                        style={{
+                          display:
+                            "flex",
+                          alignItems:
+                            "center",
+                          gap: "16px",
+                        }}
+                      >
+                        {event.image_url && (
+                          <img
+                            src={
+                              event.image_url
+                            }
+                            alt={
+                              event.name
+                            }
+                            style={{
+                              width:
+                                "90px",
+                              height:
+                                "90px",
+                              objectFit:
+                                "cover",
+                              borderRadius:
+                                "14px",
+                              flexShrink:
+                                0,
+                            }}
+                          />
+                        )}
+
+                        <div>
+                          <h3
+                            style={{
+                              margin:
+                                "0 0 8px",
+                              fontSize:
+                                "25px",
+                            }}
+                          >
+                            {
+                              event.name
+                            }
+                          </h3>
+
+                          <div
+                            style={{
+                              color:
+                                "#555",
+                              lineHeight:
+                                1.6,
+                            }}
+                          >
+                            {
+                              event.event_date
+                            }{" "}
+                            ·{" "}
+                            {event.start_time
+                              ? event.start_time.slice(
+                                  0,
+                                  5
+                                )
+                              : "--:--"}
+                            {event.end_time
+                              ? ` – ${event.end_time.slice(
+                                  0,
+                                  5
+                                )}`
+                              : ""}
+                            <br />
+
+                            {event.venue ??
+                              "Sin lugar"}{" "}
+                            ·{" "}
+                            {event.capacity ??
+                              0}{" "}
+                            cupos ·{" "}
+                            {event.registration_type ===
+                            "free"
+                              ? "Gratuito"
+                              : `$${Number(
+                                  event.price ??
+                                    0
+                                ).toLocaleString(
+                                  "es-CO"
+                                )}`}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div
                       style={{
-                        ...actionButton,
-                        background: "#ffd600",
+                        display:
+                          "flex",
+                        gap: "10px",
+                        flexWrap:
+                          "wrap",
+                        justifyContent:
+                          "flex-end",
                       }}
                     >
-                      Editar
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          toggleStatus(
+                            event
+                          )
+                        }
+                        style={
+                          actionButton
+                        }
+                      >
+                        {event.status ===
+                        "published"
+                          ? "Despublicar"
+                          : "Publicar"}
+                      </button>
 
-                    <button
-                      type="button"
-                      onClick={() =>
-                        deleteEvent(event)
-                      }
-                      style={{
-                        ...actionButton,
-                        background: "#fff",
-                        color: "#c62828",
-                        border: "1px solid #c62828",
-                      }}
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                </article>
-              ))}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          startEdit(
+                            event
+                          )
+                        }
+                        style={{
+                          ...actionButton,
+                          background:
+                            "#ffd600",
+                        }}
+                      >
+                        Editar
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          deleteEvent(
+                            event
+                          )
+                        }
+                        style={{
+                          ...actionButton,
+                          background:
+                            "#fff",
+                          color:
+                            "#c62828",
+                          border:
+                            "1px solid #c62828",
+                        }}
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  </article>
+                )
+              )}
             </div>
           )}
         </section>
