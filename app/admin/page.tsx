@@ -18,8 +18,30 @@ type Course = {
   end_date: string | null;
   start_time: string | null;
   end_time: string | null;
-    image_url: string | null;
+  image_url: string | null;
 };
+
+function normalizeCourseName(name: string | null) {
+  if (!name) return "Portugués";
+
+  return name
+    .replace(/Português/gi, "Portugués")
+    .replace(/Portugues/gi, "Portugués");
+}
+
+function buildCourseTitle(course: Course) {
+  const parts = [
+    normalizeCourseName(course.name),
+    course.modality,
+    course.campus,
+    course.shift,
+  ].filter(
+    (value): value is string =>
+      typeof value === "string" && value.trim().length > 0
+  );
+
+  return parts.join(" · ");
+}
 
 export default function AdminPage() {
   const router = useRouter();
@@ -46,10 +68,7 @@ export default function AdminPage() {
         });
 
       if (error) {
-        console.error(
-          "Error cargando cursos:",
-          error
-        );
+        console.error("Error cargando cursos:", error);
       }
 
       setCourses(data ?? []);
@@ -58,37 +77,43 @@ export default function AdminPage() {
 
     loadAdmin();
   }, [router]);
-async function toggleCourseStatus(course: Course) {
-  const newStatus =
-    course.status === "published" ? "draft" : "published";
 
-  const { error } = await supabase
-    .from("courses")
-    .update({ status: newStatus })
-    .eq("id", course.id);
+  async function toggleCourseStatus(course: Course) {
+    const newStatus =
+      course.status === "published" ? "draft" : "published";
 
-  if (error) {
-    console.error("Error actualizando estado del curso:", error);
-    alert("No fue posible cambiar el estado del curso.");
-    return;
+    const { error } = await supabase
+      .from("courses")
+      .update({ status: newStatus })
+      .eq("id", course.id);
+
+    if (error) {
+      console.error("Error actualizando estado del curso:", error);
+      alert("No fue posible cambiar el estado del curso.");
+      return;
+    }
+
+    setCourses((currentCourses) =>
+      currentCourses.map((item) =>
+        item.id === course.id
+          ? { ...item, status: newStatus }
+          : item
+      )
+    );
   }
 
-  setCourses((currentCourses) =>
-    currentCourses.map((item) =>
-      item.id === course.id
-        ? { ...item, status: newStatus }
-        : item
-    )
-  );
-}
   async function deleteCourse(course: Course) {
     if (course.status === "published") {
-      alert("Primero debes despublicar este curso antes de eliminarlo.");
+      alert(
+        "Primero debes despublicar este curso antes de eliminarlo."
+      );
       return;
     }
 
     const confirmed = window.confirm(
-      `¿Seguro que quieres eliminar "${course.name}"?\n\nEsta acción no se puede deshacer.`
+      `¿Seguro que quieres eliminar "${normalizeCourseName(
+        course.name
+      )}"?\n\nEsta acción no se puede deshacer.`
     );
 
     if (!confirmed) return;
@@ -99,13 +124,20 @@ async function toggleCourseStatus(course: Course) {
       .eq("course_id", course.id);
 
     if (ordersError) {
-      console.error("Error verificando órdenes del curso:", ordersError);
-      alert("No fue posible verificar si el curso tiene compras. No se eliminó nada.");
+      console.error(
+        "Error verificando órdenes del curso:",
+        ordersError
+      );
+      alert(
+        "No fue posible verificar si el curso tiene compras. No se eliminó nada."
+      );
       return;
     }
 
     if ((count ?? 0) > 0) {
-      alert("Este curso ya tiene una compra u orden asociada y no se puede eliminar.");
+      alert(
+        "Este curso ya tiene una compra u orden asociada y no se puede eliminar."
+      );
       return;
     }
 
@@ -144,9 +176,7 @@ async function toggleCourseStatus(course: Course) {
           fontFamily: "Arial, sans-serif",
         }}
       >
-        <strong>
-          Cargando administración IBRACO...
-        </strong>
+        <strong>Cargando administración IBRACO...</strong>
       </main>
     );
   }
@@ -209,8 +239,7 @@ async function toggleCourseStatus(course: Course) {
                 marginBottom: 0,
               }}
             >
-              Administra ciclos, horarios,
-              precios y disponibilidad.
+              Administra ciclos, horarios, precios y disponibilidad.
             </p>
           </div>
 
@@ -273,8 +302,7 @@ async function toggleCourseStatus(course: Course) {
             label="PUBLICADOS"
             value={
               courses.filter(
-                (course) =>
-                  course.status === "published"
+                (course) => course.status === "published"
               ).length
             }
           />
@@ -283,8 +311,7 @@ async function toggleCourseStatus(course: Course) {
             label="BORRADORES"
             value={
               courses.filter(
-                (course) =>
-                  course.status === "draft"
+                (course) => course.status === "draft"
               ).length
             }
           />
@@ -299,223 +326,215 @@ async function toggleCourseStatus(course: Course) {
             gap: "22px",
           }}
         >
-          {courses.map((course) => (
-            <article
-              key={course.id}
-              style={{
-                background: "#fff",
-                borderRadius: "22px",
-                padding: "28px 32px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                flexWrap: "wrap",
-                gap: "25px",
-              }}
-            >
-              <div
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: "18px",
-    flex: "1",
-  }}
->
-  {course.image_url && (
-  <img
-    src={course.image_url}
-   alt={course.name || "Curso"}
-    style={{
-      width: "110px",
-      height: "80px",
-      objectFit: "cover",
-      borderRadius: "12px",
-      flexShrink: 0,
-    }}
-  />
-)}
+          {courses.map((course) => {
+            const courseTitle = buildCourseTitle(course);
+
+            return (
+              <article
+                key={course.id}
+                style={{
+                  background: "#fff",
+                  borderRadius: "22px",
+                  padding: "28px 32px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  gap: "25px",
+                }}
+              >
                 <div
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    flexWrap: "wrap",
-                    gap: "10px",
-                    marginBottom: "6px",
+                    gap: "18px",
+                    flex: "1",
                   }}
                 >
-                  <span
-                    style={{
-                      color: "#009c4b",
-                      fontWeight: 800,
-                      textTransform:
-                        "uppercase",
-                    }}
-                  >
-                    {course.cycle}
-                  </span>
-
-                  <span
-                    style={{
-                      background:
-                        course.status ===
-                        "published"
-                          ? "#dff5e8"
-                          : "#eee",
-                      color:
-                        course.status ===
-                        "published"
-                          ? "#007b3d"
-                          : "#555",
-                      padding: "5px 9px",
-                      borderRadius: "20px",
-                      fontSize: "11px",
-                      fontWeight: 800,
-                      textTransform:
-                        "uppercase",
-                    }}
-                  >
-                    {course.status ===
-                    "published"
-                      ? "Publicado"
-                      : "Borrador"}
-                  </span>
-                </div>
-
-                <h2
-                  style={{
-                    margin: "0 0 8px",
-                    fontSize: "27px",
-                  }}
-                >
-                  {course.name}
-                </h2>
-
-                {course.level && (
-                  <p
-                    style={{
-                      margin: "0 0 6px",
-                      fontWeight: 700,
-                    }}
-                  >
-                    {course.level}
-                  </p>
-                )}
-
-                <p
-                  style={{
-                    margin: "0 0 6px",
-                    fontSize: "16px",
-                  }}
-                >
-                  {course.start_date || "—"} —{" "}
-                  {course.end_date || "—"}
-                </p>
-
-                {(course.modality ||
-                  course.campus) && (
-                  <p
-                    style={{
-                      margin: "0 0 6px",
-                      color: "#555",
-                    }}
-                  >
-                    {course.modality}
-
-                    {course.modality &&
-                    course.campus
-                      ? " · "
-                      : ""}
-
-                    {course.campus}
-                  </p>
-                )}
-
-                {course.days &&
-                  course.days.length > 0 && (
-                    <p
+                  {course.image_url && (
+                    <img
+                      src={course.image_url}
+                      alt={courseTitle || "Curso"}
                       style={{
-                        margin: 0,
-                        color: "#555",
+                        width: "110px",
+                        height: "80px",
+                        objectFit: "cover",
+                        borderRadius: "12px",
+                        flexShrink: 0,
+                      }}
+                    />
+                  )}
+
+                  <div style={{ flex: 1 }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        flexWrap: "wrap",
+                        gap: "10px",
+                        marginBottom: "6px",
                       }}
                     >
-                      {course.days.join(", ")}
-                      {" · "}
-                      {course.start_time || ""}
-                      {" – "}
-                      {course.end_time || ""}
-                    </p>
-                  )}
-              </div>
-              
-<div
-  style={{
-    display: "flex",
-    gap: "10px",
-    alignItems: "center",
-    flexShrink: 0,
-  }}
->
-  <button
-  type="button"
-  onClick={() => toggleCourseStatus(course)}
-  style={{
-    background:
-      course.status === "published" ? "#fff" : "#009c4b",
-    color:
-      course.status === "published" ? "#111" : "#fff",
-    border:
-      course.status === "published"
-        ? "1px solid #ccc"
-        : "1px solid #009c4b",
-    padding: "14px 20px",
-    borderRadius: "30px",
-    fontSize: "14px",
-    fontWeight: 800,
-    cursor: "pointer",
-    flexShrink: 0,
-  }}
->
-  {course.status === "published"
-    ? "Despublicar"
-    : "Publicar"}
-</button>
-              <a
-                href={`/admin/cursos/${course.id}`}
-                style={{
-                  background: "#ffd800",
-                  color: "#000",
-                  textDecoration: "none",
-                  padding: "14px 25px",
-                  borderRadius: "30px",
-                  fontSize: "15px",
-                  fontWeight: 800,
-                  flexShrink: 0,
-                  display: "inline-block",
-                }}
-              >
-                Editar
-              </a>
+                      <span
+                        style={{
+                          color: "#009c4b",
+                          fontWeight: 800,
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {course.cycle}
+                      </span>
 
-              <button
-                type="button"
-                onClick={() => deleteCourse(course)}
-                style={{
-                  background: "#fff",
-                  color: "#c62828",
-                  border: "1px solid #c62828",
-                  padding: "14px 20px",
-                  borderRadius: "30px",
-                  fontSize: "14px",
-                  fontWeight: 800,
-                  cursor: "pointer",
-                  flexShrink: 0,
-                }}
-              >
-                Eliminar
-              </button>
-              </div>
-            </article>
-          ))}
+                      <span
+                        style={{
+                          background:
+                            course.status === "published"
+                              ? "#dff5e8"
+                              : "#eee",
+                          color:
+                            course.status === "published"
+                              ? "#007b3d"
+                              : "#555",
+                          padding: "5px 9px",
+                          borderRadius: "20px",
+                          fontSize: "11px",
+                          fontWeight: 800,
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {course.status === "published"
+                          ? "Publicado"
+                          : "Borrador"}
+                      </span>
+                    </div>
+
+                    <h2
+                      style={{
+                        margin: "0 0 8px",
+                        fontSize: "27px",
+                        lineHeight: 1.15,
+                      }}
+                    >
+                      {courseTitle}
+                    </h2>
+
+                    {course.level && (
+                      <p
+                        style={{
+                          margin: "0 0 6px",
+                          fontWeight: 700,
+                        }}
+                      >
+                        {course.level}
+                      </p>
+                    )}
+
+                    <p
+                      style={{
+                        margin: "0 0 6px",
+                        fontSize: "16px",
+                      }}
+                    >
+                      {course.start_date || "—"} —{" "}
+                      {course.end_date || "—"}
+                    </p>
+
+                    {course.days &&
+                      course.days.length > 0 && (
+                        <p
+                          style={{
+                            margin: 0,
+                            color: "#555",
+                          }}
+                        >
+                          {course.days.join(", ")}
+                          {" · "}
+                          {course.start_time || ""}
+                          {" – "}
+                          {course.end_time || ""}
+                        </p>
+                      )}
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "10px",
+                    alignItems: "center",
+                    flexShrink: 0,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() =>
+                      toggleCourseStatus(course)
+                    }
+                    style={{
+                      background:
+                        course.status === "published"
+                          ? "#fff"
+                          : "#009c4b",
+                      color:
+                        course.status === "published"
+                          ? "#111"
+                          : "#fff",
+                      border:
+                        course.status === "published"
+                          ? "1px solid #ccc"
+                          : "1px solid #009c4b",
+                      padding: "14px 20px",
+                      borderRadius: "30px",
+                      fontSize: "14px",
+                      fontWeight: 800,
+                      cursor: "pointer",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {course.status === "published"
+                      ? "Despublicar"
+                      : "Publicar"}
+                  </button>
+
+                  <a
+                    href={`/admin/cursos/${course.id}`}
+                    style={{
+                      background: "#ffd800",
+                      color: "#000",
+                      textDecoration: "none",
+                      padding: "14px 25px",
+                      borderRadius: "30px",
+                      fontSize: "15px",
+                      fontWeight: 800,
+                      flexShrink: 0,
+                      display: "inline-block",
+                    }}
+                  >
+                    Editar
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={() => deleteCourse(course)}
+                    style={{
+                      background: "#fff",
+                      color: "#c62828",
+                      border: "1px solid #c62828",
+                      padding: "14px 20px",
+                      borderRadius: "30px",
+                      fontSize: "14px",
+                      fontWeight: 800,
+                      cursor: "pointer",
+                      flexShrink: 0,
+                    }}
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </article>
+            );
+          })}
         </div>
 
         {/* CREAR */}
