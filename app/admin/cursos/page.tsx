@@ -51,21 +51,38 @@ export default function AdminPage() {
 
   useEffect(() => {
     async function loadAdmin() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+     const {
+  data: { session },
+} = await supabase.auth.getSession();
 
-      if (!session) {
-        router.replace("/admin/login");
-        return;
-      }
+if (!session) {
+  router.replace("/admin/login");
+  return;
+}
 
-      const { data, error } = await supabase
-        .from("courses")
-        .select("*")
-        .order("start_date", {
-          ascending: true,
-        });
+const { data: adminProfile, error: profileError } =
+  await supabase
+    .from("admin_profiles")
+    .select("can_courses, is_superadmin")
+    .eq("user_id", session.user.id)
+    .single();
+
+if (
+  profileError ||
+  !adminProfile ||
+  (!adminProfile.can_courses &&
+    !adminProfile.is_superadmin)
+) {
+  router.replace("/admin");
+  return;
+}
+
+const { data, error } = await supabase
+  .from("courses")
+  .select("*")
+  .order("start_date", {
+    ascending: true,
+  });
 
       if (error) {
         console.error("Error cargando cursos:", error);
