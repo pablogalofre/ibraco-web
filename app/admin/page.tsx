@@ -4,12 +4,23 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 
+type AdminProfile = {
+  full_name: string | null;
+  can_courses: boolean;
+  can_events: boolean;
+  can_accounting: boolean;
+  is_superadmin: boolean;
+};
+
 export default function AdminDashboardPage() {
   const router = useRouter();
+
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<AdminProfile | null>(null);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    async function checkSession() {
+    async function loadAdmin() {
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -19,15 +30,32 @@ export default function AdminDashboardPage() {
         return;
       }
 
+      const { data, error } = await supabase
+        .from("admin_profiles")
+        .select(
+          "full_name, can_courses, can_events, can_accounting, is_superadmin"
+        )
+        .eq("user_id", session.user.id)
+        .single();
+
+      if (error || !data) {
+        console.error("Error cargando permisos:", error);
+        setErrorMessage(
+          "Tu usuario existe, pero todavía no tiene permisos de administración asignados."
+        );
+        setLoading(false);
+        return;
+      }
+
+      setProfile(data);
       setLoading(false);
     }
 
-    checkSession();
+    loadAdmin();
   }, [router]);
 
   async function handleLogout() {
     await supabase.auth.signOut();
-
     router.replace("/admin/login");
     router.refresh();
   }
@@ -49,6 +77,69 @@ export default function AdminDashboardPage() {
     );
   }
 
+  if (!profile) {
+    return (
+      <main
+        style={{
+          minHeight: "100vh",
+          background: "#f8f5e9",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "30px",
+          fontFamily: "Arial, sans-serif",
+        }}
+      >
+        <div
+          style={{
+            background: "#fff",
+            maxWidth: "560px",
+            width: "100%",
+            padding: "40px",
+            borderRadius: "28px",
+            textAlign: "center",
+          }}
+        >
+          <h1 style={{ marginTop: 0 }}>Acceso no autorizado</h1>
+
+          <p
+            style={{
+              color: "#555",
+              lineHeight: 1.6,
+            }}
+          >
+            {errorMessage}
+          </p>
+
+          <button
+            onClick={handleLogout}
+            style={{
+              marginTop: "20px",
+              background: "#009c4b",
+              color: "#fff",
+              border: 0,
+              borderRadius: "999px",
+              padding: "14px 24px",
+              fontWeight: 800,
+              cursor: "pointer",
+            }}
+          >
+            Cerrar sesión
+          </button>
+        </div>
+      </main>
+    );
+  }
+
+  const canSeeCourses =
+    profile.is_superadmin || profile.can_courses;
+
+  const canSeeEvents =
+    profile.is_superadmin || profile.can_events;
+
+  const canSeeAccounting =
+    profile.is_superadmin || profile.can_accounting;
+
   return (
     <main
       style={{
@@ -64,8 +155,6 @@ export default function AdminDashboardPage() {
           margin: "0 auto",
         }}
       >
-        {/* ENCABEZADO */}
-
         <div
           style={{
             display: "flex",
@@ -112,7 +201,11 @@ export default function AdminDashboardPage() {
                 color: "#333",
               }}
             >
-              Gestiona la operación comercial de IBRACO desde un solo lugar.
+              Hola{" "}
+              <strong>
+                {profile.full_name || "Administrador"}
+              </strong>
+              . Estos son los módulos que tienes autorizados.
             </p>
           </div>
 
@@ -133,8 +226,6 @@ export default function AdminDashboardPage() {
           </button>
         </div>
 
-        {/* MÓDULOS PRINCIPALES */}
-
         <section
           style={{
             display: "grid",
@@ -144,35 +235,39 @@ export default function AdminDashboardPage() {
             marginBottom: "52px",
           }}
         >
-          <AdminCard
-            eyebrow="OFERTA ACADÉMICA"
-            title="Cursos"
-            description="Administra cursos, horarios, modalidades, sedes, precios, publicación y configuración académica."
-            href="/admin/cursos"
-            buttonText="Administrar cursos"
-            accent="#009c4b"
-          />
+          {canSeeCourses && (
+            <AdminCard
+              eyebrow="OFERTA ACADÉMICA"
+              title="Cursos"
+              description="Administra cursos, horarios, modalidades, sedes, precios, publicación y configuración académica."
+              href="/admin/cursos"
+              buttonText="Administrar cursos"
+              accent="#009c4b"
+            />
+          )}
 
-          <AdminCard
-            eyebrow="AGENDA CULTURAL"
-            title="Eventos"
-            description="Crea y administra eventos, fechas, cupos, imágenes, precios y disponibilidad para la Agenda Cultural."
-            href="/admin/eventos"
-            buttonText="Administrar eventos"
-            accent="#ffd800"
-          />
+          {canSeeEvents && (
+            <AdminCard
+              eyebrow="AGENDA CULTURAL"
+              title="Eventos"
+              description="Crea y administra eventos, fechas, cupos, imágenes, precios y disponibilidad para la Agenda Cultural."
+              href="/admin/eventos"
+              buttonText="Administrar eventos"
+              accent="#ffd800"
+            />
+          )}
 
-          <AdminCard
-            eyebrow="VENTAS Y PAGOS"
-            title="Contabilidad"
-            description="Consulta órdenes, ventas, pagos, clientes y reportes financieros de cursos y eventos."
-            href="/admin/contabilidad"
-            buttonText="Ir a contabilidad"
-            accent="#111111"
-          />
+          {canSeeAccounting && (
+            <AdminCard
+              eyebrow="VENTAS Y PAGOS"
+              title="Contabilidad"
+              description="Consulta órdenes, ventas, pagos, clientes y reportes financieros de cursos y eventos."
+              href="/admin/contabilidad"
+              buttonText="Ir a contabilidad"
+              accent="#111111"
+            />
+          )}
         </section>
-
-        {/* ACCESOS PÚBLICOS */}
 
         <section
           style={{
@@ -211,7 +306,7 @@ export default function AdminDashboardPage() {
                   fontWeight: 900,
                 }}
               >
-                Revisa lo que están viendo tus clientes
+                Sitios públicos de IBRACO
               </h2>
             </div>
 
@@ -233,7 +328,7 @@ export default function AdminDashboardPage() {
                   fontWeight: 800,
                 }}
               >
-                Ver tienda de cursos
+                Ver cursos
               </a>
 
               <a
@@ -267,51 +362,51 @@ export default function AdminDashboardPage() {
           </div>
         </section>
 
-        {/* FUTUROS INDICADORES */}
-
-        <section
-          style={{
-            border: "2px dashed #d8d3c4",
-            borderRadius: "28px",
-            padding: "36px",
-          }}
-        >
-          <div
+        {profile.is_superadmin && (
+          <section
             style={{
-              color: "#777",
-              fontSize: "13px",
-              fontWeight: 800,
-              textTransform: "uppercase",
-              marginBottom: "8px",
+              border: "2px dashed #d8d3c4",
+              borderRadius: "28px",
+              padding: "36px",
             }}
           >
-            Próxima etapa
-          </div>
+            <div
+              style={{
+                color: "#777",
+                fontSize: "13px",
+                fontWeight: 800,
+                textTransform: "uppercase",
+                marginBottom: "8px",
+              }}
+            >
+              Próxima etapa
+            </div>
 
-          <h2
-            style={{
-              margin: "0 0 12px",
-              fontSize: "30px",
-              fontWeight: 900,
-            }}
-          >
-            Indicadores comerciales
-          </h2>
+            <h2
+              style={{
+                margin: "0 0 12px",
+                fontSize: "30px",
+                fontWeight: 900,
+              }}
+            >
+              Indicadores comerciales
+            </h2>
 
-          <p
-            style={{
-              margin: 0,
-              color: "#555",
-              fontSize: "17px",
-              lineHeight: 1.6,
-              maxWidth: "850px",
-            }}
-          >
-            Este espacio queda preparado para integrar más adelante Google
-            Analytics, Meta, Mercado Pago y otros indicadores de ventas,
-            tráfico, campañas y conversión.
-          </p>
-        </section>
+            <p
+              style={{
+                margin: 0,
+                color: "#555",
+                fontSize: "17px",
+                lineHeight: 1.6,
+                maxWidth: "850px",
+              }}
+            >
+              Aquí podremos integrar Google Analytics,
+              Meta, Mercado Pago y otros indicadores de
+              ventas, tráfico, campañas y conversión.
+            </p>
+          </section>
+        )}
 
         <p
           style={{
@@ -361,7 +456,8 @@ function AdminCard({
       <div>
         <div
           style={{
-            color: accent === "#ffd800" ? "#777" : accent,
+            color:
+              accent === "#ffd800" ? "#777" : accent,
             fontWeight: 800,
             fontSize: "13px",
             textTransform: "uppercase",
