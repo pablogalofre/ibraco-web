@@ -79,15 +79,44 @@ export default async function EventosPage() {
         >
           <div
             style={{
-              color: "#009b3a",
-              fontSize: "14px",
-              fontWeight: 900,
-              letterSpacing: "2px",
-              textTransform: "uppercase",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "20px",
               marginBottom: "12px",
+              flexWrap: "wrap",
             }}
           >
-            IBRACO
+            <div
+              style={{
+                color: "#009b3a",
+                fontSize: "14px",
+                fontWeight: 900,
+                letterSpacing: "2px",
+                textTransform: "uppercase",
+              }}
+            >
+              IBRACO
+            </div>
+
+            <a
+              href="/admin/eventos"
+              style={{
+                display: "inline-block",
+                textDecoration: "none",
+                color: "#111",
+                background: "#fff",
+                border: "1px solid #d9d4c7",
+                padding: "12px 18px",
+                borderRadius: "999px",
+                fontSize: "13px",
+                fontWeight: 900,
+                letterSpacing: "0.5px",
+                textTransform: "uppercase",
+              }}
+            >
+              Administración
+            </a>
           </div>
 
           <h1
@@ -160,16 +189,27 @@ export default async function EventosPage() {
               }}
             >
               {event.image_url ? (
-                <img
-                  src={event.image_url}
-                  alt={event.name}
+                <div
                   style={{
                     width: "100%",
-                    height: "380px",
-                    objectFit: "cover",
-                    display: "block",
+                    background: "#f8f4e8",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
-                />
+                >
+                  <img
+                    src={event.image_url}
+                    alt={event.name}
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      maxHeight: "620px",
+                      objectFit: "contain",
+                      display: "block",
+                    }}
+                  />
+                </div>
               ) : (
                 <div
                   style={{
