@@ -307,6 +307,35 @@ export default async function EventosPage() {
           ))}
         </div>
       </div>
+
+      <a
+        href="https://wa.me/573125841068?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20la%20Feijoada%20da%20Independ%C3%AAncia%20del%2012%20de%20septiembre."
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Contactar por WhatsApp"
+        title="WhatsApp"
+        style={{
+          position: "fixed",
+          right: "28px",
+          bottom: "28px",
+          width: "70px",
+          height: "70px",
+          borderRadius: "50%",
+          background: "#1ed760",
+          color: "#fff",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          textDecoration: "none",
+          fontSize: "30px",
+          fontWeight: 900,
+          boxShadow: "0 10px 28px rgba(0,0,0,0.22)",
+          zIndex: 9999,
+          border: "3px solid rgba(255,255,255,0.35)",
+        }}
+      >
+        ☘
+      </a>
     </main>
   );
 }
