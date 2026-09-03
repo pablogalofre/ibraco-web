@@ -1,7 +1,9 @@
 import "./cursos.css";
 import { supabase } from "../../lib/supabase";
+
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+
 const WHATSAPP_URL = "https://wa.me/573125841068";
 
 type Course = {
@@ -165,6 +167,40 @@ function formatTime(time: string | null) {
   return time.slice(0, 5);
 }
 
+/*
+ * La tienda está en español.
+ * Si el nombre viene de la base de datos escrito en portugués,
+ * aquí corregimos únicamente la palabra Português → Portugués.
+ */
+function normalizeCourseName(name: string | null) {
+  if (!name) return "Portugués";
+
+  return name
+    .replace(/Português/gi, "Portugués")
+    .replace(/Portugues/gi, "Portugués");
+}
+
+/*
+ * Todos los cursos se muestran con el mismo criterio:
+ * Curso · Modalidad · Sede · Jornada
+ *
+ * Ejemplo:
+ * Portugués Semi Intensivo · Presencial · Centro · Mañana
+ */
+function buildCourseTitle(course: Course) {
+  const parts = [
+    normalizeCourseName(course.name),
+    course.modality,
+    course.campus,
+    course.shift,
+  ].filter(
+    (value): value is string =>
+      typeof value === "string" && value.trim().length > 0
+  );
+
+  return parts.join(" · ");
+}
+
 export default async function CursosPage() {
   const { data, error } = await supabase
     .from("courses")
@@ -196,6 +232,7 @@ export default async function CursosPage() {
           <a href="/empresas">Empresas</a>
           <a href="/alumni">Alumni</a>
           <a href="/blog">Blog</a>
+
           <a
             href="/admin/login"
             style={{ fontWeight: 800, opacity: 0.72 }}
@@ -222,9 +259,9 @@ export default async function CursosPage() {
             <h1>Encuentra tu curso de portugués</h1>
 
             <p>
-              Elige la intensidad, el horario y la modalidad que mejor se
-              adaptan a tu vida. Aprende portugués con una institución que
-              integra idioma, cultura y comunidad.
+              Elige el horario y la modalidad que mejor se adapten a tu ritmo
+              de vida. Aprende portugués con IBRACO, donde lengua y cultura no
+              se separan.
             </p>
 
             <div className="hero-actions">
@@ -285,23 +322,12 @@ export default async function CursosPage() {
               <h2
                 style={{
                   fontSize: "42px",
-                  margin: "8px 0 12px",
+                  margin: "8px 0 0",
                   lineHeight: 1.05,
                 }}
               >
                 Cursos disponibles
               </h2>
-
-              <p
-                style={{
-                  fontSize: "18px",
-                  lineHeight: 1.5,
-                  margin: 0,
-                }}
-              >
-                Estas son las opciones que actualmente están habilitadas para
-                matrícula.
-              </p>
             </div>
 
             {courses.length === 0 ? (
@@ -331,219 +357,213 @@ export default async function CursosPage() {
                 </a>
               </div>
             ) : (
-             <div className="courses-live-grid">
-                {courses.map((course) => (
-                  <article
-                    key={course.id}
-                    style={{
-                      background: "#fff",
-                      borderRadius: "24px",
-                      overflow: "hidden",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
-                      minHeight: "520px",
-                    }}
-                  >
-                    {course.image_url ? (
-                      <div
-                        style={{
-                          width: "100%",
-                          overflow: "hidden",
-                          background: "#eee",
-                          padding: "24px",
-                          boxSizing: "border-box",
-                        }}
-                      >
-                        <img
-                          src={course.image_url}
-                          alt={`${course.name} ${course.cycle || ""}`}
-                          style={{
-                            width: "100%",
-                            maxWidth: "520px",
-                            height: "auto",
-                            display: "block",
-                            margin: "0 auto",
-                          }}
-                        />
-                      </div>
-                    ) : (
-                      <div
-                        style={{
-                          width: "100%",
-                          height: "240px",
-                          background: "#009c4b",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          padding: "30px",
-                          boxSizing: "border-box",
-                        }}
-                      >
-                        <div
-                          style={{
-                            color: "#fff",
-                            fontSize: "26px",
-                            fontWeight: 900,
-                            textAlign: "center",
-                          }}
-                        >
-                          IBRACO
-                        </div>
-                      </div>
-                    )}
+              <div className="courses-live-grid">
+                {courses.map((course) => {
+                  const courseTitle = buildCourseTitle(course);
 
-                    <div
+                  return (
+                    <article
+                      key={course.id}
                       style={{
-                        padding: "30px",
+                        background: "#fff",
+                        borderRadius: "24px",
+                        overflow: "hidden",
                         display: "flex",
                         flexDirection: "column",
-                        flex: 1,
                         justifyContent: "space-between",
+                        minHeight: "520px",
                       }}
                     >
-                      <div>
+                      {course.image_url ? (
                         <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            gap: "12px",
-                            alignItems: "flex-start",
-                            marginBottom: "18px",
-                          }}
-                        >
-                          <span
-                            style={{
-                              color: "#009c4b",
-                              fontSize: "14px",
-                              fontWeight: 800,
-                              textTransform: "uppercase",
-                            }}
-                          >
-                            {course.cycle || "Portugués IBRACO"}
-                          </span>
-
-                          {course.modality && (
-                            <span
-                              style={{
-                                background: "#f1f1f1",
-                                padding: "6px 10px",
-                                borderRadius: "20px",
-                                fontSize: "12px",
-                                fontWeight: 700,
-                              }}
-                            >
-                              {course.modality}
-                            </span>
-                          )}
-                        </div>
-
-                        <h3
-                          style={{
-                            fontSize: "27px",
-                            lineHeight: 1.1,
-                            margin: "0 0 8px",
-                          }}
-                        >
-                          {course.name}
-                        </h3>
-
-                        {course.shift && (
-                          <p
-                            style={{
-                              fontSize: "17px",
-                              fontWeight: 700,
-                              marginTop: 0,
-                            }}
-                          >
-                            Jornada {course.shift}
-                          </p>
-                        )}
-
-                        <div
-                          style={{
-                            marginTop: "25px",
-                            display: "grid",
-                            gap: "9px",
-                            fontSize: "15px",
-                          }}
-                        >
-                          {course.start_date && (
-                            <div>
-                              <strong>Inicio:</strong>{" "}
-                              {formatDate(course.start_date)}
-                            </div>
-                          )}
-
-                          {course.end_date && (
-                            <div>
-                              <strong>Finaliza:</strong>{" "}
-                              {formatDate(course.end_date)}
-                            </div>
-                          )}
-
-                          {course.days && course.days.length > 0 && (
-                            <div>
-                              <strong>Días:</strong>{" "}
-                              {course.days.join(", ")}
-                            </div>
-                          )}
-
-                          {(course.start_time || course.end_time) && (
-                            <div>
-                              <strong>Horario:</strong>{" "}
-                              {formatTime(course.start_time)}
-                              {course.start_time && course.end_time ? " – " : ""}
-                              {formatTime(course.end_time)}
-                            </div>
-                          )}
-
-                          {course.campus && (
-                            <div>
-                              <strong>Sede:</strong> {course.campus}
-                            </div>
-                          )}
-
-                          {course.level && (
-                            <div>
-                              <strong>Nivel:</strong> {course.level}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      <div
-                        style={{
-                          borderTop: "1px solid #eee",
-                          paddingTop: "22px",
-                          marginTop: "28px",
-                        }}
-                      >
-                        <div
-                          style={{
-                            fontSize: "25px",
-                            fontWeight: 900,
-                            marginBottom: "17px",
-                          }}
-                        >
-                          {formatPrice(course.price)}
-                        </div>
-
-                        <a
-  href={`/matricula/${course.slug}`}
-  className="btn btn-yellow"
                           style={{
                             width: "100%",
-                            textAlign: "center",
+                            overflow: "hidden",
+                            background: "#eee",
+                            padding: "24px",
                             boxSizing: "border-box",
                           }}
                         >
-                          Seleccionar curso
-                        </a>
+                          <img
+                            src={course.image_url}
+                            alt={courseTitle}
+                            style={{
+                              width: "100%",
+                              maxWidth: "520px",
+                              height: "auto",
+                              display: "block",
+                              margin: "0 auto",
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <div
+                          style={{
+                            width: "100%",
+                            height: "240px",
+                            background: "#009c4b",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            padding: "30px",
+                            boxSizing: "border-box",
+                          }}
+                        >
+                          <div
+                            style={{
+                              color: "#fff",
+                              fontSize: "26px",
+                              fontWeight: 900,
+                              textAlign: "center",
+                            }}
+                          >
+                            IBRACO
+                          </div>
+                        </div>
+                      )}
+
+                      <div
+                        style={{
+                          padding: "30px",
+                          display: "flex",
+                          flexDirection: "column",
+                          flex: 1,
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <div>
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              gap: "12px",
+                              alignItems: "flex-start",
+                              marginBottom: "18px",
+                            }}
+                          >
+                            <span
+                              style={{
+                                color: "#009c4b",
+                                fontSize: "14px",
+                                fontWeight: 800,
+                                textTransform: "uppercase",
+                              }}
+                            >
+                              {course.cycle || "Portugués IBRACO"}
+                            </span>
+
+                            {course.modality && (
+                              <span
+                                style={{
+                                  background: "#f1f1f1",
+                                  padding: "6px 10px",
+                                  borderRadius: "20px",
+                                  fontSize: "12px",
+                                  fontWeight: 700,
+                                }}
+                              >
+                                {course.modality}
+                              </span>
+                            )}
+                          </div>
+
+                          <h3
+                            style={{
+                              fontSize: "27px",
+                              lineHeight: 1.15,
+                              margin: "0 0 8px",
+                            }}
+                          >
+                            {courseTitle}
+                          </h3>
+
+                          <div
+                            style={{
+                              marginTop: "25px",
+                              display: "grid",
+                              gap: "9px",
+                              fontSize: "15px",
+                            }}
+                          >
+                            {course.start_date && (
+                              <div>
+                                <strong>Inicio:</strong>{" "}
+                                {formatDate(course.start_date)}
+                              </div>
+                            )}
+
+                            {course.end_date && (
+                              <div>
+                                <strong>Finaliza:</strong>{" "}
+                                {formatDate(course.end_date)}
+                              </div>
+                            )}
+
+                            {course.days && course.days.length > 0 && (
+                              <div>
+                                <strong>Días:</strong>{" "}
+                                {course.days.join(", ")}
+                              </div>
+                            )}
+
+                            {(course.start_time || course.end_time) && (
+                              <div>
+                                <strong>Horario:</strong>{" "}
+                                {formatTime(course.start_time)}
+                                {course.start_time && course.end_time
+                                  ? " – "
+                                  : ""}
+                                {formatTime(course.end_time)}
+                              </div>
+                            )}
+
+                            {course.campus && (
+                              <div>
+                                <strong>Sede:</strong> {course.campus}
+                              </div>
+                            )}
+
+                            {course.level && (
+                              <div>
+                                <strong>Nivel:</strong> {course.level}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div
+                          style={{
+                            borderTop: "1px solid #eee",
+                            paddingTop: "22px",
+                            marginTop: "28px",
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontSize: "25px",
+                              fontWeight: 900,
+                              marginBottom: "17px",
+                            }}
+                          >
+                            {formatPrice(course.price)}
+                          </div>
+
+                          <a
+                            href={`/matricula/${course.slug}`}
+                            className="btn btn-yellow"
+                            style={{
+                              width: "100%",
+                              textAlign: "center",
+                              boxSizing: "border-box",
+                            }}
+                          >
+                            Seleccionar curso
+                          </a>
+                        </div>
                       </div>
-                    </div>
-                  </article>
-                ))}
+                    </article>
+                  );
+                })}
               </div>
             )}
           </div>
