@@ -446,7 +446,7 @@ export default function AdminEventosPage() {
     >
       <div
         style={{
-          maxWidth: "1250px",
+          maxWidth: "1380px",
           margin: "0 auto",
         }}
       >
@@ -516,7 +516,7 @@ export default function AdminEventosPage() {
           style={{
             background: "#fff",
             borderRadius: "28px",
-            padding: "30px",
+            padding: "36px",
             marginBottom: "45px",
             boxShadow:
               "0 8px 30px rgba(0,0,0,0.05)",
@@ -542,7 +542,7 @@ export default function AdminEventosPage() {
               style={{
                 display: "grid",
                 gridTemplateColumns:
-                  "repeat(auto-fit, minmax(250px, 1fr))",
+                  "repeat(auto-fit, minmax(280px, 1fr))",
                 gap: "18px",
               }}
             >
@@ -776,13 +776,14 @@ export default function AdminEventosPage() {
                         style={{
                           width: "100%",
                           maxHeight:
-                            "180px",
+                            "360px",
                           objectFit:
-                            "cover",
+                            "contain",
                           borderRadius:
                             "14px",
                           border:
                             "1px solid #eee",
+                          background: "#f6f2e7",
                         }}
                       />
 
@@ -943,6 +944,8 @@ export default function AdminEventosPage() {
                     style={{
                       background:
                         "#fff",
+                      border: "1px solid #ece8dc",
+                      boxShadow: "0 10px 28px rgba(0,0,0,0.04)",
                       borderRadius:
                         "24px",
                       padding: "24px",
@@ -1036,7 +1039,7 @@ export default function AdminEventosPage() {
                               height:
                                 "90px",
                               objectFit:
-                                "cover",
+                                "contain",
                               borderRadius:
                                 "14px",
                               flexShrink:
