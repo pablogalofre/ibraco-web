@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "../../../lib/supabase";
 
 type EventRow = {
@@ -64,6 +65,7 @@ const emptyForm = {
 };
 
 export default function AdminEventosPage() {
+  const router = useRouter();
   const [events, setEvents] = useState<EventRow[]>([]);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -76,8 +78,34 @@ export default function AdminEventosPage() {
     [events, editingId]
   );
 
-  async function loadEvents() {
+   async function loadEvents() {
     setLoading(true);
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session) {
+      router.replace("/admin/login");
+      return;
+    }
+
+    const { data: adminProfile, error: profileError } =
+      await supabase
+        .from("admin_profiles")
+        .select("can_events, is_superadmin")
+        .eq("user_id", session.user.id)
+        .single();
+
+    if (
+      profileError ||
+      !adminProfile ||
+      (!adminProfile.can_events &&
+        !adminProfile.is_superadmin)
+    ) {
+      router.replace("/admin");
+      return;
+    }
 
     const { data, error } = await supabase
       .from("events")
