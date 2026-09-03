@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import * as XLSX from "xlsx";
 import { supabase } from "../../../lib/supabase";
 
@@ -24,6 +25,8 @@ type Order = {
 };
 
 export default function ContabilidadPage() {
+  const router = useRouter();
+
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -32,6 +35,32 @@ export default function ContabilidadPage() {
     async function loadOrders() {
       setLoading(true);
       setErrorMessage("");
+
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        router.replace("/admin/login");
+        return;
+      }
+
+      const { data: adminProfile, error: profileError } =
+        await supabase
+          .from("admin_profiles")
+          .select("can_accounting, is_superadmin")
+          .eq("user_id", session.user.id)
+          .single();
+
+      if (
+        profileError ||
+        !adminProfile ||
+        (!adminProfile.can_accounting &&
+          !adminProfile.is_superadmin)
+      ) {
+        router.replace("/admin");
+        return;
+      }
 
       const { data, error } = await supabase
         .from("orders")
@@ -69,7 +98,7 @@ export default function ContabilidadPage() {
     }
 
     loadOrders();
-  }, []);
+  }, [router]);
 
   const stats = useMemo(() => {
     const paid = orders.filter(
