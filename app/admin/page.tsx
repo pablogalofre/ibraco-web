@@ -81,6 +81,50 @@ async function toggleCourseStatus(course: Course) {
     )
   );
 }
+  async function deleteCourse(course: Course) {
+    if (course.status === "published") {
+      alert("Primero debes despublicar este curso antes de eliminarlo.");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `¿Seguro que quieres eliminar "${course.name}"?\n\nEsta acción no se puede deshacer.`
+    );
+
+    if (!confirmed) return;
+
+    const { count, error: ordersError } = await supabase
+      .from("orders")
+      .select("id", { count: "exact", head: true })
+      .eq("course_id", course.id);
+
+    if (ordersError) {
+      console.error("Error verificando órdenes del curso:", ordersError);
+      alert("No fue posible verificar si el curso tiene compras. No se eliminó nada.");
+      return;
+    }
+
+    if ((count ?? 0) > 0) {
+      alert("Este curso ya tiene una compra u orden asociada y no se puede eliminar.");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("courses")
+      .delete()
+      .eq("id", course.id);
+
+    if (error) {
+      console.error("Error eliminando curso:", error);
+      alert("No fue posible eliminar el curso.");
+      return;
+    }
+
+    setCourses((currentCourses) =>
+      currentCourses.filter((item) => item.id !== course.id)
+    );
+  }
+
   async function handleLogout() {
     await supabase.auth.signOut();
 
@@ -451,6 +495,24 @@ async function toggleCourseStatus(course: Course) {
               >
                 Editar
               </a>
+
+              <button
+                type="button"
+                onClick={() => deleteCourse(course)}
+                style={{
+                  background: "#fff",
+                  color: "#c62828",
+                  border: "1px solid #c62828",
+                  padding: "14px 20px",
+                  borderRadius: "30px",
+                  fontSize: "14px",
+                  fontWeight: 800,
+                  cursor: "pointer",
+                  flexShrink: 0,
+                }}
+              >
+                Eliminar
+              </button>
               </div>
             </article>
           ))}
