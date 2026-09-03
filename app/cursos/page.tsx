@@ -188,8 +188,12 @@ function normalizeCourseName(name: string | null) {
  * Portugués Semi Intensivo · Presencial · Centro · Mañana
  */
 function buildCourseTitle(course: Course) {
+  const courseName = normalizeCourseName(course.name)
+    .replace(/^Portugués\s*/i, "")
+    .trim();
+
   const parts = [
-    normalizeCourseName(course.name),
+    courseName ? `Curso ${courseName}` : "Curso",
     course.modality,
     course.campus,
     course.shift,
