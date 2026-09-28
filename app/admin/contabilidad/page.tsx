@@ -154,11 +154,14 @@ export default function ContabilidadPage() {
   }
 
   function q10Label(status: string | null) {
-    if (status === "completed") return "Registrado";
-    if (status === "failed") return "Error";
-    return "Pendiente";
-  }
-
+  if (status === "preinscribed") return "Preinscrito";
+  if (status === "completed") return "Registrado";
+  if (status === "processing") return "Procesando";
+  if (status === "pending_mapping") return "Falta configurar";
+  if (status === "not_applicable") return "No aplica";
+  if (status === "error" || status === "failed") return "Error";
+  return "Pendiente";
+}
   function downloadExcel() {
     const rows = orders.map((order) => ({
       Fecha: date(order.created_at),
@@ -526,15 +529,17 @@ function StatusBadge({
   let background = "#fff3cd";
   let color = "#856404";
 
-  if (
-    status === "paid" ||
-    status === "completed"
-  ) {
-    background = "#e6f6ec";
-    color = "#137333";
-  }
+ if (
+  status === "paid" ||
+  status === "completed" ||
+  status === "preinscribed" ||
+  status === "not_applicable"
+) {
+  background = "#e6f6ec";
+  color = "#137333";
+}
 
-  if (status === "failed") {
+if (status === "failed" || status === "error") {
     background = "#fdecec";
     color = "#b42318";
   }
