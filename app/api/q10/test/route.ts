@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { createQ10Preinscription } from "@/app/lib/q10";
 
 const supabaseUrl =
   process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -91,7 +92,10 @@ function getQ10ResidenceCode(cityName: string) {
 
 export async function GET() {
   try {
-    // SOLO ORDEN 88
+    // ==========================================
+    // PRUEBA CONTROLADA: SOLO ORDEN 88
+    // ==========================================
+
     const { data: order, error: orderError } =
       await supabaseAdmin
         .from("orders")
@@ -104,6 +108,43 @@ export async function GET() {
         `No encontramos la orden 88: ${
           orderError?.message || "sin datos"
         }`
+      );
+    }
+
+    if (order.payment_status !== "paid") {
+      throw new Error(
+        "La orden 88 no figura como pagada."
+      );
+    }
+
+    // Evitar una segunda creación
+    if (order.q10_status === "preinscribed") {
+      return NextResponse.json({
+        ok: true,
+        alreadyProcessed: true,
+        orderId: 88,
+        q10Status: "preinscribed",
+        q10Response:
+          order.q10_enrollment_response,
+      });
+    }
+
+    // Solo permitimos ejecutar esta prueba
+    // desde estados recuperables.
+    if (
+      ![
+        "pending",
+        "error",
+        "pending_mapping",
+      ].includes(order.q10_status)
+    ) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            `La orden 88 tiene estado Q10 "${order.q10_status}" y no será procesada.`,
+        },
+        { status: 409 }
       );
     }
 
@@ -127,6 +168,58 @@ export async function GET() {
         `No encontramos el curso: ${
           courseError?.message || "sin datos"
         }`
+      );
+    }
+
+    if (
+      !course.q10_program_code ||
+      course.q10_period_id === null ||
+      course.q10_period_id === undefined ||
+      course.q10_site_journey_id === null ||
+      course.q10_site_journey_id === undefined
+    ) {
+      throw new Error(
+        "El curso todavía no tiene el mapeo Q10 completo."
+      );
+    }
+
+    // ==========================================
+    // BLOQUEAR LA ORDEN ANTES DE ENVIAR A Q10
+    // ==========================================
+
+    const {
+      data: lockedOrders,
+      error: lockError,
+    } = await supabaseAdmin
+      .from("orders")
+      .update({
+        q10_status: "processing",
+      })
+      .eq("id", 88)
+      .in("q10_status", [
+        "pending",
+        "error",
+        "pending_mapping",
+      ])
+      .select("id");
+
+    if (lockError) {
+      throw new Error(
+        `No pudimos bloquear la orden: ${lockError.message}`
+      );
+    }
+
+    if (
+      !lockedOrders ||
+      lockedOrders.length === 0
+    ) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            "La orden ya está siendo procesada o cambió de estado.",
+        },
+        { status: 409 }
       );
     }
 
@@ -203,27 +296,62 @@ export async function GET() {
         ),
     };
 
-    // IMPORTANTE:
-    // NO SE ENVÍA NADA A Q10.
-    // SOLO MOSTRAMOS LO QUE SE ENVIARÍA.
+    // ==========================================
+    // ENVÍO REAL A Q10
+    // ==========================================
 
-    return NextResponse.json({
-      ok: true,
-      dryRun: true,
-      order: {
-        id: order.id,
-        order_number: order.order_number,
-        payment_status:
-          order.payment_status,
-        q10_status:
-          order.q10_status,
-      },
-      course: {
-        id: course.id,
-        name: course.name,
-      },
-      payload,
-    });
+    try {
+      const q10Response =
+        await createQ10Preinscription(payload);
+
+      const { error: updateError } =
+        await supabaseAdmin
+          .from("orders")
+          .update({
+            q10_status: "preinscribed",
+            q10_enrollment_response:
+              q10Response,
+          })
+          .eq("id", 88);
+
+      if (updateError) {
+        throw new Error(
+          `Q10 creó la preinscripción, pero Supabase no pudo guardar la respuesta: ${updateError.message}`
+        );
+      }
+
+      return NextResponse.json({
+        ok: true,
+        orderId: 88,
+        q10Status: "preinscribed",
+        q10Response,
+      });
+    } catch (q10Error) {
+      const message =
+        q10Error instanceof Error
+          ? q10Error.message
+          : "Error desconocido Q10";
+
+      await supabaseAdmin
+        .from("orders")
+        .update({
+          q10_status: "error",
+          q10_enrollment_response: {
+            error: message,
+          },
+        })
+        .eq("id", 88);
+
+      return NextResponse.json(
+        {
+          ok: false,
+          orderId: 88,
+          q10Status: "error",
+          error: message,
+        },
+        { status: 500 }
+      );
+    }
   } catch (error) {
     return NextResponse.json(
       {
@@ -233,9 +361,7 @@ export async function GET() {
             ? error.message
             : "Error desconocido",
       },
-      {
-        status: 500,
-      }
+      { status: 500 }
     );
   }
 }
