@@ -32,7 +32,7 @@ function getQ10ApiKey() {
 function getQ10Headers(apiKey: string) {
   return {
     "Api-Key": apiKey,
-    "Ocp-Apim-Subscription-Key": apiKey,
+    "Ocp-Apim-Subscription-Key": process.env.Q10_SUBSCRIPTION_KEY ?? apiKey,
     Accept: "application/json",
   };
 }
