@@ -1,0 +1,120 @@
+"use client";
+
+import { FormEvent, useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { supabase } from "../../../lib/supabase";
+
+type Course = {
+  id: number;
+  slug: string;
+  name: string;
+  cycle: string | null;
+  year: number | null;
+  shift: string | null;
+  modality: string | null;
+  campus: string | null;
+  start_date: string | null;
+  end_date: string | null;
+  days: string[] | null;
+  start_time: string | null;
+  end_time: string | null;
+  level: string | null;
+  price: number | null;
+  status: string | null;
+  image_url: string | null;
+};
+
+type FormData = {
+  firstName: string;
+  lastName: string;
+  documentType: string;
+  documentNumber: string;
+  birthDate: string;
+  gender: string;
+  email: string;
+  phone: string;
+  city: string;
+  address: string;
+  acceptedPrivacy: boolean;
+};
+
+const initialForm: FormData = {
+  firstName: "",
+  lastName: "",
+  documentType: "",
+  documentNumber: "",
+  birthDate: "",
+  gender: "",
+  email: "",
+  phone: "",
+  city: "",
+  address: "",
+  acceptedPrivacy: false,
+};
+
+function formatPrice(price: number | null) {
+  if (!price) return "Precio por confirmar";
+
+  return new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    maximumFractionDigits: 0,
+  }).format(price);
+}
+
+function formatDate(date: string | null) {
+  if (!date) return "";
+
+  return new Intl.DateTimeFormat("es-CO", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${date}T00:00:00Z`));
+}
+
+function formatTime(time: string | null) {
+  if (!time) return "";
+  return time.slice(0, 5);
+}
+
+export default function MatriculaPage() {
+  const params = useParams();
+  const slug = params.slug as string;
+
+  const [course, setCourse] = useState<Course | null>(null);
+  const [form, setForm] = useState<FormData>(initialForm);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    async function loadCourse() {
+      const { data, error } = await supabase
+        .from("courses")
+        .select("*")
+        .eq("slug", slug)
+        .eq("status", "published")
+        .single();
+
+      if (error || !data) {
+        console.error(error);
+        setMessage(
+          "No encontramos este curso o ya no está disponible."
+        );
+        setLoading(false);
+        return;
+      }
+
+      setCourse(data);
+      setLoading(false);
+    }
+
+    loadCourse();
+  }, [slug]);
+
+  function updateField<K extends keyof FormData>(
+    field: K,
+    value: FormData[K]
+  ) {
+    setForm((current) => ({

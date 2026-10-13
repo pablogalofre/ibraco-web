@@ -1,0 +1,115 @@
+        <ResponsiveStyles />
+      </main>
+    );
+  }
+
+  return (
+    <main className="matricula-page">
+      <div className="matricula-shell">
+        <a href="/cursos" className="back-link">
+          ← Volver a cursos
+        </a>
+
+        <div className="matricula-heading">
+          <div className="eyebrow">
+            Matrícula IBRACO
+          </div>
+
+          <h1>Completa tus datos</h1>
+
+          <p>
+            Revisa el curso seleccionado y completa la
+            información del estudiante.
+          </p>
+        </div>
+
+        <div className="matricula-layout">
+          {/* FORMULARIO */}
+
+          <form
+            onSubmit={handleSubmit}
+            className="student-form"
+          >
+            <h2>Datos del estudiante</h2>
+
+            <div className="form-grid">
+              <Field label="Nombres *">
+                <input
+                  required
+                  value={form.firstName}
+                  onChange={(e) =>
+                    updateField(
+                      "firstName",
+                      e.target.value
+                    )
+                  }
+                />
+              </Field>
+
+              <Field label="Apellidos *">
+                <input
+                  required
+                  value={form.lastName}
+                  onChange={(e) =>
+                    updateField(
+                      "lastName",
+                      e.target.value
+                    )
+                  }
+                />
+              </Field>
+
+              <Field label="Tipo de identificación *">
+                <select
+                  required
+                  value={form.documentType}
+                  onChange={(e) =>
+                    updateField(
+                      "documentType",
+                      e.target.value
+                    )
+                  }
+                >
+                  <option value="">
+                    Seleccionar
+                  </option>
+                  <option value="CC">
+                    Cédula de ciudadanía
+                  </option>
+                  <option value="TI">
+                    Tarjeta de identidad
+                  </option>
+                  <option value="CE">
+                    Cédula de extranjería
+                  </option>
+                  <option value="PA">
+                    Pasaporte
+                  </option>
+                  <option value="PEP">
+                    PEP
+                  </option>
+                </select>
+              </Field>
+
+              <Field label="Número de identificación *">
+                <input
+                  required
+                  value={form.documentNumber}
+                  onChange={(e) =>
+                    updateField(
+                      "documentNumber",
+                      e.target.value
+                    )
+                  }
+                />
+              </Field>
+
+              <Field label="Fecha de nacimiento *">
+                <input
+                  required
+                  type="date"
+                  value={form.birthDate}
+                  onChange={(e) =>
+                    updateField(
+                      "birthDate",
+                      e.target.value

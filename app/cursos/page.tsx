@@ -201,88 +201,105 @@ export default async function CursosPage() {
   return (
     <>
         <style>{`
-          .courses-page-hero-content,
-          .courses-page-hero-content h1,
-          .courses-page-hero-content p {
-            text-align: left;
+          .courses-page-hero {
+            min-height: 620px !important;
+            padding: 100px 7vw 76px !important;
+            align-items: center;
+          }
+          .courses-page-hero-content {
+            width: 100%;
+            max-width: 950px;
+            text-align: left !important;
+          }
+          .courses-page-hero-content h1 {
+            max-width: 900px;
+            margin: 16px 0 28px;
+            font-size: clamp(44px, 6vw, 88px) !important;
+            line-height: 1.03 !important;
+            letter-spacing: -0.055em !important;
+            text-align: left !important;
             overflow-wrap: normal;
             word-break: normal;
           }
-          .courses-page-hero-content p { max-width: 760px; }
-          .ibraco-course-card {
-            min-width: 0;
-            text-align: left;
+          .courses-page-hero-content p {
+            max-width: 730px;
+            font-size: clamp(17px, 1.6vw, 21px);
+            line-height: 1.5;
+            text-align: left !important;
           }
-          .ibraco-course-card * { min-width: 0; }
-          .ibraco-course-card h3,
-          .ibraco-course-card dd,
-          .ibraco-course-card span { overflow-wrap: anywhere; }
-          .ibraco-course-card .btn { white-space: normal; }
-          .courses-page-hero-content .hero-actions .btn { white-space: normal; }
-          .ibraco-course-card-body {
-            padding: 28px;
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            justify-content: space-between;
-            min-width: 0;
+          .courses-live-grid {
+            display: grid !important;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            align-items: stretch;
             gap: 24px;
           }
-          .ibraco-course-card-title {
-            font-size: clamp(21px, 2vw, 27px);
-            line-height: 1.2;
-            margin: 0;
-            text-align: left;
-            overflow-wrap: break-word;
+          .ibraco-course-card {
+            min-width: 0;
+            width: 100%;
+            text-align: left !important;
           }
-          .ibraco-course-details {
+          .ibraco-course-card-body {
+            padding: 24px;
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 24px;
+            min-width: 0;
+          }
+          .ibraco-course-card-title {
+            font-size: clamp(20px, 1.8vw, 26px);
+            line-height: 1.22;
+            margin: 0;
+            overflow-wrap: anywhere;
+            text-align: left !important;
+          }
+          .ibraco-course-facts {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin: 24px 0 0;
-            padding: 0;
+            gap: 11px;
+            margin-top: 22px;
+          }
+          .ibraco-course-fact {
+            display: block !important;
+            margin: 0 !important;
             font-size: 15px;
             line-height: 1.5;
-            text-align: left;
+            text-align: left !important;
+            white-space: normal !important;
+            overflow-wrap: anywhere;
           }
-          .ibraco-course-detail {
-            display: grid;
-            grid-template-columns: 76px minmax(0, 1fr);
-            gap: 10px;
-            align-items: start;
-            text-align: left;
-          }
-          .ibraco-course-detail dt {
+          .ibraco-course-fact strong {
+            display: inline;
             font-weight: 800;
-            margin: 0;
-            text-align: left;
+            margin-right: 6px;
           }
-          .ibraco-course-detail dd {
-            margin: 0;
-            min-width: 0;
-            text-align: left;
-            overflow-wrap: break-word;
+          .ibraco-course-badges {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-start !important;
+            gap: 10px;
+            margin-bottom: 18px;
           }
+          .ibraco-course-badges > span { max-width: 100%; }
+          .ibraco-course-card .btn { white-space: normal; }
           @media (max-width: 1100px) {
-            .ibraco-course-card-body { padding: 24px; }
+            .courses-live-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+            .ibraco-course-card-body { padding: 22px; }
           }
           @media (max-width: 700px) {
-            .courses-page-hero { min-height: auto; padding-top: 150px; }
-            .courses-page-hero h1 {
-              font-size: clamp(39px, 10vw, 54px);
-              line-height: 0.96;
-              letter-spacing: -0.055em;
+            .courses-page-hero {
+              min-height: auto !important;
+              padding: 70px 6vw 62px !important;
             }
-            .courses-page-hero-content p {
-              font-size: 17px;
-              line-height: 1.5;
+            .courses-page-hero-content h1 {
+              font-size: clamp(38px, 9.5vw, 58px) !important;
+              line-height: 1.04 !important;
             }
-            .ibraco-course-card-body { padding: 22px; }
+            .courses-live-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 18px; }
+            .ibraco-course-card-body { padding: 20px; }
             .ibraco-course-card-title { font-size: 23px; }
-            .ibraco-course-detail {
-              grid-template-columns: 70px minmax(0, 1fr);
-              gap: 8px;
-            }
             .whatsapp-float {
               max-width: calc(100vw - 24px);
               font-size: 13px !important;
@@ -290,10 +307,6 @@ export default async function CursosPage() {
               right: 12px !important;
               bottom: 12px !important;
             }
-          }
-          @media (max-width: 360px) {
-            .ibraco-course-card-body { padding: 18px; }
-            .ibraco-course-detail { grid-template-columns: 65px minmax(0, 1fr); }
           }
         `}</style>
       <header className="navbar">
@@ -322,7 +335,7 @@ export default async function CursosPage() {
           </a>
         </nav>
       </header>
-      <main className="inner-page">
+      <main className="inner-page" style={{ paddingTop: 126 }}>
         <section className="courses-page-hero">
           <div className="courses-page-hero-overlay" />
           <div className="courses-page-hero-content">
@@ -435,7 +448,7 @@ export default async function CursosPage() {
                         display: "flex",
                         flexDirection: "column",
                         justifyContent: "space-between",
-                        minHeight: "520px",
+                        minHeight: "0",
                       }}
                     >
                       {course.image_url ? (
@@ -444,7 +457,7 @@ export default async function CursosPage() {
                             width: "100%",
                             overflow: "hidden",
                             background: "#eee",
-                            padding: "24px",
+                            padding: "16px",
                             boxSizing: "border-box",
                           }}
                         >
@@ -454,6 +467,8 @@ export default async function CursosPage() {
                             style={{
                               width: "100%",
                               maxWidth: "520px",
+                              maxHeight: "320px",
+                              objectFit: "contain",
                               height: "auto",
                               display: "block",
                               margin: "0 auto",
@@ -487,15 +502,7 @@ export default async function CursosPage() {
                       )}
                       <div className="ibraco-course-card-body">
                         <div>
-                          <div
-                            style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              gap: "12px",
-                              alignItems: "flex-start",
-                              marginBottom: "18px",
-                            }}
-                          >
+                          <div className="ibraco-course-badges">
                             <span
                               style={{
                                 color: "#009c4b",
@@ -523,48 +530,30 @@ export default async function CursosPage() {
                           <h3 className="ibraco-course-card-title">
                             {courseTitle}
                           </h3>
-                          <dl className="ibraco-course-details">
+                          <div className="ibraco-course-facts">
                             {course.start_date && (
-                              <div className="ibraco-course-detail">
-                                <dt>Inicio</dt>
-                                <dd>{formatDate(course.start_date)}</dd>
-                              </div>
+                              <p className="ibraco-course-fact"><strong>Inicio:</strong> {formatDate(course.start_date)}</p>
                             )}
                             {course.end_date && (
-                              <div className="ibraco-course-detail">
-                                <dt>Finaliza</dt>
-                                <dd>{formatDate(course.end_date)}</dd>
-                              </div>
+                              <p className="ibraco-course-fact"><strong>Finaliza:</strong> {formatDate(course.end_date)}</p>
                             )}
                             {course.days && course.days.length > 0 && (
-                              <div className="ibraco-course-detail">
-                                <dt>Días</dt>
-                                <dd>{course.days.join(", ")}</dd>
-                              </div>
+                              <p className="ibraco-course-fact"><strong>Días:</strong> {course.days.join(", ")}</p>
                             )}
                             {(course.start_time || course.end_time) && (
-                              <div className="ibraco-course-detail">
-                                <dt>Horario</dt>
-                                <dd>
-                                  {formatTime(course.start_time)}
-                                  {course.start_time && course.end_time ? " – " : ""}
-                                  {formatTime(course.end_time)}
-                                </dd>
-                              </div>
+                              <p className="ibraco-course-fact">
+                                <strong>Horario:</strong> {formatTime(course.start_time)}
+                                {course.start_time && course.end_time ? " – " : ""}
+                                {formatTime(course.end_time)}
+                              </p>
                             )}
                             {course.campus && (
-                              <div className="ibraco-course-detail">
-                                <dt>Sede</dt>
-                                <dd>{course.campus}</dd>
-                              </div>
+                              <p className="ibraco-course-fact"><strong>Sede:</strong> {course.campus}</p>
                             )}
                             {course.level && (
-                              <div className="ibraco-course-detail">
-                                <dt>Nivel</dt>
-                                <dd>{course.level}</dd>
-                              </div>
+                              <p className="ibraco-course-fact"><strong>Nivel:</strong> {course.level}</p>
                             )}
-                          </dl>
+                          </div>
                         </div>
                         <div
                           style={{

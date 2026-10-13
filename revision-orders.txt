@@ -1,0 +1,105 @@
+        error:
+          "Faltan datos obligatorios del estudiante.",
+      },
+      {
+        status: 400,
+      }
+    );
+  }
+
+  if (student.acceptedPrivacy !== true) {
+    return NextResponse.json(
+      {
+        error:
+          "Debes aceptar la política de tratamiento de datos para continuar.",
+      },
+      {
+        status: 400,
+      }
+    );
+  }
+
+  const amount = Number(course.price) || 0;
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return NextResponse.json(
+      {
+        error:
+          "El curso no tiene un precio válido.",
+      },
+      {
+        status: 400,
+      }
+    );
+  }
+
+  const orderNumber =
+    `IBR-${Date.now()}-${course.id}`;
+
+  const orderPayload = {
+    order_number: orderNumber,
+    order_status: "pending",
+
+    product_type: "course",
+    quantity: 1,
+    unit_price: amount,
+
+    event_id: null,
+    event_name: null,
+
+    course_id: course.id,
+    course_slug: course.slug,
+    course_name: course.name ?? null,
+    cycle: course.cycle ?? null,
+    year: course.year ?? null,
+    shift: course.shift ?? null,
+    modality: course.modality ?? null,
+    campus: course.campus ?? null,
+    level: course.level ?? null,
+    start_date: course.start_date ?? null,
+    end_date: course.end_date ?? null,
+    days: Array.isArray(course.days)
+      ? course.days
+      : [],
+    start_time:
+      course.start_time || null,
+    end_time:
+      course.end_time || null,
+
+    first_name:
+      cleanText(student.firstName),
+    last_name:
+      cleanText(student.lastName),
+    email:
+      cleanEmail(student.email),
+    phone:
+      cleanText(student.phone),
+
+    document_type:
+      student.documentType,
+    document_number:
+      cleanText(student.documentNumber),
+
+    birth_date:
+      student.birthDate || null,
+    gender:
+      student.gender || null,
+
+    address:
+      cleanText(student.address) || null,
+    city_name:
+      cleanText(student.city) || null,
+
+    amount,
+    currency: "COP",
+
+    payment_status: "pending",
+    q10_status: "pending",
+    hubspot_status: "pending",
+
+    accepted_privacy: true,
+    source: "ibraco-web",
+  };
+
+  const { data, error } =
+    await supabaseAdmin
