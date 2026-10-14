@@ -32,10 +32,10 @@ export default function RootLayout({
       lang="es"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <head>
         <Script
           id="google-tag-manager"
-          strategy="afterInteractive"
+          strategy="beforeInteractive"
         >
           {`
             (function(w,d,s,l,i){
@@ -53,7 +53,9 @@ export default function RootLayout({
             })(window,document,'script','dataLayer','${GTM_ID}');
           `}
         </Script>
+      </head>
 
+      <body className="min-h-full flex flex-col">
         <noscript>
           <iframe
             src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
