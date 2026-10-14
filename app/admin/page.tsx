@@ -1,43 +1,36 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
-
 type AdminProfile = {
   full_name: string | null;
   can_courses: boolean;
   can_events: boolean;
   can_accounting: boolean;
+  can_content: boolean;
   is_superadmin: boolean;
 };
-
 export default function AdminDashboardPage() {
   const router = useRouter();
-
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<AdminProfile | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
-
   useEffect(() => {
     async function loadAdmin() {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-
       if (!session) {
         router.replace("/admin/login");
         return;
       }
-
       const { data, error } = await supabase
         .from("admin_profiles")
         .select(
-          "full_name, can_courses, can_events, can_accounting, is_superadmin"
+          "full_name, can_courses, can_events, can_accounting, can_content, is_superadmin"
         )
         .eq("user_id", session.user.id)
         .single();
-
       if (error || !data) {
         console.error("Error cargando permisos:", error);
         setErrorMessage(
@@ -46,20 +39,16 @@ export default function AdminDashboardPage() {
         setLoading(false);
         return;
       }
-
       setProfile(data);
       setLoading(false);
     }
-
     loadAdmin();
   }, [router]);
-
   async function handleLogout() {
     await supabase.auth.signOut();
     router.replace("/admin/login");
     router.refresh();
   }
-
   if (loading) {
     return (
       <main
@@ -76,7 +65,6 @@ export default function AdminDashboardPage() {
       </main>
     );
   }
-
   if (!profile) {
     return (
       <main
@@ -101,7 +89,6 @@ export default function AdminDashboardPage() {
           }}
         >
           <h1 style={{ marginTop: 0 }}>Acceso no autorizado</h1>
-
           <p
             style={{
               color: "#555",
@@ -110,7 +97,6 @@ export default function AdminDashboardPage() {
           >
             {errorMessage}
           </p>
-
           <button
             onClick={handleLogout}
             style={{
@@ -130,16 +116,14 @@ export default function AdminDashboardPage() {
       </main>
     );
   }
-
   const canSeeCourses =
     profile.is_superadmin || profile.can_courses;
-
   const canSeeEvents =
     profile.is_superadmin || profile.can_events;
-
   const canSeeAccounting =
     profile.is_superadmin || profile.can_accounting;
-
+  const canSeeContent =
+    profile.is_superadmin || profile.can_content;
   return (
     <main
       style={{
@@ -178,7 +162,6 @@ export default function AdminDashboardPage() {
             >
               Administración IBRACO
             </div>
-
             <h1
               style={{
                 margin: 0,
@@ -190,7 +173,6 @@ export default function AdminDashboardPage() {
             >
               CENTRO DE ADMINISTRACIÓN
             </h1>
-
             <p
               style={{
                 fontSize: "19px",
@@ -208,7 +190,6 @@ export default function AdminDashboardPage() {
               . Estos son los módulos que tienes autorizados.
             </p>
           </div>
-
           <button
             type="button"
             onClick={handleLogout}
@@ -225,7 +206,6 @@ export default function AdminDashboardPage() {
             Cerrar sesión
           </button>
         </div>
-
         <section
           style={{
             display: "grid",
@@ -245,7 +225,6 @@ export default function AdminDashboardPage() {
               accent="#009c4b"
             />
           )}
-
           {canSeeEvents && (
             <AdminCard
               eyebrow="AGENDA CULTURAL"
@@ -256,7 +235,6 @@ export default function AdminDashboardPage() {
               accent="#ffd800"
             />
           )}
-
           {canSeeAccounting && (
             <AdminCard
               eyebrow="VENTAS Y PAGOS"
@@ -267,8 +245,17 @@ export default function AdminDashboardPage() {
               accent="#111111"
             />
           )}
+          {canSeeContent && (
+            <AdminCard
+              eyebrow="MARKETING Y CONTENIDOS"
+              title="SEO y Blog"
+              description="Administra la configuración SEO de las páginas y los artículos del blog de IBRACO."
+              href="/admin/contenidos"
+              buttonText="Administrar contenidos"
+              accent="#2563eb"
+            />
+          )}
         </section>
-
         <section
           style={{
             background: "#fff",
@@ -298,7 +285,6 @@ export default function AdminDashboardPage() {
               >
                 Vista pública
               </div>
-
               <h2
                 style={{
                   margin: 0,
@@ -309,7 +295,6 @@ export default function AdminDashboardPage() {
                 Sitios públicos de IBRACO
               </h2>
             </div>
-
             <div
               style={{
                 display: "flex",
@@ -330,7 +315,6 @@ export default function AdminDashboardPage() {
               >
                 Ver cursos
               </a>
-
               <a
                 href="/agenda-cultural"
                 style={{
@@ -344,7 +328,6 @@ export default function AdminDashboardPage() {
               >
                 Ver Agenda Cultural
               </a>
-
               <a
                 href="/"
                 style={{
@@ -361,7 +344,6 @@ export default function AdminDashboardPage() {
             </div>
           </div>
         </section>
-
         {profile.is_superadmin && (
           <section
             style={{
@@ -381,7 +363,6 @@ export default function AdminDashboardPage() {
             >
               Próxima etapa
             </div>
-
             <h2
               style={{
                 margin: "0 0 12px",
@@ -391,7 +372,6 @@ export default function AdminDashboardPage() {
             >
               Indicadores comerciales
             </h2>
-
             <p
               style={{
                 margin: 0,
@@ -407,7 +387,6 @@ export default function AdminDashboardPage() {
             </p>
           </section>
         )}
-
         <p
           style={{
             textAlign: "center",
@@ -422,7 +401,6 @@ export default function AdminDashboardPage() {
     </main>
   );
 }
-
 function AdminCard({
   eyebrow,
   title,
@@ -439,7 +417,6 @@ function AdminCard({
   accent: string;
 }) {
   const darkButton = accent === "#111111";
-
   return (
     <article
       style={{
@@ -466,7 +443,6 @@ function AdminCard({
         >
           {eyebrow}
         </div>
-
         <h2
           style={{
             margin: "0 0 15px",
@@ -476,7 +452,6 @@ function AdminCard({
         >
           {title}
         </h2>
-
         <p
           style={{
             margin: 0,
@@ -488,7 +463,6 @@ function AdminCard({
           {description}
         </p>
       </div>
-
       <a
         href={href}
         style={{
