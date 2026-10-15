@@ -138,6 +138,35 @@ export default function ContenidosAdminPage() {
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <Link href="/admin" style={{ color: "#087c40", fontWeight: 800 }}>← Volver al administrador</Link>
         <p style={{ marginTop: 36, marginBottom: 6, color: "#087c40", fontWeight: 800 }}>MARKETING Y CONTENIDOS</p>
+       <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 24 }}>
+  <Link
+    href="/admin/contenidos"
+    style={{
+      padding: "12px 20px",
+      borderRadius: 30,
+      background: "#009c4b",
+      color: "#fff",
+      fontWeight: 800,
+      textDecoration: "none",
+    }}
+  >
+    SEO de páginas
+  </Link>
+
+  <Link
+    href="/admin/contenidos/blog"
+    style={{
+      padding: "12px 20px",
+      borderRadius: 30,
+      background: "#111",
+      color: "#fff",
+      fontWeight: 800,
+      textDecoration: "none",
+    }}
+  >
+    Artículos del blog →
+  </Link>
+</div>
         <h1 style={{ fontSize: "clamp(34px, 5vw, 54px)", margin: "0 0 10px" }}>SEO de páginas</h1>
         <p style={{ fontSize: 17, lineHeight: 1.6 }}>Edita los títulos y las descripciones para Google sin modificar el código de las páginas.</p>
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", gap: 24, marginTop: 28 }}>
