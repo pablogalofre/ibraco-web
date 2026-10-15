@@ -103,7 +103,17 @@ export default async function Home() {
               Instituto de Cultura Brasil Colombia
             </div>
 
-            <h1>
+            <h1
+  style={
+    seoH1
+      ? {
+          fontSize: "clamp(28px, 3.5vw, 52px)",
+          lineHeight: 1.12,
+          overflowWrap: "break-word",
+        }
+      : undefined
+  }
+>
   {seoH1 || (
     <>
       Aprende portugués. <span>O Brasil é aqui.</span>
