@@ -1,12 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useState, type CSSProperties, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../../lib/supabase";
 
 type Status = "draft" | "published";
 type Access = "loading" | "allowed" | "denied";
+type View = "dashboard" | "editor";
+type EditorTab = "write" | "preview";
+type Filter = "all" | "draft" | "published";
 type Post = {
   id: string;
   slug: string;
@@ -27,29 +30,13 @@ const CATEGORIES = [
   "Aprender portugués", "Celpe-Bras", "Cultura brasileña",
   "Portugués para negocios", "Estudiar y viajar", "Comunidad IBRACO",
 ];
-
-const colors = { green: "#008c48", dark: "#17211c", muted: "#65716b", cream: "#f8f7ef" };
-const card: CSSProperties = {
-  background: "#fff", border: "1px solid #e8e9e3", borderRadius: 20,
-  padding: "clamp(20px, 3vw, 34px)", boxShadow: "0 6px 22px rgba(20, 40, 25, .035)",
+const slugify = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+  .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const dateLabel = (value: string | null | undefined) => {
+  if (!value) return "Sin fecha";
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? "Sin fecha" : d.toLocaleDateString("es-CO", { day: "numeric", month: "short", year: "numeric" });
 };
-const input: CSSProperties = {
-  display: "block", width: "100%", boxSizing: "border-box", background: "#fff",
-  color: colors.dark, font: "inherit", fontSize: 15, lineHeight: 1.5,
-  border: "1px solid #d8ded7", borderRadius: 10, padding: "11px 14px",
-  outlineColor: colors.green,
-};
-const label: CSSProperties = { display: "block", fontSize: 14, fontWeight: 700, marginBottom: 7 };
-const button: CSSProperties = {
-  border: 0, borderRadius: 999, padding: "12px 20px", fontWeight: 700,
-  fontSize: 14, cursor: "pointer", fontFamily: "inherit",
-};
-const field: CSSProperties = { minWidth: 0 };
-
-function slugify(value: string) {
-  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-}
 
 export default function BlogAdminPage() {
   const router = useRouter();
@@ -59,6 +46,10 @@ export default function BlogAdminPage() {
   const [saving, setSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [notice, setNotice] = useState("");
+  const [view, setView] = useState<View>("dashboard");
+  const [tab, setTab] = useState<EditorTab>("write");
+  const [filter, setFilter] = useState<Filter>("all");
+  const [search, setSearch] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
@@ -73,8 +64,7 @@ export default function BlogAdminPage() {
   const [publishedAt, setPublishedAt] = useState<string | null>(null);
 
   const loadPosts = useCallback(async () => {
-    const { data, error } = await supabase.from("blog_posts").select("*")
-      .order("created_at", { ascending: false });
+    const { data, error } = await supabase.from("blog_posts").select("*").order("created_at", { ascending: false });
     if (error) throw error;
     setPosts((data ?? []) as Post[]);
   }, []);
@@ -86,9 +76,8 @@ export default function BlogAdminPage() {
         const { data: { user }, error } = await supabase.auth.getUser();
         if (!active) return;
         if (error || !user) { router.replace("/admin/login"); return; }
-        const { data: profile, error: profileError } = await supabase
-          .from("admin_profiles").select("can_content, is_superadmin")
-          .eq("user_id", user.id).single();
+        const { data: profile, error: profileError } = await supabase.from("admin_profiles")
+          .select("can_content, is_superadmin").eq("user_id", user.id).single();
         if (!active) return;
         if (profileError || !profile || (!profile.can_content && !profile.is_superadmin)) {
           setAccess("denied"); return;
@@ -100,43 +89,47 @@ export default function BlogAdminPage() {
         if (active) setPosts((data ?? []) as Post[]);
       } catch (err) {
         if (active) setErrorMessage(err instanceof Error ? err.message : "No se pudo cargar el blog.");
-      } finally {
-        if (active) setLoading(false);
-      }
+      } finally { if (active) setLoading(false); }
     }
     void initialize();
     return () => { active = false; };
   }, [router]);
+
+  const stats = useMemo(() => ({
+    total: posts.length,
+    published: posts.filter(p => p.status === "published").length,
+    drafts: posts.filter(p => p.status === "draft").length,
+    featured: posts.filter(p => p.is_featured).length,
+  }), [posts]);
+  const filteredPosts = useMemo(() => posts.filter(p =>
+    (filter === "all" || p.status === filter) &&
+    [p.title, p.category ?? "", p.slug].join(" ").toLowerCase().includes(search.trim().toLowerCase())
+  ), [posts, filter, search]);
 
   function resetForm() {
     setEditingId(null); setTitle(""); setSlug(""); setExcerpt("");
     setContent(""); setCategory(CATEGORIES[0]); setCoverImage("");
     setSeoTitle(""); setMetaDescription(""); setFeatured(false);
     setStatus("draft"); setPublishedAt(null);
-    setErrorMessage(""); setNotice("");
+    setErrorMessage(""); setNotice(""); setTab("write");
   }
-
+  function newPost() { resetForm(); setView("editor"); }
   function editPost(post: Post) {
     setEditingId(post.id); setTitle(post.title); setSlug(post.slug);
     setExcerpt(post.excerpt ?? ""); setContent(post.content ?? "");
     setCategory(post.category ?? CATEGORIES[0]); setCoverImage(post.cover_image_url ?? "");
     setSeoTitle(post.seo_title ?? ""); setMetaDescription(post.meta_description ?? "");
     setFeatured(post.is_featured); setStatus(post.status); setPublishedAt(post.published_at);
-    setErrorMessage(""); setNotice("");
+    setErrorMessage(""); setNotice(""); setTab("write"); setView("editor");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
-
   async function savePost(nextStatus: Status) {
     if (saving) return;
     setErrorMessage(""); setNotice("");
     const cleanTitle = title.trim();
     const cleanSlug = slugify(slug || title);
-    if (!cleanTitle || !cleanSlug) {
-      setErrorMessage("Completa el título y la URL del artículo."); return;
-    }
-    if (!content.trim()) {
-      setErrorMessage("Escribe el contenido del artículo."); return;
-    }
+    if (!cleanTitle || !cleanSlug) { setErrorMessage("Completa el título y la URL del artículo."); return; }
+    if (!content.trim()) { setErrorMessage("Escribe el contenido del artículo."); return; }
     setSaving(true);
     try {
       const payload = {
@@ -160,182 +153,86 @@ export default function BlogAdminPage() {
       }
       await loadPosts();
       resetForm();
+      setView("dashboard");
       setNotice(nextStatus === "published"
-        ? "Artículo marcado como publicado en Supabase. Aún falta conectarlo con el blog público."
-        : "Borrador guardado correctamente.");
+        ? "Artículo marcado como publicado en Supabase. Falta conectarlo con el blog público."
+        : "¡Borrador guardado correctamente!");
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : "No se pudo guardar el artículo.");
-    } finally {
-      setSaving(false);
-    }
+    } finally { setSaving(false); }
   }
 
-  if (access === "loading" && loading) return <main style={{ padding: "150px 6% 50px" }}>Verificando permisos...</main>;
-  if (access === "denied") return (
-    <main style={{ padding: "150px 6% 50px" }}>
-      <h1>Acceso no autorizado</h1>
-      <p>No tienes permiso para administrar el blog.</p>
-      <Link href="/admin">Volver al administrador</Link>
-    </main>
-  );
-  if (access !== "allowed") return (
-    <main style={{ padding: "150px 6% 50px" }}>
-      <h1>No se pudo abrir el administrador</h1>
-      <p role="alert">{errorMessage || "Verifica tu sesión."}</p>
-      <Link href="/admin">Volver al administrador</Link>
-    </main>
-  );
+  if (access === "loading" && loading) return <main className="ib-loading">Preparando tu estudio editorial…</main>;
+  if (access === "denied") return <main className="ib-loading"><h1>Acceso no autorizado</h1><p>No tienes permiso para administrar el blog.</p><Link href="/admin">Volver al administrador</Link></main>;
+  if (access !== "allowed") return <main className="ib-loading"><h1>No se pudo abrir el administrador</h1><p role="alert">{errorMessage || "Verifica tu sesión."}</p><Link href="/admin">Volver al administrador</Link></main>;
 
   return (
-    <main style={{ minHeight: "100vh", background: colors.cream, color: colors.dark,
-      padding: "clamp(145px, 13vw, 175px) 5% 80px", fontFamily: "Arial, sans-serif" }}>
-      <div style={{ maxWidth: 1060, margin: "0 auto" }}>
-        <Link href="/admin/contenidos" style={{ color: colors.green, fontWeight: 700, textDecoration: "none", fontSize: 14 }}>
-          ← Volver a SEO de páginas
-        </Link>
-        <header style={{ margin: "30px 0 30px" }}>
-          <p style={{ color: colors.green, fontWeight: 800, fontSize: 12, letterSpacing: "0.11em", margin: "0 0 12px" }}>
-            IBRACO / MARKETING Y CONTENIDOS
-          </p>
-          <h1 style={{ fontSize: "clamp(28px, 3.5vw, 42px)", lineHeight: 1.12,
-            letterSpacing: "-0.035em", margin: "0 0 12px", fontWeight: 800 }}>
-            Artículos del blog
-          </h1>
-          <p style={{ color: colors.muted, fontSize: 15, lineHeight: 1.6, margin: 0 }}>
-            Administra los artículos, borradores y contenidos SEO de IBRACO.
-          </p>
-        </header>
+    <main className="ib-app">
+      <style>{`
+        .ib-app{--green:#009c4b;--ink:#18221d;--muted:#68746d;--line:#e7eae5;--cream:#f6f6ef;--blue:#2d62ee;--yellow:#ffdc00;min-height:100vh;background:var(--cream);color:var(--ink);font-family:Arial,Helvetica,sans-serif;padding-top:115px}
+        .ib-app *{box-sizing:border-box}.ib-app button,.ib-app input,.ib-app textarea,.ib-app select{font:inherit}.ib-app button{cursor:pointer}.ib-shell{max-width:1500px;margin:auto;display:grid;grid-template-columns:245px minmax(0,1fr);gap:24px;padding:28px 30px 70px}
+        .ib-side{background:#fff;border:1px solid var(--line);border-radius:25px;padding:26px 16px;align-self:start;position:sticky;top:135px;box-shadow:0 10px 35px #142d1710}
+        .ib-brand{display:flex;align-items:center;gap:11px;padding:0 10px 25px;border-bottom:1px solid var(--line)}.ib-mark{width:43px;height:43px;border-radius:14px;background:var(--yellow);display:grid;place-items:center;font-size:22px;font-weight:900;color:#078b45}.ib-brand strong{display:block;font-size:18px}.ib-brand small{color:var(--muted);font-size:11px}
+        .ib-side-label{font-size:10px;font-weight:800;letter-spacing:.14em;color:#9aa39d;margin:25px 13px 12px}.ib-nav{display:flex;flex-direction:column;gap:5px}.ib-nav button,.ib-nav a{border:0;text-align:left;text-decoration:none;background:transparent;color:#526059;padding:13px 15px;border-radius:13px;font-size:14px;font-weight:700;display:flex;align-items:center;gap:12px}.ib-nav button.active{background:#e7f7ed;color:#087a3e}.ib-nav button:hover,.ib-nav a:hover{background:#f2f5f1}.ib-side-bottom{margin-top:38px;padding:18px 15px;background:#f3f8f1;border-radius:17px}.ib-side-bottom strong{font-size:13px}.ib-side-bottom p{font-size:12px;color:var(--muted);line-height:1.5;margin:7px 0 0}
+        .ib-main{min-width:0}.ib-top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px;flex-wrap:wrap}.ib-kicker{font-size:11px;color:#078848;letter-spacing:.14em;font-weight:900;margin:0 0 7px}.ib-top h1{font-size:clamp(26px,3vw,38px);letter-spacing:-.045em;margin:0;font-weight:900}.ib-top p.ib-sub{font-size:14px;color:var(--muted);margin:9px 0 0;line-height:1.5}
+        .ib-btn{border:0;border-radius:13px;padding:13px 18px;font-weight:800;font-size:13px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;white-space:nowrap}.ib-btn:disabled{opacity:.55;cursor:wait}.ib-btn-green{background:var(--green);color:#fff}.ib-btn-blue{background:var(--blue);color:#fff}.ib-btn-dark{background:var(--ink);color:#fff}.ib-btn-light{background:#f0f3ef;color:#26342b}.ib-btn-outline{background:#fff;color:var(--ink);border:1px solid var(--line)}
+        .ib-hero{background:#1b5e44;border-radius:25px;color:#fff;min-height:208px;padding:30px 36px;display:flex;justify-content:space-between;align-items:center;gap:25px;overflow:hidden;position:relative}.ib-hero:before{content:"";position:absolute;width:320px;height:320px;border:55px solid #ffffff16;border-radius:50%;right:-65px;top:-140px}.ib-hero:after{content:"";position:absolute;width:170px;height:170px;background:var(--yellow);border-radius:50%;right:75px;bottom:-130px}.ib-hero-copy{position:relative;z-index:1;max-width:520px}.ib-hero-copy small{font-size:11px;letter-spacing:.13em;font-weight:900;color:#c2e8cd}.ib-hero h2{font-size:clamp(24px,3.1vw,37px);line-height:1.12;letter-spacing:-.04em;margin:13px 0}.ib-hero p{font-size:14px;color:#d3e8d9;line-height:1.55;max-width:460px;margin:0}.ib-hero-icon{font-size:76px;position:relative;z-index:1;transform:rotate(-12deg);margin-right:45px}
+        .ib-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin:20px 0 28px}.ib-stat{background:#fff;border:1px solid var(--line);border-radius:20px;padding:21px 22px;min-width:0}.ib-stat-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.ib-stat small{font-size:12px;color:var(--muted);font-weight:700}.ib-stat-icon{width:36px;height:36px;border-radius:12px;background:#f2f6f1;display:grid;place-items:center;font-size:19px}.ib-stat strong{display:block;font-size:34px;margin-top:12px;letter-spacing:-.05em}
+        .ib-panel{background:#fff;border:1px solid var(--line);border-radius:23px;padding:25px;box-shadow:0 5px 25px #17291a08}.ib-panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:22px}.ib-panel-head h2{margin:0;font-size:20px;letter-spacing:-.025em}.ib-panel-head p{margin:6px 0 0;color:var(--muted);font-size:13px}.ib-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.ib-search{border:1px solid var(--line);background:#fafbf9;border-radius:12px;padding:11px 14px;min-width:200px;max-width:100%;font-size:13px;outline-color:var(--green)}.ib-filters{display:flex;gap:5px;background:#f4f6f2;padding:4px;border-radius:12px}.ib-filters button{background:transparent;border:0;border-radius:9px;padding:9px 12px;font-size:12px;font-weight:800;color:#718078}.ib-filters button.active{background:#fff;color:#078a47;box-shadow:0 2px 6px #0000000b}
+        .ib-list{display:grid;gap:11px}.ib-post{display:flex;align-items:center;gap:16px;border:1px solid var(--line);border-radius:17px;padding:15px;transition:background .15s}.ib-post:hover{background:#fbfcfa}.ib-thumb{width:57px;height:57px;flex-shrink:0;border-radius:14px;background:#e5f6eb;display:grid;place-items:center;font-size:24px;overflow:hidden}.ib-thumb img{width:100%;height:100%;object-fit:cover}.ib-post-info{flex:1;min-width:0}.ib-post-info strong{display:block;font-size:14px;overflow-wrap:anywhere}.ib-post-info small{display:block;color:var(--muted);font-size:12px;margin-top:7px}.ib-pill{border-radius:999px;padding:6px 10px;font-size:11px;font-weight:800;white-space:nowrap}.ib-pill.published{background:#e6f7ec;color:#078044}.ib-pill.draft{background:#fff5d2;color:#8a6500}.ib-empty{text-align:center;padding:55px 20px;color:var(--muted)}.ib-empty span{font-size:45px}.ib-empty h3{color:var(--ink);margin-bottom:5px}
+        .ib-alert{padding:15px 18px;border-radius:14px;margin-bottom:18px;font-size:13px;line-height:1.5}.ib-alert.success{background:#e7f7ed;color:#076c38}.ib-alert.error{background:#fff0ed;color:#a42b20}
+        .ib-editor-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}.ib-editor-grid .ib-panel{min-width:0}.ib-form{display:grid;gap:22px}.ib-label{display:block;font-size:12px;font-weight:900;color:#35453b;margin-bottom:9px}.ib-input{width:100%;padding:13px 15px;border:1px solid #dce3da;background:#fff;border-radius:12px;outline-color:var(--green);font-size:14px;color:var(--ink)}.ib-input::placeholder{color:#a1aaa3}.ib-textarea{resize:vertical;line-height:1.7}.ib-field-hint{font-size:11px;color:#7c8980;margin-top:7px;line-height:1.5}.ib-row2{display:grid;grid-template-columns:1fr 1fr;gap:15px}.ib-editor-tabs{display:flex;gap:7px;background:#f2f5f0;border-radius:13px;padding:5px;width:max-content;max-width:100%;margin-bottom:18px}.ib-editor-tabs button{border:0;background:transparent;border-radius:10px;padding:10px 16px;font-size:12px;font-weight:800;color:#7a867e}.ib-editor-tabs button.active{background:#fff;color:#078848;box-shadow:0 2px 9px #0000000a}.ib-preview{border:1px dashed #d2ddd2;border-radius:15px;padding:25px;min-height:320px;background:#fff;overflow-wrap:anywhere}.ib-preview h2{font-size:28px;letter-spacing:-.04em;line-height:1.2}.ib-preview p{white-space:pre-wrap;line-height:1.8;font-size:14px}.ib-preview img{max-width:100%;border-radius:12px}.ib-preview-category{color:var(--green);font-size:11px;font-weight:900;letter-spacing:.08em}.ib-editor-side .ib-panel{margin-bottom:16px}.ib-editor-side h3{margin:0 0 18px;font-size:16px}.ib-editor-side p{color:var(--muted);font-size:12px;line-height:1.55}.ib-check{display:flex;gap:10px;align-items:center;font-size:13px;font-weight:700}.ib-check input{accent-color:var(--green);width:17px;height:17px}.ib-seo{border-top:1px solid var(--line);padding-top:15px;margin-top:18px}.ib-seo summary{font-size:13px;font-weight:900;cursor:pointer}.ib-seo .ib-form{margin-top:16px;gap:16px}.ib-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:23px}.ib-note{background:#fff7db;border-radius:13px;padding:12px 14px;font-size:11px!important;color:#795d00!important}
+        @media(max-width:1100px){.ib-shell{grid-template-columns:205px minmax(0,1fr);padding:24px 18px 60px;gap:16px}.ib-editor-grid{grid-template-columns:minmax(0,1fr)}.ib-editor-side{display:grid;grid-template-columns:1fr 1fr;gap:15px}.ib-editor-side .ib-panel{margin-bottom:0}}
+        @media(max-width:800px){.ib-app{padding-top:100px}.ib-shell{display:block;padding:15px 14px 45px}.ib-side{position:static;margin-bottom:20px;padding:12px}.ib-brand{padding:6px 8px 12px}.ib-nav{flex-direction:row;flex-wrap:wrap}.ib-nav button,.ib-nav a{padding:10px 12px}.ib-side-label,.ib-side-bottom{display:none}.ib-hero{padding:25px;min-height:175px}.ib-hero-icon{display:none}.ib-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.ib-panel{padding:18px}.ib-tools{width:100%}.ib-search{flex:1}.ib-editor-side{grid-template-columns:1fr}}
+        @media(max-width:500px){.ib-row2{grid-template-columns:1fr}.ib-post{gap:10px;flex-wrap:wrap}.ib-post .ib-btn{margin-left:auto}.ib-thumb{width:45px;height:45px}.ib-pill{font-size:10px}.ib-stats{gap:9px}.ib-stat{padding:16px}.ib-stat strong{font-size:28px}}
+      `}</style>
+      <div className="ib-shell">
+        <aside className="ib-side">
+          <div className="ib-brand"><div className="ib-mark">iB</div><div><strong>IBRACO</strong><small>Estudio editorial</small></div></div>
+          <div className="ib-side-label">TU ESPACIO</div>
+          <nav className="ib-nav" aria-label="Navegación editorial">
+            <button type="button" className={view === "dashboard" ? "active" : ""} onClick={() => setView("dashboard")}>▦ &nbsp; Dashboard</button>
+            <button type="button" className={view === "editor" ? "active" : ""} onClick={newPost}>✎ &nbsp; Crear artículo</button>
+            <Link href="/admin">◈ &nbsp; Centro de administración</Link>
+            <Link href="/blog" target="_blank">↗ &nbsp; Ver blog público</Link>
+            <Link href="/admin">⌂ &nbsp; Volver al inicio</Link>
+          </nav>
+          <div className="ib-side-bottom"><strong>✨ Tu espacio creativo</strong><p>Ideas, historias y cultura brasileña, listas para conectar con más personas.</p></div>
+        </aside>
 
-        {notice && <p role="status" style={{ padding: 15, borderRadius: 10, background: "#e8f7ed", color: "#096632" }}>{notice}</p>}
-        {errorMessage && <p role="alert" style={{ padding: 15, borderRadius: 10, background: "#fff0ed", color: "#a42b20" }}>{errorMessage}</p>}
-
-        <section style={card}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 26 }}>
-            <div>
-              <p style={{ fontSize: 12, color: colors.green, fontWeight: 800, margin: "0 0 5px" }}>EDITOR DE CONTENIDOS</p>
-              <h2 style={{ fontSize: 23, margin: 0 }}>{editingId ? "Editar artículo" : "Nuevo artículo"}</h2>
-            </div>
-            {editingId && <span style={{ padding: "8px 12px", borderRadius: 30, background: "#f2f4f1", fontSize: 13, fontWeight: 700 }}>
-              {status === "published" ? "Publicado" : "Borrador"}
-            </span>}
+        <div className="ib-main">
+          <div className="ib-top">
+            <div><p className="ib-kicker">IBRACO / MARKETING Y CONTENIDOS</p><h1>{view === "dashboard" ? "¡Hola, equipo creativo! 👋" : editingId ? "Edita tu historia ✨" : "Una nueva historia ✨"}</h1><p className="ib-sub">{view === "dashboard" ? "Todo lo que está pasando en el blog, de un vistazo." : "Escribe, organiza y prepara contenidos que inspiren."}</p></div>
+            {view === "dashboard" ? <button type="button" className="ib-btn ib-btn-blue" onClick={newPost}>＋ Crear artículo</button> : <button type="button" className="ib-btn ib-btn-outline" onClick={() => setView("dashboard")}>← Volver al dashboard</button>}
           </div>
+          {notice && <div role="status" className="ib-alert success">✓ {notice}</div>}
+          {errorMessage && <div role="alert" className="ib-alert error">{errorMessage}</div>}
 
-          <form onSubmit={(event: FormEvent<HTMLFormElement>) => { event.preventDefault(); void savePost("draft"); }}
-            style={{ display: "grid", gap: 22 }}>
-            <div style={field}>
-              <label htmlFor="blog-title" style={label}>Título del artículo *</label>
-              <input id="blog-title" value={title} maxLength={180} style={input}
-                placeholder="Ej. Cómo aprender portugués desde cero"
-                onChange={(event) => {
-                  const next = event.target.value;
-                  if (!editingId && slug === slugify(title)) setSlug(slugify(next));
-                  setTitle(next);
-                }} />
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))", gap: 20 }}>
-              <div style={field}>
-                <label htmlFor="blog-slug" style={label}>URL del artículo *</label>
-                <input id="blog-slug" value={slug} style={input} placeholder="como-aprender-portugues"
-                  onChange={(event) => setSlug(slugify(event.target.value))} />
-                <small style={{ color: colors.muted }}>Ruta prevista: /blog/{slug || "nombre-del-articulo"}</small>
-              </div>
-              <div style={field}>
-                <label htmlFor="blog-category" style={label}>Categoría</label>
-                <select id="blog-category" value={category} style={input}
-                  onChange={(event) => setCategory(event.target.value)}>
-                  {CATEGORIES.map((item) => <option key={item} value={item}>{item}</option>)}
-                </select>
-              </div>
-            </div>
-
-            <div style={field}>
-              <label htmlFor="blog-excerpt" style={label}>Resumen</label>
-              <textarea id="blog-excerpt" rows={3} value={excerpt} style={{ ...input, resize: "vertical" }}
-                placeholder="Una introducción breve para presentar el artículo"
-                onChange={(event) => setExcerpt(event.target.value)} />
-            </div>
-
-            <div style={field}>
-              <label htmlFor="blog-content" style={label}>Contenido del artículo *</label>
-              <textarea id="blog-content" rows={12} value={content} style={{ ...input, resize: "vertical", lineHeight: 1.7 }}
-                placeholder="Escribe aquí el artículo..."
-                onChange={(event) => setContent(event.target.value)} />
-              <small style={{ color: colors.muted }}>Editor de texto simple. La edición enriquecida se incorporará después.</small>
-            </div>
-
-            <div style={field}>
-              <label htmlFor="blog-image" style={label}>Imagen de portada (URL)</label>
-              <input id="blog-image" value={coverImage} style={input} placeholder="https://..."
-                onChange={(event) => setCoverImage(event.target.value)} />
-              <small style={{ color: colors.muted }}>La carga directa de imágenes se incorporará en una siguiente etapa.</small>
-            </div>
-
-            <div style={{ borderTop: "1px solid #edf0eb", paddingTop: 24 }}>
-              <h3 style={{ fontSize: 19, margin: "0 0 6px" }}>Posicionamiento SEO</h3>
-              <p style={{ fontSize: 14, color: colors.muted, margin: "0 0 20px" }}>Información para los resultados de búsqueda.</p>
-              <div style={{ display: "grid", gap: 18 }}>
-                <div style={field}>
-                  <label htmlFor="blog-seo-title" style={label}>Título SEO</label>
-                  <input id="blog-seo-title" value={seoTitle} maxLength={180} style={input}
-                    placeholder="Título para Google" onChange={(event) => setSeoTitle(event.target.value)} />
-                  <small style={{ color: colors.muted }}>{seoTitle.length} caracteres</small>
-                </div>
-                <div style={field}>
-                  <label htmlFor="blog-meta" style={label}>Metadescripción</label>
-                  <textarea id="blog-meta" value={metaDescription} maxLength={500} rows={3}
-                    style={{ ...input, resize: "vertical" }} placeholder="Descripción para Google"
-                    onChange={(event) => setMetaDescription(event.target.value)} />
-                  <small style={{ color: colors.muted }}>{metaDescription.length} caracteres</small>
-                </div>
-              </div>
-            </div>
-
-            <label style={{ display: "flex", gap: 10, alignItems: "center", fontWeight: 700, fontSize: 14 }}>
-              <input type="checkbox" checked={featured} onChange={(event) => setFeatured(event.target.checked)} />
-              Destacar este artículo
-            </label>
-
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, paddingTop: 8 }}>
-              <button type="submit" disabled={saving} style={{ ...button, background: colors.dark, color: "white", opacity: saving ? 0.6 : 1 }}>
-                {saving ? "Guardando..." : "Guardar borrador"}
-              </button>
-              <button type="button" disabled={saving} onClick={() => void savePost("published")}
-                style={{ ...button, background: colors.green, color: "white", opacity: saving ? 0.6 : 1 }}>
-                {saving ? "Guardando..." : "Marcar como publicado"}
-              </button>
-              <button type="button" disabled={saving} onClick={resetForm}
-                style={{ ...button, background: "#f1f3ef", color: colors.dark }}>
-                Nuevo / Limpiar
-              </button>
-            </div>
-            <p style={{ fontSize: 12, color: colors.muted, margin: 0 }}>
-              Los artículos se guardan en Supabase. Todavía no aparecen automáticamente en la página pública del blog.
-            </p>
-          </form>
-        </section>
-
-        <section style={{ ...card, marginTop: 24 }}>
-          <h2 style={{ fontSize: 22, margin: "0 0 20px" }}>Artículos guardados</h2>
-          {loading ? <p>Cargando artículos...</p> : posts.length === 0
-            ? <p style={{ color: colors.muted }}>Todavía no hay artículos. Crea el primero en el formulario.</p>
-            : <div style={{ display: "grid", gap: 12 }}>
-                {posts.map((post) => (
-                  <article key={post.id} style={{ border: "1px solid #e7eae5", borderRadius: 14,
-                    padding: 18, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 15 }}>
-                    <div style={{ minWidth: 0 }}>
-                      <strong style={{ fontSize: 16 }}>{post.title}</strong>
-                      <p style={{ color: colors.muted, fontSize: 13, margin: "7px 0" }}>
-                        {post.category ?? "Sin categoría"} · {post.status === "published" ? "Publicado" : "Borrador"}
-                      </p>
-                      <small style={{ color: colors.muted, overflowWrap: "anywhere" }}>/blog/{post.slug}</small>
-                    </div>
-                    <button type="button" onClick={() => editPost(post)}
-                      style={{ ...button, background: "#e8f5ed", color: "#086b39" }}>Editar artículo</button>
-                  </article>
-                ))}
-              </div>}
-        </section>
+          {view === "dashboard" ? <>
+            <section className="ib-hero"><div className="ib-hero-copy"><small>EL BLOG DE IBRACO</small><h2>Las buenas historias<br />merecen ser contadas.</h2><p>Comparte el portugués, la cultura y las oportunidades que conectan a Colombia con Brasil.</p></div><div className="ib-hero-icon" aria-hidden="true">✍️</div></section>
+            <section className="ib-stats" aria-label="Estadísticas de artículos">
+              {[{ label: "Total de artículos", value: stats.total, icon: "📚" }, { label: "Publicados", value: stats.published, icon: "🟢" }, { label: "Borradores", value: stats.drafts, icon: "✏️" }, { label: "Destacados", value: stats.featured, icon: "⭐" }].map(item => <div className="ib-stat" key={item.label}><div className="ib-stat-top"><small>{item.label}</small><span className="ib-stat-icon">{item.icon}</span></div><strong>{item.value}</strong></div>)}
+            </section>
+            <section className="ib-panel">
+              <div className="ib-panel-head"><div><h2>Tu biblioteca de contenidos</h2><p>Encuentra, organiza y continúa tus artículos.</p></div><div className="ib-tools"><input className="ib-search" aria-label="Buscar artículos" placeholder="⌕  Buscar artículos..." value={search} onChange={e => setSearch(e.target.value)} /><div className="ib-filters">{([{ id: "all", label: "Todos" }, { id: "published", label: "Publicados" }, { id: "draft", label: "Borradores" }] as const).map(f => <button key={f.id} type="button" className={filter === f.id ? "active" : ""} onClick={() => setFilter(f.id)}>{f.label}</button>)}</div></div></div>
+              {loading ? <div className="ib-empty">Cargando artículos...</div> : filteredPosts.length === 0 ? <div className="ib-empty"><span>📝</span><h3>{posts.length ? "No encontramos artículos" : "Tu próxima historia empieza aquí"}</h3><p>{posts.length ? "Prueba con otra búsqueda o filtro." : "Todavía no hay artículos. ¡Creemos el primero!"}</p><button type="button" className="ib-btn ib-btn-green" onClick={newPost}>＋ Nuevo artículo</button></div> : <div className="ib-list">{filteredPosts.map(post => <article className="ib-post" key={post.id}><div className="ib-thumb">{post.cover_image_url ? <img src={post.cover_image_url} alt="" onError={e => { e.currentTarget.style.display = "none"; }} /> : "📖"}</div><div className="ib-post-info"><strong>{post.title}</strong><small>{post.category ?? "Sin categoría"} · {dateLabel(post.published_at ?? post.created_at)} {post.is_featured ? "· ⭐ Destacado" : ""}</small></div><span className={`ib-pill ${post.status}`}>{post.status === "published" ? "● Publicado" : "● Borrador"}</span><button type="button" className="ib-btn ib-btn-light" onClick={() => editPost(post)}>Editar ↗</button></article>)}</div>}
+            </section>
+          </> : <div className="ib-editor-grid">
+            <section className="ib-panel"><div className="ib-panel-head"><div><p className="ib-kicker">EDITOR CREATIVO</p><h2>{editingId ? "Editando artículo" : "Empecemos por una gran idea"}</h2><p>Tu artículo, a tu ritmo.</p></div><span className={`ib-pill ${status}`}>{status === "published" ? "● Publicado" : "● Borrador"}</span></div>
+              <form className="ib-form" onSubmit={(event: FormEvent<HTMLFormElement>) => { event.preventDefault(); void savePost("draft"); }}>
+                <div><label className="ib-label" htmlFor="ib-title">Título del artículo *</label><input className="ib-input" id="ib-title" maxLength={180} value={title} placeholder="Ej. 7 razones para enamorarte del portugués" onChange={event => { const next = event.target.value; if (!editingId && slug === slugify(title)) setSlug(slugify(next)); setTitle(next); }} /></div>
+                <div className="ib-row2"><div><label className="ib-label" htmlFor="ib-slug">Dirección del artículo *</label><input className="ib-input" id="ib-slug" value={slug} placeholder="mi-articulo" onChange={e => setSlug(slugify(e.target.value))} /><div className="ib-field-hint">/blog/{slug || "nombre-del-articulo"}</div></div><div><label className="ib-label" htmlFor="ib-category">Categoría</label><select className="ib-input" id="ib-category" value={category} onChange={e => setCategory(e.target.value)}>{CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}</select></div></div>
+                <div><label className="ib-label" htmlFor="ib-excerpt">Una breve introducción</label><textarea className="ib-input ib-textarea" id="ib-excerpt" rows={3} value={excerpt} placeholder="Cuenta de qué trata tu historia..." onChange={e => setExcerpt(e.target.value)} /></div>
+                <div><div className="ib-editor-tabs"><button type="button" className={tab === "write" ? "active" : ""} onClick={() => setTab("write")}>✎ Escribir</button><button type="button" className={tab === "preview" ? "active" : ""} onClick={() => setTab("preview")}>◉ Vista previa</button></div>{tab === "write" ? <><label className="ib-label" htmlFor="ib-content">Contenido del artículo *</label><textarea className="ib-input ib-textarea" id="ib-content" rows={17} value={content} placeholder="Aquí empieza tu historia..." onChange={e => setContent(e.target.value)} /><div className="ib-field-hint">Editor de texto simple. La vista previa respeta los saltos de línea.</div></> : <div className="ib-preview"><div className="ib-preview-category">{category.toUpperCase()}</div><h2>{title || "Tu gran título aparecerá aquí"}</h2>{coverImage && <img src={coverImage} alt="Vista previa de portada" onError={e => { e.currentTarget.style.display = "none"; }} />}{excerpt && <p><strong>{excerpt}</strong></p>}<p>{content || "Cuando escribas tu artículo, podrás leerlo aquí antes de guardarlo."}</p></div>}</div>
+                <div className="ib-actions"><button type="submit" className="ib-btn ib-btn-dark" disabled={saving}>{saving ? "Guardando..." : "Guardar borrador"}</button><button type="button" className="ib-btn ib-btn-green" disabled={saving} onClick={() => void savePost("published")}>{saving ? "Guardando..." : "✓ Marcar como publicado"}</button><button type="button" className="ib-btn ib-btn-light" disabled={saving} onClick={newPost}>Limpiar</button></div>
+              </form>
+            </section>
+            <aside className="ib-editor-side"><section className="ib-panel"><h3>🎨 Presentación</h3><div><label className="ib-label" htmlFor="ib-cover">Imagen de portada (URL)</label><input className="ib-input" id="ib-cover" value={coverImage} placeholder="https://..." onChange={e => setCoverImage(e.target.value)} /><div className="ib-field-hint">Por ahora, utiliza la dirección de una imagen pública.</div></div>{coverImage && <div style={{ marginTop: 12, borderRadius: 12, overflow: "hidden" }}><img src={coverImage} alt="Portada seleccionada" style={{ width: "100%", maxHeight: 170, objectFit: "cover" }} onError={e => { e.currentTarget.style.display = "none"; }} /></div>}<label className="ib-check" style={{ marginTop: 20 }}><input type="checkbox" checked={featured} onChange={e => setFeatured(e.target.checked)} />⭐ Destacar artículo</label></section>
+              <section className="ib-panel"><h3>🔎 Visibilidad en Google</h3><p>Optimiza el título y la descripción para los buscadores cuando lo necesites.</p><details className="ib-seo"><summary>Configurar SEO ▾</summary><div className="ib-form"><div><label className="ib-label" htmlFor="ib-seo-title">Título SEO</label><input className="ib-input" id="ib-seo-title" maxLength={180} value={seoTitle} placeholder="Título para Google" onChange={e => setSeoTitle(e.target.value)} /><div className="ib-field-hint">{seoTitle.length} caracteres</div></div><div><label className="ib-label" htmlFor="ib-meta">Metadescripción</label><textarea className="ib-input ib-textarea" id="ib-meta" rows={4} maxLength={500} value={metaDescription} placeholder="Descripción para Google" onChange={e => setMetaDescription(e.target.value)} /><div className="ib-field-hint">{metaDescription.length} caracteres</div></div></div></details></section>
+              <p className="ib-note">ℹ️ Los artículos se guardan en Supabase. Marcar como publicado todavía no los muestra automáticamente en el blog público.</p>
+            </aside>
+          </div>}
+        </div>
       </div>
     </main>
   );
