@@ -1,4 +1,40 @@
-export default function Home() {
+import { createClient } from "@supabase/supabase-js";
+
+export const dynamic = "force-dynamic";
+
+async function getHomeH1(): Promise<string | null> {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+  if (!url || !key) return null;
+
+  try {
+    const supabase = createClient(url, key, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    });
+
+    const { data, error } = await supabase
+      .from("seo_pages")
+      .select("h1")
+      .eq("page_path", "/")
+      .maybeSingle();
+
+    if (error) {
+      console.error("Error consultando H1:", error.message);
+      return null;
+    }
+
+    return data?.h1?.trim() || null;
+  } catch {
+    return null;
+  }
+}
+
+export default async function Home() {
+  const seoH1 = await getHomeH1();
   return (
     <>
       <div className="topbar">
@@ -68,8 +104,12 @@ export default function Home() {
             </div>
 
             <h1>
-              Aprende portugués. <span>O Brasil é aqui.</span>
-            </h1>
+  {seoH1 || (
+    <>
+      Aprende portugués. <span>O Brasil é aqui.</span>
+    </>
+  )}
+</h1>
 
             <p className="hero-copy">
               Aprende portugués en Bogotá o en modalidad virtual con IBRACO:
