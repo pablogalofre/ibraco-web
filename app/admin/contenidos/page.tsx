@@ -378,7 +378,7 @@ export default function BlogAdminPage() {
 
       setNotice(nextStatus === "published"
 
-        ? "Artículo marcado como publicado en Supabase. Falta conectarlo con el blog público."
+        ? "Artículo publicado. Ya está disponible en el blog público."
 
         : "¡Borrador guardado correctamente!");
 
@@ -414,7 +414,7 @@ export default function BlogAdminPage() {
 
         .ib-main{min-width:0}.ib-top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px;flex-wrap:wrap}.ib-kicker{font-size:11px;color:#078848;letter-spacing:.14em;font-weight:900;margin:0 0 7px}.ib-top h1{font-size:clamp(26px,3vw,38px);letter-spacing:-.045em;margin:0;font-weight:900}.ib-top p.ib-sub{font-size:14px;color:var(--muted);margin:9px 0 0;line-height:1.5}
 
-        .ib-btn{border:0;border-radius:13px;padding:13px 18px;font-weight:800;font-size:13px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;white-space:nowrap}.ib-btn:disabled{opacity:.55;cursor:wait}.ib-btn-green{background:var(--green);color:#fff}.ib-btn-blue{background:var(--blue);color:#fff}.ib-btn-dark{background:var(--ink);color:#fff}.ib-btn-light{background:#f0f3ef;color:#26342b}.ib-btn-outline{background:#fff;color:var(--ink);border:1px solid var(--line)}
+        .ib-btn{border:0;border-radius:13px;padding:13px 18px;font-weight:800;font-size:13px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;white-space:nowrap}.ib-btn:disabled{opacity:.55;cursor:default}.ib-btn[aria-busy="true"]{cursor:wait}.ib-btn-green{background:var(--green);color:#fff}.ib-btn-blue{background:var(--blue);color:#fff}.ib-btn-dark{background:var(--ink);color:#fff}.ib-btn-light{background:#f0f3ef;color:#26342b}.ib-btn-outline{background:#fff;color:var(--ink);border:1px solid var(--line)}
 
         .ib-hero{background:#1b5e44;border-radius:25px;color:#fff;min-height:208px;padding:30px 36px;display:flex;justify-content:space-between;align-items:center;gap:25px;overflow:hidden;position:relative}.ib-hero:before{content:"";position:absolute;width:320px;height:320px;border:55px solid #ffffff16;border-radius:50%;right:-65px;top:-140px}.ib-hero:after{content:"";position:absolute;width:170px;height:170px;background:var(--yellow);border-radius:50%;right:75px;bottom:-130px}.ib-hero-copy{position:relative;z-index:1;max-width:520px}.ib-hero-copy small{font-size:11px;letter-spacing:.13em;font-weight:900;color:#c2e8cd}.ib-hero h2{font-size:clamp(24px,3.1vw,37px);line-height:1.12;letter-spacing:-.04em;margin:13px 0}.ib-hero p{font-size:14px;color:#d3e8d9;line-height:1.55;max-width:460px;margin:0}.ib-hero-art{width:230px;height:165px;position:relative;z-index:1;flex-shrink:0}.ib-hero-line{position:absolute;display:block;border:12px solid #ffffff35;border-radius:60px;transform:rotate(-27deg)}.ib-hero-line-a{width:185px;height:88px;right:18px;top:5px}.ib-hero-line-b{width:155px;height:75px;right:48px;top:65px;border-color:#ffffff24}.ib-hero-circle{position:absolute;display:block;width:58px;height:58px;border-radius:50%;background:var(--yellow);right:14px;bottom:8px}
 
@@ -510,7 +510,7 @@ export default function BlogAdminPage() {
                 <h3 style={{color:"#1a0dab", overflowWrap:"anywhere"}}>{pageTitle || "Título SEO de la página"}</h3>
                 <p>{pageDescription || "Metadescripción de la página."}</p>
               </div>
-              <div className="ib-actions"><button type="submit" className="ib-btn ib-btn-green" disabled={seoSaving || !seoDirty}>{seoSaving ? "Guardando…" : "Guardar SEO de esta página"}</button></div>
+              <div className="ib-actions"><button type="submit" className="ib-btn ib-btn-green" disabled={seoSaving || !seoDirty} aria-busy={seoSaving}>{seoSaving ? "Guardando…" : "Guardar SEO de esta página"}</button></div>
             </form>}
           </section> : view === "dashboard" ? <>
 
@@ -544,7 +544,7 @@ export default function BlogAdminPage() {
 
                 <div><div className="ib-editor-tabs"><button type="button" className={tab === "write" ? "active" : ""} onClick={() => setTab("write")}>✎ Escribir</button><button type="button" className={tab === "preview" ? "active" : ""} onClick={() => setTab("preview")}>◉ Vista previa</button></div>{tab === "write" ? <><label className="ib-label" htmlFor="ib-content">Contenido del artículo *</label><textarea className="ib-input ib-textarea" id="ib-content" rows={17} value={content} placeholder="Aquí empieza tu historia..." onChange={e => setContent(e.target.value)} /><div className="ib-field-hint">Editor de texto simple. La vista previa respeta los saltos de línea.</div></> : <div className="ib-preview"><div className="ib-preview-category">{category.toUpperCase()}</div><h2>{title || "Tu gran título aparecerá aquí"}</h2>{coverImage && <img src={coverImage} alt="Vista previa de portada" onError={e => { e.currentTarget.style.display = "none"; }} />}{excerpt && <p><strong>{excerpt}</strong></p>}<p>{content || "Cuando escribas tu artículo, podrás leerlo aquí antes de guardarlo."}</p></div>}</div>
 
-                <div className="ib-actions"><button type="submit" className="ib-btn ib-btn-dark" disabled={saving}>{saving ? "Guardando..." : "Guardar borrador"}</button><button type="button" className="ib-btn ib-btn-green" disabled={saving} onClick={() => void savePost("published")}>{saving ? "Guardando..." : "✓ Marcar como publicado"}</button><button type="button" className="ib-btn ib-btn-light" disabled={saving} onClick={newPost}>Limpiar</button></div>
+                <div className="ib-actions"><button type="submit" className="ib-btn ib-btn-dark" disabled={saving} aria-busy={saving}>{saving ? "Guardando..." : "Guardar borrador"}</button><button type="button" className="ib-btn ib-btn-green" disabled={saving} aria-busy={saving} onClick={() => void savePost("published")}>{saving ? "Guardando..." : "✓ Marcar como publicado"}</button><button type="button" className="ib-btn ib-btn-light" disabled={saving} onClick={newPost}>Limpiar</button></div>
 
               </form>
 
@@ -554,7 +554,7 @@ export default function BlogAdminPage() {
 
               <section className="ib-panel"><h3>Visibilidad en Google</h3><p>Optimiza el título y la descripción para los buscadores cuando lo necesites.</p><details className="ib-seo"><summary>Configurar SEO ▾</summary><div className="ib-form"><div><label className="ib-label" htmlFor="ib-seo-title">Título SEO</label><input className="ib-input" id="ib-seo-title" maxLength={180} value={seoTitle} placeholder="Título para Google" onChange={e => setSeoTitle(e.target.value)} /><div className="ib-field-hint">{seoTitle.length} caracteres</div></div><div><label className="ib-label" htmlFor="ib-meta">Metadescripción</label><textarea className="ib-input ib-textarea" id="ib-meta" rows={4} maxLength={500} value={metaDescription} placeholder="Descripción para Google" onChange={e => setMetaDescription(e.target.value)} /><div className="ib-field-hint">{metaDescription.length} caracteres</div></div></div></details></section>
 
-              <p className="ib-note">ℹ️ Los artículos se guardan en Supabase. Marcar como publicado todavía no los muestra automáticamente en el blog público.</p>
+              <p className="ib-note">ℹ️ Los artículos publicados aparecen en el blog público. Los borradores solo están disponibles en el administrador.</p>
 
             </aside>
 
