@@ -1,7 +1,5 @@
 "use client";
 
-
-
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 
 import Link from "next/link";
@@ -10,13 +8,13 @@ import { useRouter } from "next/navigation";
 
 import { supabase } from "../../../lib/supabase";
 
-
-
 type Status = "draft" | "published";
 
 type Access = "loading" | "allowed" | "denied";
 
-type View = "dashboard" | "editor";
+type View = "dashboard" | "editor" | "seo";
+
+type SeoPage = { id: string; page_path: string; seo_title: string | null; meta_description: string | null; h1: string | null; updated_at: string };
 
 type EditorTab = "write" | "preview";
 
@@ -52,8 +50,6 @@ type Post = {
 
 };
 
-
-
 const CATEGORIES = [
 
   "Aprender portugués", "Celpe-Bras", "Cultura brasileña",
@@ -76,8 +72,6 @@ const dateLabel = (value: string | null | undefined) => {
 
 };
 
-
-
 export default function BlogAdminPage() {
 
   const router = useRouter();
@@ -85,6 +79,86 @@ export default function BlogAdminPage() {
   const [access, setAccess] = useState<Access>("loading");
 
   const [posts, setPosts] = useState<Post[]>([]);
+  const [seoPages, setSeoPages] = useState<SeoPage[]>([]);
+  const [seoLoading, setSeoLoading] = useState(false);
+  const [seoSaving, setSeoSaving] = useState(false);
+  const [seoError, setSeoError] = useState("");
+  const [seoNotice, setSeoNotice] = useState("");
+  const [selectedPageId, setSelectedPageId] = useState("");
+  const [pageTitle, setPageTitle] = useState("");
+  const [pageDescription, setPageDescription] = useState("");
+  const [pageH1, setPageH1] = useState("");
+  const [seoDirty, setSeoDirty] = useState(false);
+
+  function selectSeoPage(page: SeoPage) {
+    setSelectedPageId(page.id);
+    setPageTitle(page.seo_title ?? "");
+    setPageDescription(page.meta_description ?? "");
+    setPageH1(page.h1 ?? "");
+    setSeoDirty(false);
+    setSeoNotice("");
+  }
+
+  async function openSeo() {
+    if (seoLoading || seoSaving) return;
+    if (view === "seo" && seoDirty && !window.confirm("¿Descartar los cambios SEO sin guardar?")) return;
+    setView("seo");
+    setNotice(""); setErrorMessage("");
+    setSeoError(""); setSeoNotice(""); setSeoLoading(true);
+    try {
+      const { data, error } = await supabase.from("seo_pages")
+        .select("id, page_path, seo_title, meta_description, h1, updated_at")
+        .order("page_path", { ascending: true });
+      if (error) throw new Error(error.message);
+      const pages = (data ?? []) as SeoPage[];
+      setSeoPages(pages);
+      const selected = pages.find(p => p.id === selectedPageId) ?? pages[0];
+      if (selected) selectSeoPage(selected);
+      else { setSelectedPageId(""); setSeoDirty(false); }
+    } catch (err) {
+      setSeoError(err instanceof Error ? err.message : "No se pudieron cargar las páginas SEO.");
+    } finally { setSeoLoading(false); }
+  }
+
+  async function savePageSeo(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (seoSaving || !selectedPageId) return;
+    const original = seoPages.find(p => p.id === selectedPageId);
+    if (!original) return;
+    setSeoSaving(true); setSeoError(""); setSeoNotice("");
+    try {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) throw new Error("Tu sesión expiró. Vuelve a iniciar sesión.");
+      const { data: profile, error: profileError } = await supabase.from("admin_profiles")
+        .select("can_content, is_superadmin").eq("user_id", user.id).single();
+      if (profileError || !profile || (!profile.can_content && !profile.is_superadmin))
+        throw new Error("No tienes permiso para editar SEO.");
+      const { data, error } = await supabase.from("seo_pages").update({
+        seo_title: pageTitle.trim() || null,
+        meta_description: pageDescription.trim() || null,
+        h1: pageH1.trim() || null,
+        updated_at: new Date().toISOString(),
+      }).eq("id", original.id).eq("updated_at", original.updated_at)
+        .select("id, page_path, seo_title, meta_description, h1, updated_at");
+      if (error) throw new Error(error.message);
+      if (!data || data.length !== 1)
+        throw new Error("No se guardaron cambios. El registro pudo cambiar o faltan permisos. Recarga las páginas antes de reintentar.");
+      const saved = data[0] as SeoPage;
+      setSeoPages(pages => pages.map(p => p.id === saved.id ? saved : p));
+      selectSeoPage(saved);
+      setSeoNotice("SEO guardado en Supabase. Revisa la página pública para comprobar cómo se aplica.");
+    } catch (err) {
+      setSeoError(err instanceof Error ? err.message : "No se pudo guardar el SEO.");
+    } finally { setSeoSaving(false); }
+  }
+
+  function leaveSeo(nextView: "dashboard" | "editor") {
+    if (seoSaving) return;
+    if (view === "seo" && seoDirty && !window.confirm("¿Descartar los cambios SEO sin guardar?")) return;
+    setView(nextView);
+    setSeoDirty(false);
+  }
+
 
   const [loading, setLoading] = useState(true);
 
@@ -126,8 +200,6 @@ export default function BlogAdminPage() {
 
   const [publishedAt, setPublishedAt] = useState<string | null>(null);
 
-
-
   const loadPosts = useCallback(async () => {
 
     const { data, error } = await supabase.from("blog_posts").select("*").order("created_at", { ascending: false });
@@ -137,8 +209,6 @@ export default function BlogAdminPage() {
     setPosts((data ?? []) as Post[]);
 
   }, []);
-
-
 
   useEffect(() => {
 
@@ -190,8 +260,6 @@ export default function BlogAdminPage() {
 
   }, [router]);
 
-
-
   const stats = useMemo(() => ({
 
     total: posts.length,
@@ -212,8 +280,6 @@ export default function BlogAdminPage() {
 
   ), [posts, filter, search]);
 
-
-
   function resetForm() {
 
     setEditingId(null); setTitle(""); setSlug(""); setExcerpt("");
@@ -228,7 +294,7 @@ export default function BlogAdminPage() {
 
   }
 
-  function newPost() { resetForm(); setView("editor"); }
+  function newPost() { if (view === "seo" && (seoSaving || (seoDirty && !window.confirm("¿Descartar los cambios SEO sin guardar?")))) return; resetForm(); setSeoDirty(false); setView("editor"); }
 
   function editPost(post: Post) {
 
@@ -324,15 +390,11 @@ export default function BlogAdminPage() {
 
   }
 
-
-
   if (access === "loading" && loading) return <main className="ib-loading">Preparando tu estudio editorial…</main>;
 
   if (access === "denied") return <main className="ib-loading"><h1>Acceso no autorizado</h1><p>No tienes permiso para administrar el blog.</p><Link href="/admin">Volver al administrador</Link></main>;
 
   if (access !== "allowed") return <main className="ib-loading"><h1>No se pudo abrir el administrador</h1><p role="alert">{errorMessage || "Verifica tu sesión."}</p><Link href="/admin">Volver al administrador</Link></main>;
-
-
 
   return (
 
@@ -384,9 +446,11 @@ export default function BlogAdminPage() {
 
           <nav className="ib-nav" aria-label="Navegación editorial">
 
-            <button type="button" className={view === "dashboard" ? "active" : ""} onClick={() => setView("dashboard")}>▦ &nbsp; Dashboard</button>
+            <button type="button" className={view === "dashboard" ? "active" : ""} onClick={() => leaveSeo("dashboard")}>▦ &nbsp; Dashboard</button>
 
             <button type="button" className={view === "editor" ? "active" : ""} onClick={newPost}>✎ &nbsp; Crear artículo</button>
+
+            <button type="button" className={view === "seo" ? "active" : ""} disabled={seoSaving || seoLoading} onClick={() => void openSeo()}>◎ &nbsp; SEO de páginas</button>
 
             <Link href="/admin">◈ &nbsp; Centro de administración</Link>
 
@@ -400,15 +464,13 @@ export default function BlogAdminPage() {
 
         </aside>
 
-
-
         <div className="ib-main">
 
           <div className="ib-top">
 
-            <div><p className="ib-kicker">IBRACO / MARKETING Y CONTENIDOS</p><h1>{view === "dashboard" ? "Bienvenidos al estudio editorial" : editingId ? "Edita tu historia" : "Una nueva historia"}</h1><p className="ib-sub">{view === "dashboard" ? "Todo lo que está pasando en el blog, de un vistazo." : "Escribe, organiza y prepara contenidos que inspiren."}</p></div>
+            <div><p className="ib-kicker">IBRACO / MARKETING Y CONTENIDOS</p><h1>{view === "seo" ? "SEO de páginas" : view === "dashboard" ? "Bienvenidos al estudio editorial" : editingId ? "Edita tu historia" : "Una nueva historia"}</h1><p className="ib-sub">{view === "seo" ? "Edita los títulos, las descripciones y los H1 de las páginas del sitio." : view === "dashboard" ? "Todo lo que está pasando en el blog, de un vistazo." : "Escribe, organiza y prepara contenidos que inspiren."}</p></div>
 
-            {view === "dashboard" ? <button type="button" className="ib-btn ib-btn-blue" onClick={newPost}>＋ Crear artículo</button> : <button type="button" className="ib-btn ib-btn-outline" onClick={() => setView("dashboard")}>← Volver al dashboard</button>}
+            {view === "dashboard" ? <button type="button" className="ib-btn ib-btn-blue" onClick={newPost}>＋ Crear artículo</button> : <button type="button" className="ib-btn ib-btn-outline" onClick={() => leaveSeo("dashboard")}>← Volver al dashboard</button>}
 
           </div>
 
@@ -416,9 +478,41 @@ export default function BlogAdminPage() {
 
           {errorMessage && <div role="alert" className="ib-alert error">{errorMessage}</div>}
 
-
-
-          {view === "dashboard" ? <>
+          {view === "seo" ? <section className="ib-panel">
+            <div className="ib-panel-head"><div><h2>Configuración SEO por página</h2><p>Selecciona una página para consultar y editar sus datos actuales.</p></div>
+              <button type="button" className="ib-btn ib-btn-outline" disabled={seoLoading || seoSaving} onClick={() => void openSeo()}>Recargar páginas</button>
+            </div>
+            {seoError && <div role="alert" className="ib-alert error">{seoError}</div>}
+            {seoNotice && <div role="status" className="ib-alert success">{seoNotice}</div>}
+            {seoLoading ? <p role="status">Cargando páginas…</p> : !seoPages.length ? <div className="ib-empty"><h3>No hay páginas disponibles</h3><p>{seoError ? "Revisa el error e intenta recargar." : "No se encontraron registros visibles. Comprueba los registros y permisos de seo_pages."}</p></div> :
+            <form className="ib-form" onSubmit={savePageSeo}>
+              <div><label className="ib-label" htmlFor="ib-seo-page">Página</label>
+                <select id="ib-seo-page" className="ib-input" value={selectedPageId} disabled={seoSaving} onChange={e => {
+                  const page = seoPages.find(p => p.id === e.target.value);
+                  if (!page || (seoDirty && !window.confirm("¿Descartar los cambios SEO sin guardar?"))) return;
+                  setSeoError(""); selectSeoPage(page);
+                }}>{seoPages.map(page => <option key={page.id} value={page.id}>{page.page_path === "/" ? "/ — Inicio" : page.page_path}</option>)}</select>
+              </div>
+              <div><label className="ib-label" htmlFor="ib-page-title">Título SEO</label>
+                <input id="ib-page-title" className="ib-input" value={pageTitle} disabled={seoSaving} onChange={e => {setPageTitle(e.target.value); setSeoDirty(true); setSeoNotice("");}} />
+                <div className="ib-field-hint">{pageTitle.length} caracteres. Orientación editorial: aproximadamente 50–60 caracteres.</div>
+              </div>
+              <div><label className="ib-label" htmlFor="ib-page-description">Metadescripción / snippet</label>
+                <textarea id="ib-page-description" className="ib-input ib-textarea" rows={4} value={pageDescription} disabled={seoSaving} onChange={e => {setPageDescription(e.target.value); setSeoDirty(true); setSeoNotice("");}} />
+                <div className="ib-field-hint">{pageDescription.length} caracteres. Google puede mostrar una descripción distinta.</div>
+              </div>
+              <div><label className="ib-label" htmlFor="ib-page-h1">H1 de la página</label>
+                <textarea id="ib-page-h1" className="ib-input ib-textarea" rows={2} value={pageH1} disabled={seoSaving} onChange={e => {setPageH1(e.target.value); setSeoDirty(true); setSeoNotice("");}} />
+                <div className="ib-field-hint">Encabezado principal. Su visualización depende de la integración de cada página.</div>
+              </div>
+              <div className="ib-preview"><span className="ib-label">Vista previa orientativa del resultado de búsqueda</span>
+                <small>{seoPages.find(p => p.id === selectedPageId)?.page_path}</small>
+                <h3 style={{color:"#1a0dab", overflowWrap:"anywhere"}}>{pageTitle || "Título SEO de la página"}</h3>
+                <p>{pageDescription || "Metadescripción de la página."}</p>
+              </div>
+              <div className="ib-actions"><button type="submit" className="ib-btn ib-btn-green" disabled={seoSaving || !seoDirty}>{seoSaving ? "Guardando…" : "Guardar SEO de esta página"}</button></div>
+            </form>}
+          </section> : view === "dashboard" ? <>
 
             <section className="ib-hero"><div className="ib-hero-copy"><small>EL BLOG DE IBRACO</small><h2>Las buenas historias<br />merecen ser contadas.</h2><p>Comparte el portugués, la cultura y las oportunidades que conectan a Colombia con Brasil.</p></div><div className="ib-hero-art" aria-hidden="true"><span className="ib-hero-line ib-hero-line-a"/><span className="ib-hero-line ib-hero-line-b"/><span className="ib-hero-circle"/></div></section>
 
