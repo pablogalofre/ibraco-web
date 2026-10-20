@@ -1,27 +1,7 @@
 export default function SedesPage() {
   return (
     <>
-      <header className="navbar">
-        <a href="/" className="logo-box" aria-label="IBRACO inicio">
-          <img
-            src="/assets/logos/logo-ibraco.png"
-            alt="IBRACO Instituto Brasil Colombia"
-          />
-        </a>
-
-        <nav className="nav-links" aria-label="Navegación principal">
-          <a href="/cursos">Cursos</a>
-          <a href="/sedes">Sedes</a>
-          <a href="/cultura">Cultura</a>
-          <a href="/agenda-cultural">Agenda cultural</a>
-          <a href="/empresas">Empresas</a>
-          <a href="/alumni">Alumni</a>
-          <a href="/blog">Blog</a>
-          <a href="/#inscripcion" className="nav-cta">
-            Inscribirme
-          </a>
-        </nav>
-      </header>
+      
 
       <main className="inner-page">
         <section className="inner-hero">

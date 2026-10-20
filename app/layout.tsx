@@ -1,3 +1,4 @@
+import SiteNavigation from "./components/site-navigation";
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -38,6 +39,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             height="0" width="0" style={{ display: "none", visibility: "hidden" }}
             title="Google Tag Manager" />
         </noscript>
+        <SiteNavigation />
         {children}
       </body>
     </html>
