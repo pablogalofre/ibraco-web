@@ -55,7 +55,7 @@ export default function SiteNavigation() {
   }
   if (!visible) return null;
   return <>
-    <header className={`${styles.header} ${pathname === "/" ? styles.home : ""}`}>
+    <header className={styles.header}>
       <div className={styles.headerInner}>
         <button type="button" className={styles.toggle} onClick={showMenu} aria-expanded={open} aria-controls="ibraco-site-menu" aria-haspopup="dialog"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true"><path d="M4 8h16M4 16h16" /></svg><span>Menú</span></button>
         <Brand /><Contacts />

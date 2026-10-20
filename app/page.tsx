@@ -1,3 +1,4 @@
+import homeStyles from "./home.module.css";
 import { createClient } from "@supabase/supabase-js";
 
 export const dynamic = "force-dynamic";
@@ -37,44 +38,7 @@ export default async function Home() {
   const seoH1 = await getHomeH1();
   return (
     <>
-      <div className="topbar">
-        <div className="topbar-left">
-          <span className="topbar-highlight">
-            🇧🇷 30 años conectando Colombia con Brasil
-          </span>
-
-          <a href="tel:+573125841068">📞 (+57) 312 584 1068</a>
-
-          <a href="mailto:informacion@ibraco.org.co">
-            ✉ informacion@ibraco.org.co
-          </a>
-        </div>
-
-        <div className="topbar-center">
-          <span>🇨🇴 Español ▾</span>
-        </div>
-
-        <div className="topbar-right">
-          <a href="#">Ingreso estudiantes</a>
-          <a href="#">Preinscripción</a>
-          <a href="#" aria-label="X">
-            𝕏
-          </a>
-          <a href="#" aria-label="Facebook">
-            f
-          </a>
-          <a href="#" aria-label="Instagram">
-            ◎
-          </a>
-          <a href="#" aria-label="LinkedIn">
-            in
-          </a>
-        </div>
-      </div>
-
-      
-
-      <main>
+      <main className={homeStyles.home}>
         <section className="hero" id="inscripcion">
           <div>
             <div className="eyebrow">
@@ -83,15 +47,14 @@ export default async function Home() {
             </div>
 
             <h1
-  style={
-    seoH1
-      ? {
-          fontSize: "clamp(28px, 3.5vw, 52px)",
-          lineHeight: 1.12,
-          overflowWrap: "break-word",
-        }
-      : undefined
-  }
+  style={{
+    fontSize: "clamp(30px, 3.2vw, 48px)",
+    lineHeight: 1.14,
+    letterSpacing: "-0.045em",
+    textTransform: "none",
+    fontWeight: 600,
+    overflowWrap: "break-word",
+  }}
 >
   {seoH1 || (
     <>
@@ -115,9 +78,7 @@ export default async function Home() {
                 Mide tu nivel
               </a>
 
-              <a href="#ciclos" className="btn btn-secondary">
-                Inscribirme ahora
-              </a>
+
             </div>
 
             <div className="trust-row">
@@ -129,10 +90,7 @@ export default async function Home() {
 
           <div className="hero-panel">
             <div className="hero-photo">
-              <div className="eyebrow">
-                <span className="dot"></span>
-                Cursos · Cultura · Comunidad
-              </div>
+
 
               <div className="floating-card">
                 <h3>Portugués que se vive.</h3>

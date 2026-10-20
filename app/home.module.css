@@ -1,0 +1,10 @@
+.home :global(.hero){padding-top:144px;gap:48px}
+.home :global(.hero-copy){font-size:19px;line-height:1.6;max-width:610px}
+.home :global(.hero)::before{opacity:.28}
+.home :global(.hero)::after{opacity:.55}
+.home :global(.hero-actions){gap:14px}
+.home :global(.hero-actions .btn){font-size:13px;letter-spacing:.015em;padding:16px 25px;text-transform:none;font-weight:600}
+.home :global(.eyebrow){font-size:10px;letter-spacing:.08em;box-shadow:none;font-weight:600}
+@media(max-width:1120px){.home :global(.hero){gap:36px}}
+@media(max-width:680px){.home :global(.hero){padding-top:116px;gap:30px}.home :global(.hero-copy){font-size:17px}.home :global(.hero-actions .btn){padding:14px 20px}}
+.home :global(.hero-photo){justify-content:flex-end}
