@@ -1,6 +1,6 @@
 import "./alumni.css";
 
-const WHATSAPP_URL = "https://wa.me/573102412817";
+const WHATSAPP_URL = "https://wa.me/573125841068";
 
 const benefits = [
   {

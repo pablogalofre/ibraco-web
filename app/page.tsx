@@ -631,7 +631,7 @@ export default async function Home() {
               </p>
 
               <a
-                href="https://wa.me/573102412817"
+                href="https://wa.me/573125841068"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-yellow"
@@ -652,7 +652,7 @@ export default async function Home() {
               </p>
 
               <a
-                href="https://wa.me/573102412817"
+                href="https://wa.me/573125841068"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-yellow"
@@ -712,7 +712,7 @@ export default async function Home() {
           <a href="#nivel">Mide tu nivel</a>
           <a href="/blog/travessias">Travessias</a>
           <a
-            href="https://wa.me/573102412817"
+            href="https://wa.me/573125841068"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -730,7 +730,7 @@ export default async function Home() {
 
       <a
         className="whatsapp-float"
-        href="https://wa.me/573102412817"
+        href="https://wa.me/573125841068"
         target="_blank"
         rel="noopener noreferrer"
         aria-label="WhatsApp IBRACO"

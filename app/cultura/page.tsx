@@ -203,13 +203,13 @@ export default function CulturaPage() {
           <a href="/blog">Blog</a>
           <a href="/blog/travessias">Travessias</a>
           <a href="/#nivel">Mide en qué nivel estás</a>
-          <a href="https://wa.me/573102412817">WhatsApp</a>
+          <a href="https://wa.me/573125841068">WhatsApp</a>
         </div>
       </footer>
 
       <a
         className="whatsapp-float"
-        href="https://wa.me/573102412817"
+        href="https://wa.me/573125841068"
         target="_blank"
         rel="noopener noreferrer"
         aria-label="WhatsApp IBRACO"
