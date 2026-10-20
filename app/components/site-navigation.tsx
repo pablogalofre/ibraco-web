@@ -81,5 +81,9 @@ export default function SiteNavigation() {
         <div className={styles.menuFooter}><a href="/admin/login" onClick={closeMenu}>Acceso a administración</a><a href="/cursos#cursos-disponibles" className={styles.courseCta} onClick={closeMenu}>Ver cursos e inscribirme <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg></a></div>
       </div>
     </dialog>
+    <a className={styles.whatsapp} href="https://wa.me/573102412817" target="_blank" rel="noopener noreferrer" aria-label="Habla con nosotros por WhatsApp">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 11.5a9 9 0 0 1-13.3 7.9L3 21l1.6-4.7A9 9 0 1 1 21 11.5Z" /><path d="m8 7 2 2-1 1a9 9 0 0 0 4 4l1-1 2 2c-1 2-3 1-5-1s-5-5-3-7Z" /></svg>
+      <span>Habla con nosotros</span>
+    </a>
   </>;
 }
