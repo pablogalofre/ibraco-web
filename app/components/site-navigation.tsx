@@ -4,28 +4,26 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import styles from "./site-navigation.module.css";
 
-const groups = [
-  { title: "Estudia", links: [
-    { href: "/cursos", label: "Cursos de portugués" },
-    { href: "/sedes", label: "Nuestras sedes" },
-    { href: "/empresas", label: "Para empresas" },
-    { href: "/#nivel", label: "Mide tu nivel" },
-  ] },
-  { title: "Vive Brasil", links: [
-    { href: "/cultura", label: "Cultura brasileña" },
-    { href: "/agenda-cultural", label: "Agenda cultural" },
-    { href: "/eventos", label: "Eventos e inscripciones" },
-  ] },
-  { title: "Comunidad", links: [
-    { href: "/blog", label: "Blog" },
-    { href: "/blog/travessias", label: "Travessias" },
-    { href: "/alumni", label: "Alumni" },
-  ] },
-];
-
-function Arrow({ className }: { className?: string }) {
-  return <svg className={className} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg>;
+type IconName = "home" | "courses" | "building" | "culture" | "community" | "user" | "phone";
+function Icon({ name }: { name: IconName }) {
+  const paths: Record<IconName, React.ReactNode> = {
+    home: <><path d="m3 10 9-7 9 7v11H3Z" /><path d="M9 21v-8h6v8" /></>,
+    courses: <><path d="m2 7 10-5 10 5-10 5Z" /><path d="m2 12 10 5 10-5M2 17l10 5 10-5" /></>,
+    building: <><path d="M3 21V8l10-5v18M13 10h8v11M1 21h22M7 9v2m3-4v2m-3 5v2m3-4v2m7-1v2m0 3v2" /></>,
+    culture: <><circle cx="12" cy="12" r="5" /><path d="M12 1v3m0 16v3M1 12h3m16 0h3M4 4l2 2m12 12 2 2M4 20l2-2M18 6l2-2" /></>,
+    community: <><circle cx="9" cy="7" r="4" /><path d="M2 22v-3a7 7 0 0 1 14 0v3M17 4a4 4 0 0 1 0 8m2 3a6 6 0 0 1 3 5v2" /></>,
+    user: <><circle cx="12" cy="7" r="4" /><path d="M4 22v-3a8 8 0 0 1 16 0v3" /></>,
+    phone: <path d="m5 3 4 5-3 3a15 15 0 0 0 7 7l3-3 5 4c-2 5-6 4-10 1S1 9 2 6Z" />,
+  };
+  return <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
 }
+const categories: { title: string; href: string; description: string; icon: IconName; links: { href: string; label: string }[] }[] = [
+  { title: "Inicio", href: "/", description: "Bienvenido a IBRACO", icon: "home", links: [] },
+  { title: "Cursos", href: "/cursos", description: "Encuentra tu curso", icon: "courses", links: [{ href: "/#nivel", label: "Mide tu nivel" }, { href: "/empresas", label: "Para empresas" }] },
+  { title: "Sedes", href: "/sedes", description: "Conoce nuestras sedes", icon: "building", links: [] },
+  { title: "Cultura", href: "/cultura", description: "Vive Brasil con nosotros", icon: "culture", links: [{ href: "/agenda-cultural", label: "Agenda cultural" }, { href: "/eventos", label: "Eventos e inscripciones" }] },
+  { title: "Comunidad", href: "/alumni", description: "Conecta con IBRACO", icon: "community", links: [{ href: "/alumni", label: "Alumni" }, { href: "/blog", label: "Blog" }, { href: "/blog/travessias", label: "Travessias" }] },
+];
 const publicRoots = ["/cursos", "/sedes", "/cultura", "/agenda-cultural", "/eventos", "/empresas", "/alumni", "/blog"];
 
 export default function SiteNavigation() {
@@ -33,87 +31,54 @@ export default function SiteNavigation() {
   const dialog = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState(false);
   const visible = pathname === "/" || (pathname != null && publicRoots.some(root => pathname === root || pathname.startsWith(`${root}/`)) && !pathname.startsWith("/eventos/pago/"));
-
   useEffect(() => {
     if (!open) return;
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = previous; };
   }, [open]);
-
   function showMenu() {
     if (!dialog.current || dialog.current.open) return;
     dialog.current.showModal();
     setOpen(true);
   }
-  function closeMenu() {
-    dialog.current?.close();
-    setOpen(false);
+  function closeMenu() { dialog.current?.close(); setOpen(false); }
+  function current(href: string) { return pathname === href ? "page" as const : undefined; }
+  function Brand() {
+    return <a href="/" className={styles.logo} aria-label="IBRACO, ir al inicio" onClick={closeMenu}><img src="/assets/logos/logo-ibraco.png" alt="IBRACO Instituto de Cultura Brasil Colombia" /></a>;
   }
-  function isCurrent(href: string) {
-    if (!pathname || href.includes("#")) return false;
-    if (href === "/blog") return pathname === "/blog" || (pathname.startsWith("/blog/") && pathname !== "/blog/travessias");
-    return pathname === href;
+  function Contacts() {
+    return <div className={styles.contacts}>
+      <a href="tel:+573125841068" className={styles.phone}><span>(+57) 312 584 1068</span><Icon name="phone" /></a>
+      <a href="/admin/login" className={styles.admin} aria-label="Acceso a administración" title="Administración" onClick={closeMenu}><Icon name="user" /><span>Administración</span></a>
+    </div>;
   }
-
   if (!visible) return null;
-
   return <>
     <header className={`${styles.header} ${pathname === "/" ? styles.home : ""}`}>
-      <a href="/" className={styles.logo} aria-label="IBRACO, ir al inicio">
-        <img src="/assets/logos/logo-ibraco.png" alt="IBRACO Instituto de Cultura Brasil Colombia" />
-      </a>
-      <nav className={styles.shortcuts} aria-label="Accesos principales">
-        <a href="/cursos" aria-current={isCurrent("/cursos") ? "page" : undefined}>Cursos</a>
-        <a href="/sedes" aria-current={isCurrent("/sedes") ? "page" : undefined}>Sedes</a>
-        <a href="/cultura" aria-current={isCurrent("/cultura") ? "page" : undefined}>Cultura</a>
-        <a href="/empresas" aria-current={isCurrent("/empresas") ? "page" : undefined}>Empresas</a>
-        <a href="/blog" aria-current={isCurrent("/blog") ? "page" : undefined}>Blog</a>
-      </nav>
-      <div className={styles.actions}>
-        <a href="/admin/login" className={styles.adminLink} aria-label="Acceso a administración" title="Administración">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5" /><path d="M5 21v-2a7 7 0 0 1 14 0v2" /></svg><span>Administración</span>
-        </a>
-        <a href="/cursos#cursos-disponibles" className={styles.cta}>Inscribirme</a>
-        <button type="button" className={styles.menuButton} onClick={showMenu} aria-expanded={open} aria-controls="ibraco-site-menu" aria-haspopup="dialog">
-          <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true"><path d="M4 8h16M4 16h16" /></svg>
-          <span>Menú</span>
-        </button>
+      <div className={styles.headerInner}>
+        <button type="button" className={styles.toggle} onClick={showMenu} aria-expanded={open} aria-controls="ibraco-site-menu" aria-haspopup="dialog"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true"><path d="M4 8h16M4 16h16" /></svg><span>Menú</span></button>
+        <Brand /><Contacts />
       </div>
     </header>
     {pathname?.startsWith("/eventos") && <div className={styles.spacer} aria-hidden="true" />}
-    <dialog id="ibraco-site-menu" ref={dialog} className={styles.dialog} aria-labelledby="ibraco-menu-title" onCancel={event => { event.preventDefault(); closeMenu(); }} onClose={() => setOpen(false)} onClick={event => { if (event.target === event.currentTarget) closeMenu(); }}>
-      <div className={styles.menuShell}>
-        <div className={styles.menuTop}>
-          <img src="/assets/logos/logo-ibraco.png" alt="IBRACO" className={styles.menuLogo} />
-          <h2 id="ibraco-menu-title" className={styles.menuTitle}>Explora IBRACO</h2>
-          <button type="button" className={styles.closeButton} onClick={closeMenu} aria-label="Cerrar menú" autoFocus>
-            <span>Cerrar</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
-          </button>
-        </div>
-        <div className={styles.menuBody}>
-          <aside className={styles.brandPanel}>
-            <p className={styles.eyebrow}>Idioma. Cultura. Conexiones.</p>
-            <p className={styles.brandTitle}>Brasil<br />empieza<br /><em>aquí.</em></p>
-            <div className={styles.brandBottom}><span className={styles.brandLine} /><p>Un idioma que abre puertas.<br />Una cultura que te conecta.</p></div>
-          </aside>
-          <div className={styles.navigationPanel}>
-            <a href="/" className={styles.homeLink} onClick={closeMenu} aria-current={pathname === "/" ? "page" : undefined}>Volver al inicio <Arrow /></a>
-            <nav className={styles.groups} aria-label="Todas las secciones">
-              {groups.map((group, index) => <section key={group.title} className={styles.group}>
-                <h3 className={styles.groupTitle}><span>0{index + 1}</span>{group.title}</h3>
-                <div className={styles.groupLinks}>{group.links.map(link => <a key={link.href} href={link.href} className={styles.menuLink} aria-current={isCurrent(link.href) ? "page" : undefined} onClick={closeMenu}>
-                  <span>{link.label}</span><Arrow className={styles.linkArrow} />
-                </a>)}</div>
-              </section>)}
-            </nav>
-            <div className={styles.menuBottom}>
-              <div><p className={styles.bottomTitle}>Tu próximo paso, en portugués.</p><p className={styles.bottomNote}>Encuentra un curso para ti.</p></div>
-              <a href="/cursos#cursos-disponibles" className={styles.panelCta} onClick={closeMenu}>Ver cursos <Arrow /></a>
-            </div>
-            <a href="/admin/login" className={styles.adminFooter} onClick={closeMenu}>Acceso a administración <Arrow /></a>
+    <dialog id="ibraco-site-menu" ref={dialog} className={styles.dialog} aria-label="Menú principal de IBRACO" onCancel={event => { event.preventDefault(); closeMenu(); }} onClose={() => setOpen(false)} onClick={event => { if (event.target === event.currentTarget) closeMenu(); }}>
+      <div className={styles.surface}>
+        <div className={styles.menuHeader}>
+          <div className={styles.headerInner}>
+            <button type="button" className={styles.toggle} onClick={closeMenu} aria-label="Cerrar menú" autoFocus><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg><span>Cerrar</span></button>
+            <Brand /><Contacts />
           </div>
         </div>
+        <nav className={styles.grid} aria-label="Todas las secciones">
+          {categories.map(category => <div className={styles.category} key={category.title}>
+            <a href={category.href} className={styles.categoryLink} onClick={closeMenu} aria-current={current(category.href)}>
+              <Icon name={category.icon} /><span className={styles.categoryTitle}>{category.title}</span><span className={styles.description}>{category.description}</span>
+            </a>
+            {category.links.length > 0 && <div className={styles.subLinks}>{category.links.map(link => <a key={link.href} href={link.href} onClick={closeMenu} aria-current={current(link.href)}>{link.label}</a>)}</div>}
+          </div>)}
+        </nav>
+        <div className={styles.menuFooter}><a href="/admin/login" onClick={closeMenu}>Acceso a administración</a><a href="/cursos#cursos-disponibles" className={styles.courseCta} onClick={closeMenu}>Ver cursos e inscribirme <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg></a></div>
       </div>
     </dialog>
   </>;
