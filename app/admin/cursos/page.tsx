@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { displayCampusText } from "../../lib/campus-label";
 import { supabase } from "../../../lib/supabase";
 
 type Course = {
@@ -31,9 +32,9 @@ function normalizeCourseName(name: string | null) {
 
 function buildCourseTitle(course: Course) {
   const parts = [
-    normalizeCourseName(course.name),
+    normalizeCourseName(displayCampusText(course.name)),
     course.modality,
-    course.campus,
+    displayCampusText(course.campus),
     course.shift,
   ].filter(
     (value): value is string =>

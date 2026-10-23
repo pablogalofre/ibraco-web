@@ -84,7 +84,7 @@ export default async function Home() {
 
             <div className="trust-row">
               <span>✓ Sede Norte en Bogotá</span>
-              <span>✓ Sede Centro CITIU</span>
+              <span>✓ Sede Centro CityU</span>
               <span>✓ Modalidad virtual en vivo</span>
             </div>
           </div>
@@ -131,7 +131,7 @@ export default async function Home() {
           </a>
 
           <a href="/cursos?sede=Centro#cursos-disponibles" className="path-item">
-            <strong>Sede Centro CITIU</strong>
+            <strong>Sede Centro CityU</strong>
             <span>Un espacio moderno en Bogotá</span>
           </a>
 
@@ -177,7 +177,7 @@ export default async function Home() {
             <article className="campus-card campus-centro">
               <div>
                 <span className="tag">Presencial</span>
-                <h3>Sede Centro CITIU</h3>
+                <h3>Sede Centro CityU</h3>
               </div>
 
               <p>

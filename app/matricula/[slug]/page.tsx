@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { displayCampusText } from "../../lib/campus-label";
 import { supabase } from "../../../lib/supabase";
 
 type Course = {
@@ -516,7 +517,7 @@ export default function MatriculaPage() {
               <div className="course-image-wrap">
                 <img
                   src={course.image_url}
-                  alt={course.name}
+                  alt={displayCampusText(course.name)}
                   className="course-image"
                 />
               </div>
@@ -527,7 +528,7 @@ export default function MatriculaPage() {
                 {course.cycle}
               </div>
 
-              <h2>{course.name}</h2>
+              <h2>{displayCampusText(course.name)}</h2>
 
               {course.shift && (
                 <p className="course-shift">
@@ -546,7 +547,7 @@ export default function MatriculaPage() {
                 {course.campus && (
                   <div>
                     <strong>Sede:</strong>{" "}
-                    {course.campus}
+                    {displayCampusText(course.campus)}
                   </div>
                 )}
 

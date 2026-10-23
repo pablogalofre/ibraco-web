@@ -37,7 +37,7 @@ export default function SedesPage() {
 
           <article className="inner-card">
             <span>🏙️</span>
-            <h2>Sede Centro · CITIU</h2>
+            <h2>Sede Centro · CityU</h2>
             <p>
               Un espacio contemporáneo y universitario en el centro estudiantil
               de Bogotá.

@@ -1,3 +1,4 @@
+import { displayCampusText } from "../lib/campus-label";
 import { programs, filterCourses, courseListUrl, type Course } from "../lib/course-catalog";
 import "./cursos.css";
 import { supabase } from "../../lib/supabase";
@@ -68,13 +69,13 @@ function normalizeCourseName(name: string | null) {
  * Portugués Semi Intensivo · Presencial · Centro · Mañana
  */
 function buildCourseTitle(course: Course) {
-  const courseName = normalizeCourseName(course.name)
+  const courseName = normalizeCourseName(displayCampusText(course.name))
     .replace(/^Portugués\s*/i, "")
     .trim();
   const parts = [
     courseName ? `Curso ${courseName}` : "Curso",
     course.modality,
-    course.campus,
+    displayCampusText(course.campus),
     course.shift,
   ].filter(
     (value): value is string =>
@@ -286,13 +287,13 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
               </h2>
             </div>
             <form action="/cursos#cursos-disponibles" method="get" className="qa-filters">
-              <label>Sede<select name="sede" defaultValue={filters.sede}><option value="">Todas las sedes</option>{Array.from(new Set([...allCourses.map(c => c.campus), filters.sede].filter((v): v is string => Boolean(v)))).map(value => <option key={value} value={value}>{value}</option>)}</select></label>
-              <label>Modalidad<select name="modalidad" defaultValue={filters.modalidad}><option value="">Todas las modalidades</option>{Array.from(new Set([...allCourses.map(c => c.modality), filters.modalidad].filter((v): v is string => Boolean(v)))).map(value => <option key={value} value={value}>{value}</option>)}</select></label>
+              <label>Sede<select name="sede" defaultValue={filters.sede}><option value="">Todas las sedes</option>{Array.from(new Set([...allCourses.map(c => c.campus), filters.sede].filter((v): v is string => Boolean(v)))).map(value => <option key={value} value={value}>{displayCampusText(value)}</option>)}</select></label>
+              <label>Modalidad<select name="modalidad" defaultValue={filters.modalidad}><option value="">Todas las modalidades</option>{Array.from(new Set(["Presencial", "Virtual", ...allCourses.map(c => c.modality), filters.modalidad].filter((v): v is string => Boolean(v)))).map(value => <option key={value} value={value}>{displayCampusText(value)}</option>)}</select></label>
               <label>Programa<select name="programa" defaultValue={filters.programa}><option value="">Todos los programas</option>{programs.map(p => <option key={p.slug} value={p.slug}>{p.title}</option>)}{filters.programa && !programs.some(p => p.slug === filters.programa) && <option value={filters.programa}>{filters.programa}</option>}</select></label>
               <button className="btn btn-primary" type="submit">Buscar cursos</button>
               {activeFilters && <a href="/cursos#cursos-disponibles" className="text-link">Quitar filtros</a>}
             </form>
-            <p className="qa-summary" role="status">{error ? "No pudimos consultar la programación. Intenta nuevamente." : `${courses.length} cursos encontrados`}{activeFilters ? ` · ${[filters.sede, filters.modalidad, programs.find(p => p.slug === filters.programa)?.title || filters.programa].filter(Boolean).join(" · ")}` : ""}</p>
+            <p className="qa-summary" role="status">{error ? "No pudimos consultar la programación. Intenta nuevamente." : `${courses.length} cursos encontrados`}{activeFilters ? ` · ${[displayCampusText(filters.sede), filters.modalidad, programs.find(p => p.slug === filters.programa)?.title || filters.programa].filter(Boolean).join(" · ")}` : ""}</p>
             {courses.length === 0 ? (
               <div
                 style={{
@@ -433,7 +434,7 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
                               </p>
                             )}
                             {course.campus && (
-                              <p className="ibraco-course-fact"><strong>Sede:</strong> {course.campus}</p>
+                              <p className="ibraco-course-fact"><strong>Sede:</strong> {displayCampusText(course.campus)}</p>
                             )}
                             {course.level && (
                               <p className="ibraco-course-fact"><strong>Nivel:</strong> {course.level}</p>

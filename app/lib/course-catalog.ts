@@ -1,3 +1,4 @@
+import { displayCampusText } from "./campus-label";
 export type Course = {
   id: number;
   slug: string;
@@ -102,7 +103,7 @@ export const programs = [
 ];
 
 export function normalize(value: string | null | undefined) {
-  return (value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  return displayCampusText(value).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 }
 export function matchesProgram(name: string, slug: string) {
   const text = normalize(name);
