@@ -1,23 +1,7 @@
-import { supabase } from "../../lib/supabase";
+import { loadPublicEvents, filterEvents } from "../lib/public-events";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-
-type Event = {
-  id: number;
-  slug: string;
-  name: string;
-  description: string | null;
-  event_date: string;
-  start_time: string | null;
-  end_time: string | null;
-  venue: string | null;
-  address: string | null;
-  price: number | null;
-  capacity: number | null;
-  status: string | null;
-  image_url: string | null;
-};
 
 function formatDate(date: string) {
   const [year, month, day] = date.split("-").map(Number);
@@ -44,19 +28,11 @@ function formatPrice(price: number | null) {
   }).format(price ?? 0);
 }
 
-export default async function EventosPage() {
-  const { data, error } = await supabase
-    .from("events")
-    .select("*")
-    .eq("status", "published")
-    .order("event_date", { ascending: true });
-
-  const events = (data ?? []) as Event[];
-
-  if (error) {
-    console.error("Error cargando eventos:", error);
-  }
-
+export default async function EventosPage({ searchParams }: {searchParams: Promise<{tema?:string|string[]}>}) {
+  const params = await searchParams;
+  const topic = typeof params.tema === "string" ? params.tema.slice(0,80) : "";
+  const {events: allEvents, error} = await loadPublicEvents();
+  const events = filterEvents(allEvents, topic);
   return (
     <main
       style={{
@@ -145,6 +121,7 @@ export default async function EventosPage() {
           </p>
         </header>
 
+        {topic && <div className="qa-summary"><p>Actividades de {topic.replace(/-/g, " ")}: {events.length} resultados</p><a className="text-link" href="/eventos">Ver toda la agenda →</a></div>}
         {error && (
           <div
             style={{
@@ -167,14 +144,14 @@ export default async function EventosPage() {
               fontSize: "18px",
             }}
           >
-            Próximamente tendremos nuevos eventos.
+            {topic ? "No hay eventos publicados para este tema. Puedes consultar la agenda completa o preguntar a IBRACO por próximas actividades." : "Próximamente tendremos nuevos eventos."}
           </div>
         )}
 
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))",
             gap: "28px",
           }}
         >

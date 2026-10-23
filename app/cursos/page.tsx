@@ -1,115 +1,9 @@
+import { programs, filterCourses, courseListUrl, type Course } from "../lib/course-catalog";
 import "./cursos.css";
 import { supabase } from "../../lib/supabase";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 const WHATSAPP_URL = "https://wa.me/573125841068";
-type Course = {
-  id: number;
-  slug: string;
-  name: string;
-  cycle: string | null;
-  year: number | null;
-  shift: string | null;
-  modality: string | null;
-  campus: string | null;
-  start_date: string | null;
-  end_date: string | null;
-  days: string[] | null;
-  start_time: string | null;
-  end_time: string | null;
-  level: string | null;
-  price: number | null;
-  capacity: number | null;
-  status: string | null;
-  image_url: string | null;
-};
-const programs = [
-  {
-    eyebrow: "5 semanas · 50 horas",
-    title: "Intensivo",
-    description:
-      "Avanza un nivel en cinco semanas con clases de alta intensidad. Disponible según programación en Sede Norte, Sede Centro y modalidad virtual.",
-    detailsHref: "https://www.ibraco.org.co/courses/intensivos/",
-    image:
-      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1400&q=85",
-    imagePosition: "center",
-  },
-  {
-    eyebrow: "Entre semana · 50 horas",
-    title: "Semi-intensivo",
-    description:
-      "Estudia de manera más pausada entre semana. Cada nivel se desarrolla durante diez semanas.",
-    detailsHref:
-      "https://www.ibraco.org.co/courses/semi-intensivos-entre-semana/",
-    image:
-      "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1400&q=85",
-    imagePosition: "center",
-  },
-  {
-    eyebrow: "Sábados · 48 horas",
-    title: "Semi-intensivo sábados",
-    description:
-      "Una alternativa para quienes necesitan concentrar su formación los sábados durante doce semanas.",
-    detailsHref:
-      "https://www.ibraco.org.co/courses/semi-intensivos-sabados/",
-    image:
-      "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1400&q=85",
-    imagePosition: "center",
-  },
-  {
-    eyebrow: "Vacaciones · avance rápido",
-    title: "Curso Expresso",
-    description:
-      "Una experiencia intensiva diseñada para avanzar dos niveles en un periodo corto durante temporadas especiales.",
-    detailsHref: "#cursos-disponibles",
-    image:
-      "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1400&q=85",
-    imagePosition: "center",
-  },
-  {
-    eyebrow: "Preparación especializada",
-    title: "Celpe-Bras",
-    description:
-      "Prepárate para el certificado oficial de dominio del portugués de Brasil con acompañamiento especializado.",
-    detailsHref:
-      "https://www.ibraco.org.co/courses/preparatorio-celpe-bras/",
-    image:
-      "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1400&q=85",
-    imagePosition: "center",
-  },
-  {
-    eyebrow: "Atención personalizada",
-    title: "Clases particulares",
-    description:
-      "Un programa flexible y personalizado según tu nivel, disponibilidad y objetivos específicos.",
-    detailsHref:
-      "https://www.ibraco.org.co/courses/clases-particulares/",
-    image:
-      "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1400&q=85",
-    imagePosition: "center",
-  },
-  {
-    eyebrow: "Equipos y organizaciones",
-    title: "Portugués para empresas",
-    description:
-      "Programas corporativos adaptados al sector, las funciones y los objetivos de cada organización.",
-    detailsHref: "/empresas",
-    image:
-      "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1400&q=85",
-    imagePosition: "center",
-  },
-  {
-    eyebrow: "Instituciones educativas",
-    title: "Colegios y universidades",
-    description:
-      "Alianzas, clases extracurriculares, currículo, certificación y beneficios para comunidades educativas.",
-    detailsHref:
-      "https://www.ibraco.org.co/courses/para-entidades-educativas/",
-    image:
-      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1400&q=85",
-    imagePosition: "center",
-  },
-];
 const learningLevels = [
   {
     level: "A1",
@@ -188,13 +82,21 @@ function buildCourseTitle(course: Course) {
   );
   return parts.join(" · ");
 }
-export default async function CursosPage() {
+export default async function CursosPage({ searchParams }: { searchParams: Promise<{ sede?: string | string[]; modalidad?: string | string[]; programa?: string | string[] }> }) {
+  const params = await searchParams;
+  const filters = {
+    sede: typeof params.sede === "string" ? params.sede.slice(0, 80) : "",
+    modalidad: typeof params.modalidad === "string" ? params.modalidad.slice(0, 80) : "",
+    programa: typeof params.programa === "string" ? params.programa.slice(0, 80) : "",
+  };
   const { data, error } = await supabase
     .from("courses")
     .select("*")
     .eq("status", "published")
     .order("start_date", { ascending: true });
-  const courses: Course[] = error ? [] : data ?? [];
+  const allCourses: Course[] = error ? [] : data ?? [];
+  const courses = filterCourses(allCourses, filters);
+  const activeFilters = Object.values(filters).some(Boolean);
   if (error) {
     console.error("Error cargando cursos:", error);
   }
@@ -383,6 +285,14 @@ export default async function CursosPage() {
                 Cursos disponibles
               </h2>
             </div>
+            <form action="/cursos#cursos-disponibles" method="get" className="qa-filters">
+              <label>Sede<select name="sede" defaultValue={filters.sede}><option value="">Todas las sedes</option>{Array.from(new Set([...allCourses.map(c => c.campus), filters.sede].filter((v): v is string => Boolean(v)))).map(value => <option key={value} value={value}>{value}</option>)}</select></label>
+              <label>Modalidad<select name="modalidad" defaultValue={filters.modalidad}><option value="">Todas las modalidades</option>{Array.from(new Set([...allCourses.map(c => c.modality), filters.modalidad].filter((v): v is string => Boolean(v)))).map(value => <option key={value} value={value}>{value}</option>)}</select></label>
+              <label>Programa<select name="programa" defaultValue={filters.programa}><option value="">Todos los programas</option>{programs.map(p => <option key={p.slug} value={p.slug}>{p.title}</option>)}{filters.programa && !programs.some(p => p.slug === filters.programa) && <option value={filters.programa}>{filters.programa}</option>}</select></label>
+              <button className="btn btn-primary" type="submit">Buscar cursos</button>
+              {activeFilters && <a href="/cursos#cursos-disponibles" className="text-link">Quitar filtros</a>}
+            </form>
+            <p className="qa-summary" role="status">{error ? "No pudimos consultar la programación. Intenta nuevamente." : `${courses.length} cursos encontrados`}{activeFilters ? ` · ${[filters.sede, filters.modalidad, programs.find(p => p.slug === filters.programa)?.title || filters.programa].filter(Boolean).join(" · ")}` : ""}</p>
             {courses.length === 0 ? (
               <div
                 style={{
@@ -392,7 +302,7 @@ export default async function CursosPage() {
                 }}
               >
                 <h3 style={{ marginTop: 0 }}>
-                  Próximamente nuevas fechas
+                  {error ? "No pudimos cargar los cursos" : activeFilters ? "No hay cursos publicados para esta selección" : "Próximamente nuevas fechas"}
                 </h3>
                 <p>
                   Estamos preparando la siguiente programación de cursos.
@@ -547,7 +457,7 @@ export default async function CursosPage() {
                             {formatPrice(course.price)}
                           </div>
                           <a
-                            href={`/matricula/${course.slug}`}
+                            href={`/cursos/${encodeURIComponent(course.slug)}`}
                             className="btn btn-yellow"
                             style={{
                               width: "100%",
@@ -555,7 +465,7 @@ export default async function CursosPage() {
                               boxSizing: "border-box",
                             }}
                           >
-                            Seleccionar curso
+                            Ver detalles del curso
                           </a>
                         </div>
                       </div>
@@ -578,8 +488,6 @@ export default async function CursosPage() {
         </section>
         <section id="programas" className="courses-program-grid">
           {programs.map((program) => {
-            const externalDetails =
-              program.detailsHref.startsWith("http");
             return (
               <article
                 className="courses-program-card"
@@ -602,21 +510,13 @@ export default async function CursosPage() {
                   <p>{program.description}</p>
                   <div className="courses-program-actions">
                     <a
-                      href={program.detailsHref}
-                      target={
-                        externalDetails ? "_blank" : undefined
-                      }
-                      rel={
-                        externalDetails
-                          ? "noopener noreferrer"
-                          : undefined
-                      }
+                      href={`/cursos/programas/${program.slug}`}
                       className="text-link"
                     >
                       Conocer programa →
                     </a>
                     <a
-                      href="#cursos-disponibles"
+                      href={courseListUrl({ programa: program.slug })}
                       className="btn btn-yellow"
                     >
                       Ver disponibilidad
@@ -678,15 +578,15 @@ export default async function CursosPage() {
             </p>
             <div className="courses-level-purchase-actions">
               <a
-                href="https://ibraco.landingpauta.com/producto/examen-de-nivelacion/"
+                href="/nivelacion"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-primary"
               >
-                Comprar examen
+                Consultar examen
               </a>
               <a
-                href="https://www.ibraco.org.co/courses/examen-de-nivelacion-ibraco/"
+                href="/nivelacion"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-secondary"
@@ -745,7 +645,7 @@ export default async function CursosPage() {
           <a href="/blog">Blog</a>
           <a href="/blog/travessias">Travessias</a>
           <a
-            href="https://ibraco.landingpauta.com/producto/examen-de-nivelacion/"
+            href="/nivelacion"
             target="_blank"
             rel="noopener noreferrer"
           >

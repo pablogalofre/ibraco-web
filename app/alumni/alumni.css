@@ -57,8 +57,8 @@
 }
 
 .alumni-hero-secondary {
-  border-color: #ffffff;
-  color: #ffffff;
+  border-color: #101010;
+  color: #101010;
 }
 
 .alumni-hero-trust {
@@ -217,8 +217,8 @@
 }
 
 .alumni-community-content .btn-secondary {
-  border-color: #ffffff;
-  color: #ffffff;
+  border-color: #101010;
+  color: #101010;
 }
 
 .alumni-journey-section {
@@ -333,8 +333,8 @@
 }
 
 .inner-cta .alumni-final-actions .btn-secondary {
-  border-color: #ffffff;
-  color: #ffffff;
+  border-color: #101010;
+  color: #101010;
 }
 
 @media (max-width: 1100px) {
@@ -400,3 +400,10 @@
     padding: 60px 6vw;
   }
 }
+.alumni-community > * { min-width: 0; }
+@media (max-width: 700px) {
+  .alumni-community { grid-template-columns: minmax(0, 1fr); }
+  .alumni-community-content h2 { font-size: clamp(34px, 10vw, 48px); line-height: 1.05; overflow-wrap: anywhere; }
+}
+
+.alumni-community-content h2 { font-size: clamp(34px, 4vw, 58px); line-height: 1.02; overflow-wrap: anywhere; }

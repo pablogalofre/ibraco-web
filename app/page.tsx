@@ -1,3 +1,4 @@
+import LevelConsultation from "./components/level-consultation";
 import homeStyles from "./home.module.css";
 import { createClient } from "@supabase/supabase-js";
 
@@ -124,17 +125,17 @@ export default async function Home() {
         <section className="quick-path">
           <h2>Estudia donde mejor te quede</h2>
 
-          <a href="/sedes" className="path-item">
+          <a href="/cursos?sede=Norte#cursos-disponibles" className="path-item">
             <strong>Sede Norte</strong>
             <span>Experiencia presencial en Bogotá</span>
           </a>
 
-          <a href="/sedes" className="path-item">
+          <a href="/cursos?sede=Centro#cursos-disponibles" className="path-item">
             <strong>Sede Centro CITIU</strong>
             <span>Un espacio moderno en Bogotá</span>
           </a>
 
-          <a href="/sedes" className="path-item">
+          <a href="/cursos?modalidad=Virtual#cursos-disponibles" className="path-item">
             <strong>Virtual</strong>
             <span>Clases en vivo desde cualquier ciudad</span>
           </a>
@@ -168,7 +169,7 @@ export default async function Home() {
                 cercano y vivo.
               </p>
 
-              <a href="/cursos" className="btn btn-yellow">
+              <a href="/cursos?sede=Norte#cursos-disponibles" className="btn btn-yellow">
                 Ver cursos Norte
               </a>
             </article>
@@ -184,7 +185,7 @@ export default async function Home() {
                 para aprender, encontrarse y vivir la cultura.
               </p>
 
-              <a href="/cursos" className="btn btn-yellow">
+              <a href="/cursos?sede=Centro#cursos-disponibles" className="btn btn-yellow">
                 Ver cursos Centro
               </a>
             </article>
@@ -200,7 +201,7 @@ export default async function Home() {
                 metodología y experiencia IBRACO.
               </p>
 
-              <a href="/cursos" className="btn btn-yellow">
+              <a href="/cursos?modalidad=Virtual#cursos-disponibles" className="btn btn-yellow">
                 Ver cursos virtuales
               </a>
             </article>
@@ -290,7 +291,7 @@ export default async function Home() {
                   cultural IBRACO.
                 </p>
 
-                <a href="/cursos" className="btn btn-yellow">
+                <a href="/cursos?modalidad=Presencial#cursos-disponibles" className="btn btn-yellow">
                   Conocer programa
                 </a>
               </div>
@@ -308,7 +309,7 @@ export default async function Home() {
                   metodología IBRACO.
                 </p>
 
-                <a href="/cursos" className="btn btn-yellow">
+                <a href="/cursos?modalidad=Virtual#cursos-disponibles" className="btn btn-yellow">
                   Ver horarios
                 </a>
               </div>
@@ -326,7 +327,7 @@ export default async function Home() {
                   semi-intensivos.
                 </p>
 
-                <a href="/cursos" className="btn btn-yellow">
+                <a href="/cursos?programa=expresso#cursos-disponibles" className="btn btn-yellow">
                   Ver oferta
                 </a>
               </div>
@@ -344,7 +345,7 @@ export default async function Home() {
                   acompañamiento especializado.
                 </p>
 
-                <a href="/cursos" className="btn btn-yellow">
+                <a href="/cursos/programas/celpe-bras" className="btn btn-yellow">
                   Prepararme
                 </a>
               </div>
@@ -410,7 +411,7 @@ export default async function Home() {
               </p>
 
               <a
-                href="https://www.ibraco.org.co/courses/examen-de-nivelacion-ibraco/"
+                href="/nivelacion"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-primary"
@@ -419,37 +420,7 @@ export default async function Home() {
               </a>
             </div>
 
-            <div className="test-card">
-              <label htmlFor="level-name">Nombre</label>
-              <input id="level-name" type="text" placeholder="Tu nombre" />
-
-              <label htmlFor="level-country">País</label>
-              <select id="level-country">
-                <option>Colombia</option>
-                <option>México</option>
-                <option>Estados Unidos</option>
-                <option>Otro país</option>
-              </select>
-
-              <label htmlFor="level-objective">Objetivo</label>
-              <select id="level-objective">
-                <option>Aprender desde cero</option>
-                <option>Mejorar mi nivel</option>
-                <option>Prepararme para Celpe-Bras</option>
-                <option>Portugués para empresa</option>
-                <option>Portugués para mi hijo(a)</option>
-                <option>Viajar o estudiar en Brasil</option>
-              </select>
-
-              <a
-                href="https://ibraco.landingpauta.com/producto/examen-de-nivelacion/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-primary"
-              >
-                Comprar prueba
-              </a>
-            </div>
+            <LevelConsultation />
           </div>
         </section>
 
@@ -478,35 +449,35 @@ export default async function Home() {
             </div>
 
             <div className="culture-cards">
-              <div className="culture-card c1">
+              <a href="/cultura/musica" className="culture-card c1">
                 <h3>Música</h3>
                 <span>Ritmo, escucha y expresión</span>
-              </div>
+              </a>
 
-              <div className="culture-card c2">
+              <a href="/cultura/cine" className="culture-card c2">
                 <h3>Cine</h3>
                 <span>Idioma en contexto real</span>
-              </div>
+              </a>
 
-              <div className="culture-card c3">
+              <a href="/cultura/gastronomia" className="culture-card c3">
                 <h3>Gastronomía</h3>
                 <span>Experiencias y conversación</span>
-              </div>
+              </a>
 
-              <div className="culture-card c4">
+              <a href="/cultura/arte" className="culture-card c4">
                 <h3>Arte</h3>
                 <span>Creatividad y vocabulario</span>
-              </div>
+              </a>
 
-              <div className="culture-card c5">
+              <a href="/cultura/literatura" className="culture-card c5">
                 <h3>Literatura</h3>
                 <span>Lectura y pensamiento</span>
-              </div>
+              </a>
 
-              <div className="culture-card c6">
+              <a href="/cultura/viajes" className="culture-card c6">
                 <h3>Viajes</h3>
                 <span>Cuando el idioma empieza a vivirse</span>
-              </div>
+              </a>
             </div>
           </div>
 
@@ -534,10 +505,10 @@ export default async function Home() {
 
               <p>Dos niveles en un mes. Ideal para avanzar rápido.</p>
 
-              <div className="price">$1.842.000</div>
+              <div className="qa-summary">Consulta fechas y tarifa vigente</div>
 
               <a
-                href="https://ibraco.landingpauta.com/cursos/"
+                href="/cursos?programa=expresso#cursos-disponibles"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-yellow"
@@ -552,10 +523,10 @@ export default async function Home() {
 
               <p>Sede Norte, Sede Centro o Virtual.</p>
 
-              <div className="price">$1.364.000</div>
+              <div className="qa-summary">Consulta fechas y tarifa vigente</div>
 
               <a
-                href="https://ibraco.landingpauta.com/cursos/"
+                href="/cursos?programa=intensivo#cursos-disponibles"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-yellow"
@@ -570,15 +541,15 @@ export default async function Home() {
 
               <p>Identifica tu nivel y entra al curso adecuado.</p>
 
-              <div className="price">$76.000</div>
+              <div className="qa-summary">Consulta fechas y tarifa vigente</div>
 
               <a
-                href="https://ibraco.landingpauta.com/producto/examen-de-nivelacion/"
+                href="/nivelacion"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-yellow"
               >
-                Comprar prueba
+                Consultar prueba
               </a>
             </article>
 
@@ -588,10 +559,10 @@ export default async function Home() {
 
               <p>Una experiencia cultural para vivir Brasil desde el ritmo.</p>
 
-              <div className="price">$160.000</div>
+              <div className="qa-summary">Consulta fechas y tarifa vigente</div>
 
               <a
-                href="https://ibraco.landingpauta.com/cursos/"
+                href="https://wa.me/573125841068?text=Hola%2C%20quiero%20consultar%20las%20fechas%20y%20cupos%20del%20curso%20de%20Samba."
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-yellow"
@@ -696,7 +667,7 @@ export default async function Home() {
           <a href="/cursos">Cursos</a>
           <a href="/sedes">Sedes</a>
           <a href="/empresas">Empresas</a>
-          <a href="/cursos">Celpe-Bras</a>
+          <a href="/cursos/programas/celpe-bras">Celpe-Bras</a>
         </div>
 
         <div>
@@ -719,7 +690,7 @@ export default async function Home() {
             WhatsApp
           </a>
           <a
-            href="https://ibraco.landingpauta.com/cursos/"
+            href="/cursos#cursos-disponibles"
             target="_blank"
             rel="noopener noreferrer"
           >

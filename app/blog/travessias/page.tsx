@@ -1,27 +1,5 @@
-const articles = [
-  {
-    category: "Portugués",
-    title: "Verbos en portugués que necesitas conocer",
-    excerpt:
-      "Una guía práctica para reconocer y utilizar algunos de los verbos más frecuentes del idioma.",
-    href: "https://www.ibraco.org.co/travessias/",
-  },
-  {
-    category: "Portugués",
-    title: "Saludos y expresiones para empezar a hablar",
-    excerpt:
-      "Expresiones cotidianas para presentarte, saludar y comenzar conversaciones en portugués.",
-    href: "https://www.ibraco.org.co/travessias/",
-  },
-  {
-    category: "Brasil",
-    title: "Viajar a Brasil: idioma, cultura y experiencias",
-    excerpt:
-      "Contenidos para prepararte antes de viajar y comprender mejor la vida cotidiana en Brasil.",
-    href: "https://www.ibraco.org.co/travessias/",
-  },
-];
-
+import { listPublicPosts } from "../../../lib/blog-public";
+export const dynamic = "force-dynamic";
 const categories = [
   {
     title: "Aprende portugués",
@@ -55,7 +33,8 @@ const categories = [
   },
 ];
 
-export default function TravessiasPage() {
+export default async function TravessiasPage() {
+  const { posts: articles } = await listPublicPosts("", 1);
   return (
     <>
       
@@ -88,15 +67,16 @@ export default function TravessiasPage() {
 
         <section id="articulos" className="blog-featured">
           <div className="section-header">
-            <h2>Artículos destacados</h2>
+            <h2>Publicaciones recientes</h2>
 
             <p>
-              Una selección inicial de contenidos de aprendizaje, cultura y
+              Artículos publicados en el blog de IBRACO sobre aprendizaje, cultura y
               conexión con Brasil.
             </p>
           </div>
 
           <div className="blog-featured-grid">
+            {articles.length === 0 && <div className="inner-card"><h3>Pronto encontrarás nuevas publicaciones</h3><p>Estamos preparando contenidos de portugués, Brasil y cultura.</p><a href="/blog" className="text-link">Explorar el blog →</a></div>}
             {articles.map((article) => (
               <article className="blog-article-card" key={article.title}>
                 <div className="blog-article-image">
@@ -109,12 +89,11 @@ export default function TravessiasPage() {
                   <p>{article.excerpt}</p>
 
                   <a
-                    href={article.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href={"/blog/" + encodeURIComponent(article.slug)}
+                    
                     className="text-link"
                   >
-                    Leer en Travessias →
+                    Leer artículo →
                   </a>
                 </div>
               </article>
@@ -144,9 +123,7 @@ export default function TravessiasPage() {
                 <p>{category.description}</p>
 
                 <a
-                  href="https://www.ibraco.org.co/travessias/"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href={"/blog?categoria=" + encodeURIComponent(category.title === "Aprende portugués" ? "Aprender portugués" : category.title === "Viajes y experiencias" ? "Estudiar y viajar" : category.title) + "#articulos"}
                   className="text-link"
                 >
                   Explorar contenido →
@@ -174,7 +151,7 @@ export default function TravessiasPage() {
               id="travessias-name"
               type="text"
               name="name"
-              placeholder="Tu nombre"
+              placeholder="Tu nombre" disabled
             />
 
             <label htmlFor="travessias-email">Correo electrónico</label>
@@ -182,11 +159,11 @@ export default function TravessiasPage() {
               id="travessias-email"
               type="email"
               name="email"
-              placeholder="tu@correo.com"
+              placeholder="tu@correo.com" disabled
             />
 
-            <button type="button" className="btn btn-primary">
-              Quiero recibir novedades
+            <button type="button" className="btn btn-primary" disabled>
+              Próximamente
             </button>
           </form>
         </section>

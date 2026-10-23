@@ -57,8 +57,8 @@
 }
 
 .courses-hero-secondary {
-  border-color: #ffffff;
-  color: #ffffff;
+  border-color: #101010;
+  color: #101010;
 }
 
 .courses-hero-trust {
@@ -224,8 +224,8 @@
 }
 
 .courses-format-content .btn-secondary {
-  border-color: #ffffff;
-  color: #ffffff;
+  border-color: #101010;
+  color: #101010;
 }
 
 .courses-academic-route {
@@ -338,8 +338,8 @@
 }
 
 .inner-cta .courses-final-actions .btn-secondary {
-  border-color: #ffffff;
-  color: #ffffff;
+  border-color: #101010;
+  color: #101010;
 }
 
 @media (max-width: 1100px) {
@@ -466,3 +466,10 @@
     box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
   }
 }
+.courses-format-section > *, .courses-level-purchase > * { min-width: 0; }
+@media (max-width: 700px) {
+  .courses-format-section, .courses-level-purchase { grid-template-columns: minmax(0, 1fr); }
+  .courses-format-content h2 { font-size: clamp(34px, 10vw, 48px); line-height: 1.05; overflow-wrap: anywhere; }
+}
+
+.courses-format-content h2 { font-size: clamp(34px, 4vw, 58px); line-height: 1.02; overflow-wrap: anywhere; }

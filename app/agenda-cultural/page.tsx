@@ -1,54 +1,9 @@
+import PublicEventList from "../components/public-event-list";
+import { normalize } from "../lib/course-catalog";
+export const dynamic = "force-dynamic";
 import "./agenda-cultural.css";
 
 const WHATSAPP_URL = "https://wa.me/573125841068";
-
-const events = [
-  {
-    day: "08",
-    month: "AGO",
-    category: "Cine",
-    title: "Cine brasileño y conversación",
-    description:
-      "Proyección de cine brasileño seguida de una conversación en portugués con estudiantes y profesores.",
-    location: "Sede Centro · CITIU",
-    time: "6:30 p. m.",
-    access: "Cupos limitados",
-    buttonText: "Reservar cupo",
-    href: WHATSAPP_URL,
-    image:
-      "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1400&q=85",
-  },
-  {
-    day: "22",
-    month: "AGO",
-    category: "Música",
-    title: "Roda de samba IBRACO",
-    description:
-      "Una experiencia musical para acercarte al ritmo, la pronunciación y la cultura brasileña.",
-    location: "Sede Norte",
-    time: "11:00 a. m.",
-    access: "Evento abierto",
-    buttonText: "Quiero asistir",
-    href: WHATSAPP_URL,
-    image:
-      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1400&q=85",
-  },
-  {
-    day: "05",
-    month: "SEP",
-    category: "Comunidad",
-    title: "Encuentro cultural IBRACO",
-    description:
-      "Un espacio para compartir, practicar portugués y conocer a otros estudiantes de la comunidad.",
-    location: "Sede Centro · CITIU",
-    time: "4:00 p. m.",
-    access: "Inscripción previa",
-    buttonText: "Inscribirme",
-    href: WHATSAPP_URL,
-    image:
-      "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1400&q=85",
-  },
-];
 
 const categories = [
   {
@@ -143,68 +98,7 @@ export default function AgendaCulturalPage() {
           </div>
         </section>
 
-        <section id="proximos-eventos" className="agenda-events-grid">
-          {events.map((event) => (
-            <article className="agenda-event-card" key={event.title}>
-              <div
-                className="agenda-event-image"
-                style={{ backgroundImage: `url("${event.image}")` }}
-              >
-                <div className="agenda-event-image-overlay" />
-
-                <div className="agenda-event-date">
-                  <strong>{event.day}</strong>
-                  <span>{event.month}</span>
-                </div>
-
-                <span className="agenda-event-category">
-                  {event.category}
-                </span>
-              </div>
-
-              <div className="agenda-event-content">
-                <h2>{event.title}</h2>
-
-                <p>{event.description}</p>
-
-                <ul className="agenda-event-meta">
-                  <li>
-                    <strong>Lugar</strong>
-                    <span>{event.location}</span>
-                  </li>
-
-                  <li>
-                    <strong>Hora</strong>
-                    <span>{event.time}</span>
-                  </li>
-
-                  <li>
-                    <strong>Acceso</strong>
-                    <span>{event.access}</span>
-                  </li>
-                </ul>
-
-                <a
-                  href={event.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-primary"
-                >
-                  {event.buttonText}
-                </a>
-              </div>
-            </article>
-          ))}
-        </section>
-
-        <section className="agenda-note">
-          <span>Programación de muestra</span>
-
-          <p>
-            Las fechas y actividades de esta versión son temporales. La agenda
-            definitiva se actualizará con la programación oficial de IBRACO.
-          </p>
-        </section>
+        <PublicEventList />
 
         <section className="agenda-experiences">
           <div className="section-header">
@@ -234,7 +128,7 @@ export default function AgendaCulturalPage() {
                 <div className="agenda-category-content">
                   <p>{category.description}</p>
 
-                  <a href="#proximos-eventos" className="text-link">
+                  <a href={`/eventos?tema=${normalize(category.title).replace(/ /g, "-")}`} className="text-link">
                     Ver eventos →
                   </a>
                 </div>

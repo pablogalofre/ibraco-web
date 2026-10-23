@@ -24,7 +24,7 @@ const categories: { title: string; href: string; description: string; icon: Icon
   { title: "Cultura", href: "/cultura", description: "Vive Brasil con nosotros", icon: "culture", links: [{ href: "/agenda-cultural", label: "Agenda cultural" }, { href: "/eventos", label: "Eventos e inscripciones" }] },
   { title: "Comunidad", href: "/alumni", description: "Conecta con IBRACO", icon: "community", links: [{ href: "/alumni", label: "Alumni" }, { href: "/blog", label: "Blog" }, { href: "/blog/travessias", label: "Travessias" }] },
 ];
-const publicRoots = ["/cursos", "/sedes", "/cultura", "/agenda-cultural", "/eventos", "/empresas", "/alumni", "/blog"];
+const publicRoots = ["/cursos", "/sedes", "/cultura", "/agenda-cultural", "/eventos", "/empresas", "/alumni", "/blog", "/nivelacion"];
 
 export default function SiteNavigation() {
   const pathname = usePathname();

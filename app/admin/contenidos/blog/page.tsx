@@ -33,22 +33,31 @@ const CATEGORIES = [
   "Comunidad IBRACO",
 ];
 
+
 const inputStyle: React.CSSProperties = {
   width: "100%",
-  padding: "13px 15px",
-  border: "1px solid #d5d5d5",
-  borderRadius: 10,
+  padding: "12px 16px",
+  border: "1px solid #e3e3df",
+  borderRadius: 12,
   background: "#fff",
   color: "#111",
   font: "inherit",
+  fontSize: 15,
+  lineHeight: 1.5,
   boxSizing: "border-box",
+  outlineColor: "#009c4b",
 };
+;
+
 
 const labelStyle: React.CSSProperties = {
   display: "block",
   fontWeight: 700,
+  fontSize: 14,
   marginBottom: 8,
+  color: "#292929",
 };
+
 
 function makeSlug(value: string) {
   return value
@@ -283,7 +292,7 @@ export default function BlogAdminPage() {
       style={{
         minHeight: "100vh",
         background: "#f8f5e9",
-        padding: "40px 5% 80px",
+        padding: "110px 5% 80px",
         color: "#111",
         fontFamily: "Arial, sans-serif",
       }}
@@ -306,7 +315,14 @@ export default function BlogAdminPage() {
           MARKETING Y CONTENIDOS
         </p>
 
-        <h1 style={{ fontSize: "clamp(32px, 5vw, 52px)" }}>
+        <h1
+  style={{
+    fontSize: "clamp(28px, 3.5vw, 42px)",
+    lineHeight: 1.15,
+    margin: "12px 0 18px",
+    letterSpacing: "-0.03em",
+  }}
+>
           Artículos del blog
         </h1>
 

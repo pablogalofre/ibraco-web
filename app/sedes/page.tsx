@@ -30,7 +30,7 @@ export default function SedesPage() {
               Una sede cercana, tradicional y llena de vida cultural para
               aprender portugués en comunidad.
             </p>
-            <a href="/#ciclos" className="text-link">
+            <a href="/cursos?sede=Norte#cursos-disponibles" className="text-link">
               Ver cursos en Norte →
             </a>
           </article>
@@ -42,7 +42,7 @@ export default function SedesPage() {
               Un espacio contemporáneo y universitario en el centro estudiantil
               de Bogotá.
             </p>
-            <a href="/#ciclos" className="text-link">
+            <a href="/cursos?sede=Centro#cursos-disponibles" className="text-link">
               Ver cursos en Centro →
             </a>
           </article>
@@ -54,7 +54,7 @@ export default function SedesPage() {
               Clases en vivo con profesores de IBRACO, estés donde estés, con
               la misma metodología y acompañamiento.
             </p>
-            <a href="/#ciclos" className="text-link">
+            <a href="/cursos?modalidad=Virtual#cursos-disponibles" className="text-link">
               Ver cursos virtuales →
             </a>
           </article>
