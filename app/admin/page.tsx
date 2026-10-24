@@ -247,6 +247,16 @@ export default function AdminDashboardPage() {
           )}
           {canSeeContent && (
             <AdminCard
+              eyebrow="PÁGINAS DEL SITIO"
+              title="Inicio y Sedes"
+              description="Edita textos, imágenes y botones. Prepara borradores, revisa la vista previa y publica cuando esté listo."
+              href="/admin/paginas"
+              buttonText="Editar páginas"
+              accent="#12633f"
+            />
+          )}
+          {canSeeContent && (
+            <AdminCard
               eyebrow="MARKETING Y CONTENIDOS"
               title="SEO y Blog"
               description="Administra la configuración SEO de las páginas y los artículos del blog de IBRACO."

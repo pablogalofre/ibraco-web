@@ -1,0 +1,1965 @@
+{
+  "/": {
+    "name": "Inicio",
+    "fields": [
+      {
+        "key": "hero.text_1",
+        "section": "Portada",
+        "label": "Texto · Instituto de Cultura Brasil Colombia",
+        "kind": "text",
+        "defaultValue": "Instituto de Cultura Brasil Colombia",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "hero.textarea_1",
+        "section": "Portada",
+        "label": "Descripción · Aprende portugués en Bogotá o en modalidad virtu",
+        "kind": "textarea",
+        "defaultValue": "Aprende portugués en Bogotá o en modalidad virtual con IBRACO: una institución que conecta a Colombia con Brasil a través del idioma, la cultura y la comunidad.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "hero.link_1",
+        "section": "Portada",
+        "label": "Destino · Ver cursos",
+        "kind": "link",
+        "defaultValue": "/cursos",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "hero.text_2",
+        "section": "Portada",
+        "label": "Texto del botón · Ver cursos",
+        "kind": "text",
+        "defaultValue": "Ver cursos",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "hero.link_2",
+        "section": "Portada",
+        "label": "Destino · Mide tu nivel",
+        "kind": "link",
+        "defaultValue": "#nivel",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "hero.text_3",
+        "section": "Portada",
+        "label": "Texto del botón · Mide tu nivel",
+        "kind": "text",
+        "defaultValue": "Mide tu nivel",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "hero.text_4",
+        "section": "Portada",
+        "label": "Texto · ✓ Sede Norte en Bogotá",
+        "kind": "text",
+        "defaultValue": "✓ Sede Norte en Bogotá",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "hero.text_5",
+        "section": "Portada",
+        "label": "Texto · ✓ Sede Centro CityU",
+        "kind": "text",
+        "defaultValue": "✓ Sede Centro CityU",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "hero.text_6",
+        "section": "Portada",
+        "label": "Texto · ✓ Modalidad virtual en vivo",
+        "kind": "text",
+        "defaultValue": "✓ Modalidad virtual en vivo",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "hero.image_1",
+        "section": "Portada",
+        "label": "Imagen · Portada",
+        "kind": "image",
+        "defaultValue": "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?q=80&w=1600&auto=format&fit=crop",
+        "required": false,
+        "maxLength": 2048
+      },
+      {
+        "key": "hero.text_7",
+        "section": "Portada",
+        "label": "Título · Portugués que se vive.",
+        "kind": "text",
+        "defaultValue": "Portugués que se vive.",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "hero.textarea_2",
+        "section": "Portada",
+        "label": "Descripción · En IBRACO aprendes portugués por medio de conver",
+        "kind": "textarea",
+        "defaultValue": "En IBRACO aprendes portugués por medio de conversación, música, cine, literatura, eventos y cultura real de Brasil.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "hero.text_8",
+        "section": "Portada",
+        "label": "Texto · 3.000+",
+        "kind": "text",
+        "defaultValue": "3.000+",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "hero.text_9",
+        "section": "Portada",
+        "label": "Texto · Estudiantes al año",
+        "kind": "text",
+        "defaultValue": "Estudiantes al año",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "hero.text_10",
+        "section": "Portada",
+        "label": "Texto · 30+",
+        "kind": "text",
+        "defaultValue": "30+",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "hero.text_11",
+        "section": "Portada",
+        "label": "Texto · Años de trayectoria",
+        "kind": "text",
+        "defaultValue": "Años de trayectoria",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "hero.text_12",
+        "section": "Portada",
+        "label": "Texto · 260M",
+        "kind": "text",
+        "defaultValue": "260M",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "hero.text_13",
+        "section": "Portada",
+        "label": "Texto · Personas sueñan en portugués",
+        "kind": "text",
+        "defaultValue": "Personas sueñan en portugués",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "quick-path.text_1",
+        "section": "Accesos por sede",
+        "label": "Título · Estudia donde mejor te quede",
+        "kind": "text",
+        "defaultValue": "Estudia donde mejor te quede",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "quick-path.link_1",
+        "section": "Accesos por sede",
+        "label": "Destino · Sede Norte",
+        "kind": "link",
+        "defaultValue": "/cursos?sede=Norte#cursos-disponibles",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "quick-path.text_2",
+        "section": "Accesos por sede",
+        "label": "Texto · Sede Norte",
+        "kind": "text",
+        "defaultValue": "Sede Norte",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "quick-path.text_3",
+        "section": "Accesos por sede",
+        "label": "Texto · Experiencia presencial en Bogotá",
+        "kind": "text",
+        "defaultValue": "Experiencia presencial en Bogotá",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "quick-path.link_2",
+        "section": "Accesos por sede",
+        "label": "Destino · Sede Centro CityU",
+        "kind": "link",
+        "defaultValue": "/cursos?sede=Centro#cursos-disponibles",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "quick-path.text_4",
+        "section": "Accesos por sede",
+        "label": "Texto · Sede Centro CityU",
+        "kind": "text",
+        "defaultValue": "Sede Centro CityU",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "quick-path.text_5",
+        "section": "Accesos por sede",
+        "label": "Texto · Un espacio moderno en Bogotá",
+        "kind": "text",
+        "defaultValue": "Un espacio moderno en Bogotá",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "quick-path.link_3",
+        "section": "Accesos por sede",
+        "label": "Destino · Virtual",
+        "kind": "link",
+        "defaultValue": "/cursos?modalidad=Virtual#cursos-disponibles",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "quick-path.text_6",
+        "section": "Accesos por sede",
+        "label": "Texto · Virtual",
+        "kind": "text",
+        "defaultValue": "Virtual",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "quick-path.text_7",
+        "section": "Accesos por sede",
+        "label": "Texto · Clases en vivo desde cualquier ciudad",
+        "kind": "text",
+        "defaultValue": "Clases en vivo desde cualquier ciudad",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "quick-path.link_4",
+        "section": "Accesos por sede",
+        "label": "Destino · Mide tu nivel",
+        "kind": "link",
+        "defaultValue": "#nivel",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "quick-path.text_8",
+        "section": "Accesos por sede",
+        "label": "Texto · Mide tu nivel",
+        "kind": "text",
+        "defaultValue": "Mide tu nivel",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "quick-path.text_9",
+        "section": "Accesos por sede",
+        "label": "Texto · Encuentra el curso adecuado",
+        "kind": "text",
+        "defaultValue": "Encuentra el curso adecuado",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "campus-section.text_1",
+        "section": "Sedes",
+        "label": "Título · Sedes en Bogotá y modalidad virtual",
+        "kind": "text",
+        "defaultValue": "Sedes en Bogotá y modalidad virtual",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "campus-section.textarea_1",
+        "section": "Sedes",
+        "label": "Descripción · La presencialidad es una fortaleza de IBRACO. La",
+        "kind": "textarea",
+        "defaultValue": "La presencialidad es una fortaleza de IBRACO. La virtualidad no la reemplaza: la amplía y conecta a más personas con nuestra comunidad.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "campus-section.image_1",
+        "section": "Sedes",
+        "label": "Imagen · Sede Norte",
+        "kind": "image",
+        "defaultValue": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1400&auto=format&fit=crop",
+        "required": false,
+        "maxLength": 2048
+      },
+      {
+        "key": "campus-section.text_2",
+        "section": "Sedes",
+        "label": "Texto · Presencial",
+        "kind": "text",
+        "defaultValue": "Presencial",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "campus-section.text_3",
+        "section": "Sedes",
+        "label": "Título · Sede Norte",
+        "kind": "text",
+        "defaultValue": "Sede Norte",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "campus-section.textarea_2",
+        "section": "Sedes",
+        "label": "Descripción · Comunidad, profesores, eventos y cultura brasile",
+        "kind": "textarea",
+        "defaultValue": "Comunidad, profesores, eventos y cultura brasileña en un entorno cercano y vivo.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "campus-section.link_1",
+        "section": "Sedes",
+        "label": "Destino · Ver cursos Norte",
+        "kind": "link",
+        "defaultValue": "/cursos?sede=Norte#cursos-disponibles",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "campus-section.text_4",
+        "section": "Sedes",
+        "label": "Texto del botón · Ver cursos Norte",
+        "kind": "text",
+        "defaultValue": "Ver cursos Norte",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "campus-section.image_2",
+        "section": "Sedes",
+        "label": "Imagen · Sede Centro CityU",
+        "kind": "image",
+        "defaultValue": "https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1400&auto=format&fit=crop",
+        "required": false,
+        "maxLength": 2048
+      },
+      {
+        "key": "campus-section.text_5",
+        "section": "Sedes",
+        "label": "Texto · Presencial",
+        "kind": "text",
+        "defaultValue": "Presencial",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "campus-section.text_6",
+        "section": "Sedes",
+        "label": "Título · Sede Centro CityU",
+        "kind": "text",
+        "defaultValue": "Sede Centro CityU",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "campus-section.textarea_3",
+        "section": "Sedes",
+        "label": "Descripción · Una sede moderna en el centro estudiantil de Bog",
+        "kind": "textarea",
+        "defaultValue": "Una sede moderna en el centro estudiantil de Bogotá, diseñada para aprender, encontrarse y vivir la cultura.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "campus-section.link_2",
+        "section": "Sedes",
+        "label": "Destino · Ver cursos Centro",
+        "kind": "link",
+        "defaultValue": "/cursos?sede=Centro#cursos-disponibles",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "campus-section.text_7",
+        "section": "Sedes",
+        "label": "Texto del botón · Ver cursos Centro",
+        "kind": "text",
+        "defaultValue": "Ver cursos Centro",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "campus-section.image_3",
+        "section": "Sedes",
+        "label": "Imagen · Modalidad virtual",
+        "kind": "image",
+        "defaultValue": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1400&auto=format&fit=crop",
+        "required": false,
+        "maxLength": 2048
+      },
+      {
+        "key": "campus-section.text_8",
+        "section": "Sedes",
+        "label": "Texto · Virtual",
+        "kind": "text",
+        "defaultValue": "Virtual",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "campus-section.text_9",
+        "section": "Sedes",
+        "label": "Título · Virtual",
+        "kind": "text",
+        "defaultValue": "Virtual",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "campus-section.textarea_4",
+        "section": "Sedes",
+        "label": "Descripción · Aprende portugués en vivo desde cualquier ciudad",
+        "kind": "textarea",
+        "defaultValue": "Aprende portugués en vivo desde cualquier ciudad con profesores, metodología y experiencia IBRACO.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "campus-section.link_3",
+        "section": "Sedes",
+        "label": "Destino · Ver cursos virtuales",
+        "kind": "link",
+        "defaultValue": "/cursos?modalidad=Virtual#cursos-disponibles",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "campus-section.text_10",
+        "section": "Sedes",
+        "label": "Texto del botón · Ver cursos virtuales",
+        "kind": "text",
+        "defaultValue": "Ver cursos virtuales",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "campus-section.link_4",
+        "section": "Sedes",
+        "label": "Destino · Conocer todas las sedes",
+        "kind": "link",
+        "defaultValue": "/sedes",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "campus-section.text_11",
+        "section": "Sedes",
+        "label": "Texto del botón · Conocer todas las sedes",
+        "kind": "text",
+        "defaultValue": "Conocer todas las sedes",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "lusophone-section.text_1",
+        "section": "Por qué portugués",
+        "label": "Título · ¿Por qué aprender portugués hoy?",
+        "kind": "text",
+        "defaultValue": "¿Por qué aprender portugués hoy?",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "lusophone-section.textarea_1",
+        "section": "Por qué portugués",
+        "label": "Descripción · El portugués abre oportunidades académicas, prof",
+        "kind": "textarea",
+        "defaultValue": "El portugués abre oportunidades académicas, profesionales, culturales y de viaje. Brasil es el corazón de nuestra historia, pero el idioma conecta con un mundo mucho más amplio.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "lusophone-section.text_2",
+        "section": "Por qué portugués",
+        "label": "Texto · BR",
+        "kind": "text",
+        "defaultValue": "BR",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "lusophone-section.text_3",
+        "section": "Por qué portugués",
+        "label": "Título · Brasil",
+        "kind": "text",
+        "defaultValue": "Brasil",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "lusophone-section.textarea_2",
+        "section": "Por qué portugués",
+        "label": "Descripción · El mayor mercado de habla portuguesa y una poten",
+        "kind": "textarea",
+        "defaultValue": "El mayor mercado de habla portuguesa y una potencia cultural, académica y empresarial.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "lusophone-section.text_4",
+        "section": "Por qué portugués",
+        "label": "Texto · NEG",
+        "kind": "text",
+        "defaultValue": "NEG",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "lusophone-section.text_5",
+        "section": "Por qué portugués",
+        "label": "Título · Trabajo",
+        "kind": "text",
+        "defaultValue": "Trabajo",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "lusophone-section.textarea_3",
+        "section": "Por qué portugués",
+        "label": "Descripción · Portugués para empresas, profesionales y equipos",
+        "kind": "textarea",
+        "defaultValue": "Portugués para empresas, profesionales y equipos que se conectan con Brasil.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "lusophone-section.text_6",
+        "section": "Por qué portugués",
+        "label": "Texto · EDU",
+        "kind": "text",
+        "defaultValue": "EDU",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "lusophone-section.text_7",
+        "section": "Por qué portugués",
+        "label": "Título · Estudio",
+        "kind": "text",
+        "defaultValue": "Estudio",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "lusophone-section.textarea_4",
+        "section": "Por qué portugués",
+        "label": "Descripción · Una herramienta para certificaciones, movilidad ",
+        "kind": "textarea",
+        "defaultValue": "Una herramienta para certificaciones, movilidad académica y oportunidades internacionales.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "lusophone-section.text_8",
+        "section": "Por qué portugués",
+        "label": "Texto · CUL",
+        "kind": "text",
+        "defaultValue": "CUL",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "lusophone-section.text_9",
+        "section": "Por qué portugués",
+        "label": "Título · Cultura",
+        "kind": "text",
+        "defaultValue": "Cultura",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "lusophone-section.textarea_5",
+        "section": "Por qué portugués",
+        "label": "Descripción · Un idioma para viajar, conversar, leer, cantar y",
+        "kind": "textarea",
+        "defaultValue": "Un idioma para viajar, conversar, leer, cantar y vivir nuevas experiencias.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "courses-section.text_1",
+        "section": "Programas",
+        "label": "Título · Cursos de portugués",
+        "kind": "text",
+        "defaultValue": "Cursos de portugués",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "courses-section.textarea_1",
+        "section": "Programas",
+        "label": "Descripción · Programas diseñados para empezar, avanzar rápido",
+        "kind": "textarea",
+        "defaultValue": "Programas diseñados para empezar, avanzar rápido, certificar tu nivel o formar equipos que trabajan con Brasil.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "courses-section.image_1",
+        "section": "Programas",
+        "label": "Imagen · Portugués presencial",
+        "kind": "image",
+        "defaultValue": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1200&auto=format&fit=crop",
+        "required": false,
+        "maxLength": 2048
+      },
+      {
+        "key": "courses-section.text_2",
+        "section": "Programas",
+        "label": "Texto · Presencial",
+        "kind": "text",
+        "defaultValue": "Presencial",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "courses-section.text_3",
+        "section": "Programas",
+        "label": "Título · Portugués presencial",
+        "kind": "text",
+        "defaultValue": "Portugués presencial",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "courses-section.textarea_2",
+        "section": "Programas",
+        "label": "Descripción · Clases en sede con acompañamiento, comunidad y e",
+        "kind": "textarea",
+        "defaultValue": "Clases en sede con acompañamiento, comunidad y experiencia cultural IBRACO.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "courses-section.link_1",
+        "section": "Programas",
+        "label": "Destino · Conocer programa",
+        "kind": "link",
+        "defaultValue": "/cursos?modalidad=Presencial#cursos-disponibles",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "courses-section.text_4",
+        "section": "Programas",
+        "label": "Texto del botón · Conocer programa",
+        "kind": "text",
+        "defaultValue": "Conocer programa",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "courses-section.image_2",
+        "section": "Programas",
+        "label": "Imagen · Portugués virtual",
+        "kind": "image",
+        "defaultValue": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop",
+        "required": false,
+        "maxLength": 2048
+      },
+      {
+        "key": "courses-section.text_5",
+        "section": "Programas",
+        "label": "Texto · Virtual",
+        "kind": "text",
+        "defaultValue": "Virtual",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "courses-section.text_6",
+        "section": "Programas",
+        "label": "Título · Portugués virtual",
+        "kind": "text",
+        "defaultValue": "Portugués virtual",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "courses-section.textarea_3",
+        "section": "Programas",
+        "label": "Descripción · Clases en vivo desde cualquier ciudad, con profe",
+        "kind": "textarea",
+        "defaultValue": "Clases en vivo desde cualquier ciudad, con profesores y metodología IBRACO.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "courses-section.link_2",
+        "section": "Programas",
+        "label": "Destino · Ver horarios",
+        "kind": "link",
+        "defaultValue": "/cursos?modalidad=Virtual#cursos-disponibles",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "courses-section.text_7",
+        "section": "Programas",
+        "label": "Texto del botón · Ver horarios",
+        "kind": "text",
+        "defaultValue": "Ver horarios",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "courses-section.image_3",
+        "section": "Programas",
+        "label": "Imagen · Curso Expresso",
+        "kind": "image",
+        "defaultValue": "https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=1200&auto=format&fit=crop",
+        "required": false,
+        "maxLength": 2048
+      },
+      {
+        "key": "courses-section.text_8",
+        "section": "Programas",
+        "label": "Texto · Intensivo",
+        "kind": "text",
+        "defaultValue": "Intensivo",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "courses-section.text_9",
+        "section": "Programas",
+        "label": "Título · Curso Expresso",
+        "kind": "text",
+        "defaultValue": "Curso Expresso",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "courses-section.textarea_4",
+        "section": "Programas",
+        "label": "Descripción · Avanza más rápido con programas intensivos y sem",
+        "kind": "textarea",
+        "defaultValue": "Avanza más rápido con programas intensivos y semi-intensivos.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "courses-section.link_3",
+        "section": "Programas",
+        "label": "Destino · Ver oferta",
+        "kind": "link",
+        "defaultValue": "/cursos?programa=expresso#cursos-disponibles",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "courses-section.text_10",
+        "section": "Programas",
+        "label": "Texto del botón · Ver oferta",
+        "kind": "text",
+        "defaultValue": "Ver oferta",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "courses-section.image_4",
+        "section": "Programas",
+        "label": "Imagen · Celpe-Bras",
+        "kind": "image",
+        "defaultValue": "https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=80&w=1200&auto=format&fit=crop",
+        "required": false,
+        "maxLength": 2048
+      },
+      {
+        "key": "courses-section.text_11",
+        "section": "Programas",
+        "label": "Texto · Certificación",
+        "kind": "text",
+        "defaultValue": "Certificación",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "courses-section.text_12",
+        "section": "Programas",
+        "label": "Título · Celpe-Bras",
+        "kind": "text",
+        "defaultValue": "Celpe-Bras",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "courses-section.textarea_5",
+        "section": "Programas",
+        "label": "Descripción · Prepárate para certificar tu dominio del portugu",
+        "kind": "textarea",
+        "defaultValue": "Prepárate para certificar tu dominio del portugués con acompañamiento especializado.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "courses-section.link_4",
+        "section": "Programas",
+        "label": "Destino · Prepararme",
+        "kind": "link",
+        "defaultValue": "/cursos/programas/celpe-bras",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "courses-section.text_13",
+        "section": "Programas",
+        "label": "Texto del botón · Prepararme",
+        "kind": "text",
+        "defaultValue": "Prepararme",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "courses-section.image_5",
+        "section": "Programas",
+        "label": "Imagen · Portugués corporativo",
+        "kind": "image",
+        "defaultValue": "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1200&auto=format&fit=crop",
+        "required": false,
+        "maxLength": 2048
+      },
+      {
+        "key": "courses-section.text_14",
+        "section": "Programas",
+        "label": "Texto · Empresas",
+        "kind": "text",
+        "defaultValue": "Empresas",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "courses-section.text_15",
+        "section": "Programas",
+        "label": "Título · Portugués corporativo",
+        "kind": "text",
+        "defaultValue": "Portugués corporativo",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "courses-section.textarea_6",
+        "section": "Programas",
+        "label": "Descripción · Programas para equipos que trabajan con Brasil o",
+        "kind": "textarea",
+        "defaultValue": "Programas para equipos que trabajan con Brasil o quieren abrir oportunidades regionales.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "courses-section.link_5",
+        "section": "Programas",
+        "label": "Destino · Cotizar",
+        "kind": "link",
+        "defaultValue": "/empresas",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "courses-section.text_16",
+        "section": "Programas",
+        "label": "Texto del botón · Cotizar",
+        "kind": "text",
+        "defaultValue": "Cotizar",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "courses-section.image_6",
+        "section": "Programas",
+        "label": "Imagen · Samba",
+        "kind": "image",
+        "defaultValue": "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=1200&auto=format&fit=crop",
+        "required": false,
+        "maxLength": 2048
+      },
+      {
+        "key": "courses-section.text_17",
+        "section": "Programas",
+        "label": "Texto · Cultura",
+        "kind": "text",
+        "defaultValue": "Cultura",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "courses-section.text_18",
+        "section": "Programas",
+        "label": "Título · Samba",
+        "kind": "text",
+        "defaultValue": "Samba",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "courses-section.textarea_7",
+        "section": "Programas",
+        "label": "Descripción · Una experiencia cultural para vivir Brasil desde",
+        "kind": "textarea",
+        "defaultValue": "Una experiencia cultural para vivir Brasil desde el ritmo, el movimiento y la conversación.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "courses-section.link_6",
+        "section": "Programas",
+        "label": "Destino · Ver experiencias",
+        "kind": "link",
+        "defaultValue": "/agenda-cultural",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "courses-section.text_19",
+        "section": "Programas",
+        "label": "Texto del botón · Ver experiencias",
+        "kind": "text",
+        "defaultValue": "Ver experiencias",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "courses-section.link_7",
+        "section": "Programas",
+        "label": "Destino · Ver todos los cursos",
+        "kind": "link",
+        "defaultValue": "/cursos",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "courses-section.text_20",
+        "section": "Programas",
+        "label": "Texto del botón · Ver todos los cursos",
+        "kind": "text",
+        "defaultValue": "Ver todos los cursos",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "test-section.text_1",
+        "section": "Prueba de nivel",
+        "label": "Texto · Mide en qué nivel estás",
+        "kind": "text",
+        "defaultValue": "Mide en qué nivel estás",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "test-section.text_2",
+        "section": "Prueba de nivel",
+        "label": "Título · ¿Ya sabes portugués?",
+        "kind": "text",
+        "defaultValue": "¿Ya sabes portugués?",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "test-section.textarea_1",
+        "section": "Prueba de nivel",
+        "label": "Descripción · Presenta tu examen de nivel, encuentra el curso ",
+        "kind": "textarea",
+        "defaultValue": "Presenta tu examen de nivel, encuentra el curso adecuado y agenda tu entrevista para iniciar el proceso de matrícula.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "test-section.link_1",
+        "section": "Prueba de nivel",
+        "label": "Destino · Conocer la prueba",
+        "kind": "link",
+        "defaultValue": "/nivelacion",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "test-section.text_3",
+        "section": "Prueba de nivel",
+        "label": "Texto del botón · Conocer la prueba",
+        "kind": "text",
+        "defaultValue": "Conocer la prueba",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "culture-section.text_1",
+        "section": "Cultura",
+        "label": "Título · El idioma entra por la cultura",
+        "kind": "text",
+        "defaultValue": "El idioma entra por la cultura",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "culture-section.textarea_1",
+        "section": "Cultura",
+        "label": "Descripción · Este es el gran diferencial de IBRACO frente a u",
+        "kind": "textarea",
+        "defaultValue": "Este es el gran diferencial de IBRACO frente a una academia tradicional: el portugués se aprende viviéndolo.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "culture-section.text_2",
+        "section": "Cultura",
+        "label": "Título · O Brasil é aqui.",
+        "kind": "text",
+        "defaultValue": "O Brasil é aqui.",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "culture-section.textarea_2",
+        "section": "Cultura",
+        "label": "Descripción · La cultura no compite con los cursos: los hace m",
+        "kind": "textarea",
+        "defaultValue": "La cultura no compite con los cursos: los hace más deseables, más memorables y más valiosos.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "culture-section.link_1",
+        "section": "Cultura",
+        "label": "Destino · Explorar cultura",
+        "kind": "link",
+        "defaultValue": "/cultura",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "culture-section.text_3",
+        "section": "Cultura",
+        "label": "Texto del botón · Explorar cultura",
+        "kind": "text",
+        "defaultValue": "Explorar cultura",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "culture-section.image_1",
+        "section": "Cultura",
+        "label": "Imagen · Música",
+        "kind": "image",
+        "defaultValue": "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=900&auto=format&fit=crop",
+        "required": false,
+        "maxLength": 2048
+      },
+      {
+        "key": "culture-section.link_2",
+        "section": "Cultura",
+        "label": "Destino · Música",
+        "kind": "link",
+        "defaultValue": "/cultura/musica",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "culture-section.text_4",
+        "section": "Cultura",
+        "label": "Título · Música",
+        "kind": "text",
+        "defaultValue": "Música",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "culture-section.text_5",
+        "section": "Cultura",
+        "label": "Texto · Ritmo, escucha y expresión",
+        "kind": "text",
+        "defaultValue": "Ritmo, escucha y expresión",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "culture-section.image_2",
+        "section": "Cultura",
+        "label": "Imagen · Cine",
+        "kind": "image",
+        "defaultValue": "https://images.unsplash.com/photo-1508973379184-7517410fb0bc?q=80&w=900&auto=format&fit=crop",
+        "required": false,
+        "maxLength": 2048
+      },
+      {
+        "key": "culture-section.link_3",
+        "section": "Cultura",
+        "label": "Destino · Cine",
+        "kind": "link",
+        "defaultValue": "/cultura/cine",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "culture-section.text_6",
+        "section": "Cultura",
+        "label": "Título · Cine",
+        "kind": "text",
+        "defaultValue": "Cine",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "culture-section.text_7",
+        "section": "Cultura",
+        "label": "Texto · Idioma en contexto real",
+        "kind": "text",
+        "defaultValue": "Idioma en contexto real",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "culture-section.image_3",
+        "section": "Cultura",
+        "label": "Imagen · Gastronomía",
+        "kind": "image",
+        "defaultValue": "https://images.unsplash.com/photo-1543353071-873f17a7a088?q=80&w=900&auto=format&fit=crop",
+        "required": false,
+        "maxLength": 2048
+      },
+      {
+        "key": "culture-section.link_4",
+        "section": "Cultura",
+        "label": "Destino · Gastronomía",
+        "kind": "link",
+        "defaultValue": "/cultura/gastronomia",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "culture-section.text_8",
+        "section": "Cultura",
+        "label": "Título · Gastronomía",
+        "kind": "text",
+        "defaultValue": "Gastronomía",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "culture-section.text_9",
+        "section": "Cultura",
+        "label": "Texto · Experiencias y conversación",
+        "kind": "text",
+        "defaultValue": "Experiencias y conversación",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "culture-section.image_4",
+        "section": "Cultura",
+        "label": "Imagen · Arte",
+        "kind": "image",
+        "defaultValue": "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?q=80&w=900&auto=format&fit=crop",
+        "required": false,
+        "maxLength": 2048
+      },
+      {
+        "key": "culture-section.link_5",
+        "section": "Cultura",
+        "label": "Destino · Arte",
+        "kind": "link",
+        "defaultValue": "/cultura/arte",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "culture-section.text_10",
+        "section": "Cultura",
+        "label": "Título · Arte",
+        "kind": "text",
+        "defaultValue": "Arte",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "culture-section.text_11",
+        "section": "Cultura",
+        "label": "Texto · Creatividad y vocabulario",
+        "kind": "text",
+        "defaultValue": "Creatividad y vocabulario",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "culture-section.image_5",
+        "section": "Cultura",
+        "label": "Imagen · Literatura",
+        "kind": "image",
+        "defaultValue": "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=900&auto=format&fit=crop",
+        "required": false,
+        "maxLength": 2048
+      },
+      {
+        "key": "culture-section.link_6",
+        "section": "Cultura",
+        "label": "Destino · Literatura",
+        "kind": "link",
+        "defaultValue": "/cultura/literatura",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "culture-section.text_12",
+        "section": "Cultura",
+        "label": "Título · Literatura",
+        "kind": "text",
+        "defaultValue": "Literatura",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "culture-section.text_13",
+        "section": "Cultura",
+        "label": "Texto · Lectura y pensamiento",
+        "kind": "text",
+        "defaultValue": "Lectura y pensamiento",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "culture-section.image_6",
+        "section": "Cultura",
+        "label": "Imagen · Viajes",
+        "kind": "image",
+        "defaultValue": "https://images.unsplash.com/photo-1516306580123-e6e52b1b7b5f?q=80&w=900&auto=format&fit=crop",
+        "required": false,
+        "maxLength": 2048
+      },
+      {
+        "key": "culture-section.link_7",
+        "section": "Cultura",
+        "label": "Destino · Viajes",
+        "kind": "link",
+        "defaultValue": "/cultura/viajes",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "culture-section.text_14",
+        "section": "Cultura",
+        "label": "Título · Viajes",
+        "kind": "text",
+        "defaultValue": "Viajes",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "culture-section.text_15",
+        "section": "Cultura",
+        "label": "Texto · Cuando el idioma empieza a vivirse",
+        "kind": "text",
+        "defaultValue": "Cuando el idioma empieza a vivirse",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "culture-section.link_8",
+        "section": "Cultura",
+        "label": "Destino · Ver agenda cultural",
+        "kind": "link",
+        "defaultValue": "/agenda-cultural",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "culture-section.text_16",
+        "section": "Cultura",
+        "label": "Texto del botón · Ver agenda cultural",
+        "kind": "text",
+        "defaultValue": "Ver agenda cultural",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "cycles-section.text_1",
+        "section": "Próximos ciclos",
+        "label": "Título · Próximos ciclos abiertos",
+        "kind": "text",
+        "defaultValue": "Próximos ciclos abiertos",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "cycles-section.textarea_1",
+        "section": "Próximos ciclos",
+        "label": "Descripción · Inscríbete al curso que más se ajuste a tu horar",
+        "kind": "textarea",
+        "defaultValue": "Inscríbete al curso que más se ajuste a tu horario, nivel y objetivo.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "cycles-section.text_2",
+        "section": "Próximos ciclos",
+        "label": "Texto · Nuevo",
+        "kind": "text",
+        "defaultValue": "Nuevo",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "cycles-section.text_3",
+        "section": "Próximos ciclos",
+        "label": "Título · Curso Expresso",
+        "kind": "text",
+        "defaultValue": "Curso Expresso",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "cycles-section.textarea_2",
+        "section": "Próximos ciclos",
+        "label": "Descripción · Dos niveles en un mes. Ideal para avanzar rápido",
+        "kind": "textarea",
+        "defaultValue": "Dos niveles en un mes. Ideal para avanzar rápido.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "cycles-section.text_4",
+        "section": "Próximos ciclos",
+        "label": "Texto · Consulta fechas y tarifa vigente",
+        "kind": "text",
+        "defaultValue": "Consulta fechas y tarifa vigente",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "cycles-section.link_1",
+        "section": "Próximos ciclos",
+        "label": "Destino · Matricularme",
+        "kind": "link",
+        "defaultValue": "/cursos?programa=expresso#cursos-disponibles",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "cycles-section.text_5",
+        "section": "Próximos ciclos",
+        "label": "Texto del botón · Matricularme",
+        "kind": "text",
+        "defaultValue": "Matricularme",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "cycles-section.text_6",
+        "section": "Próximos ciclos",
+        "label": "Texto · Intensivo",
+        "kind": "text",
+        "defaultValue": "Intensivo",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "cycles-section.text_7",
+        "section": "Próximos ciclos",
+        "label": "Título · Intensivo",
+        "kind": "text",
+        "defaultValue": "Intensivo",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "cycles-section.textarea_3",
+        "section": "Próximos ciclos",
+        "label": "Descripción · Sede Norte, Sede Centro o Virtual.",
+        "kind": "textarea",
+        "defaultValue": "Sede Norte, Sede Centro o Virtual.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "cycles-section.text_8",
+        "section": "Próximos ciclos",
+        "label": "Texto · Consulta fechas y tarifa vigente",
+        "kind": "text",
+        "defaultValue": "Consulta fechas y tarifa vigente",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "cycles-section.link_2",
+        "section": "Próximos ciclos",
+        "label": "Destino · Matricularme",
+        "kind": "link",
+        "defaultValue": "/cursos?programa=intensivo#cursos-disponibles",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "cycles-section.text_9",
+        "section": "Próximos ciclos",
+        "label": "Texto del botón · Matricularme",
+        "kind": "text",
+        "defaultValue": "Matricularme",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "cycles-section.text_10",
+        "section": "Próximos ciclos",
+        "label": "Texto · Nivelación",
+        "kind": "text",
+        "defaultValue": "Nivelación",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "cycles-section.text_11",
+        "section": "Próximos ciclos",
+        "label": "Título · Examen de nivel",
+        "kind": "text",
+        "defaultValue": "Examen de nivel",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "cycles-section.textarea_4",
+        "section": "Próximos ciclos",
+        "label": "Descripción · Identifica tu nivel y entra al curso adecuado.",
+        "kind": "textarea",
+        "defaultValue": "Identifica tu nivel y entra al curso adecuado.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "cycles-section.text_12",
+        "section": "Próximos ciclos",
+        "label": "Texto · Consulta fechas y tarifa vigente",
+        "kind": "text",
+        "defaultValue": "Consulta fechas y tarifa vigente",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "cycles-section.link_3",
+        "section": "Próximos ciclos",
+        "label": "Destino · Consultar prueba",
+        "kind": "link",
+        "defaultValue": "/nivelacion",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "cycles-section.text_13",
+        "section": "Próximos ciclos",
+        "label": "Texto del botón · Consultar prueba",
+        "kind": "text",
+        "defaultValue": "Consultar prueba",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "cycles-section.text_14",
+        "section": "Próximos ciclos",
+        "label": "Texto · Cultura",
+        "kind": "text",
+        "defaultValue": "Cultura",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "cycles-section.text_15",
+        "section": "Próximos ciclos",
+        "label": "Título · Curso de Samba",
+        "kind": "text",
+        "defaultValue": "Curso de Samba",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "cycles-section.textarea_5",
+        "section": "Próximos ciclos",
+        "label": "Descripción · Una experiencia cultural para vivir Brasil desde",
+        "kind": "textarea",
+        "defaultValue": "Una experiencia cultural para vivir Brasil desde el ritmo.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "cycles-section.text_16",
+        "section": "Próximos ciclos",
+        "label": "Texto · Consulta fechas y tarifa vigente",
+        "kind": "text",
+        "defaultValue": "Consulta fechas y tarifa vigente",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "cycles-section.link_4",
+        "section": "Próximos ciclos",
+        "label": "Destino · Reservar cupo",
+        "kind": "link",
+        "defaultValue": "https://wa.me/573125841068?text=Hola%2C%20quiero%20consultar%20las%20fechas%20y%20cupos%20del%20curso%20de%20Samba.",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "cycles-section.text_17",
+        "section": "Próximos ciclos",
+        "label": "Texto del botón · Reservar cupo",
+        "kind": "text",
+        "defaultValue": "Reservar cupo",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "cycles-section.link_5",
+        "section": "Próximos ciclos",
+        "label": "Destino · Ver oferta completa",
+        "kind": "link",
+        "defaultValue": "/cursos",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "cycles-section.text_18",
+        "section": "Próximos ciclos",
+        "label": "Texto del botón · Ver oferta completa",
+        "kind": "text",
+        "defaultValue": "Ver oferta completa",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "dual-section.text_1",
+        "section": "Niños y viajes",
+        "label": "Título · Nuevas formas de vivir Brasil",
+        "kind": "text",
+        "defaultValue": "Nuevas formas de vivir Brasil",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "dual-section.textarea_1",
+        "section": "Niños y viajes",
+        "label": "Descripción · IBRACO puede ampliar la experiencia sin perder f",
+        "kind": "textarea",
+        "defaultValue": "IBRACO puede ampliar la experiencia sin perder foco: cursos primero, cultura como diferenciador.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "dual-section.image_1",
+        "section": "Niños y viajes",
+        "label": "Imagen · IBRACO Niños",
+        "kind": "image",
+        "defaultValue": "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?q=80&w=1200&auto=format&fit=crop",
+        "required": false,
+        "maxLength": 2048
+      },
+      {
+        "key": "dual-section.text_2",
+        "section": "Niños y viajes",
+        "label": "Texto · Próximamente",
+        "kind": "text",
+        "defaultValue": "Próximamente",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "dual-section.text_3",
+        "section": "Niños y viajes",
+        "label": "Título · IBRACO Niños",
+        "kind": "text",
+        "defaultValue": "IBRACO Niños",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "dual-section.textarea_2",
+        "section": "Niños y viajes",
+        "label": "Descripción · Portugués para niños a través de juego, música, ",
+        "kind": "textarea",
+        "defaultValue": "Portugués para niños a través de juego, música, creatividad y cultura brasileña.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "dual-section.link_1",
+        "section": "Niños y viajes",
+        "label": "Destino · Quiero saber más",
+        "kind": "link",
+        "defaultValue": "https://wa.me/573125841068",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "dual-section.text_4",
+        "section": "Niños y viajes",
+        "label": "Texto del botón · Quiero saber más",
+        "kind": "text",
+        "defaultValue": "Quiero saber más",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "dual-section.image_2",
+        "section": "Niños y viajes",
+        "label": "Imagen · IBRACO Viajes",
+        "kind": "image",
+        "defaultValue": "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?q=80&w=1200&auto=format&fit=crop",
+        "required": false,
+        "maxLength": 2048
+      },
+      {
+        "key": "dual-section.text_5",
+        "section": "Niños y viajes",
+        "label": "Texto · Próximamente",
+        "kind": "text",
+        "defaultValue": "Próximamente",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "dual-section.text_6",
+        "section": "Niños y viajes",
+        "label": "Título · IBRACO Viajes",
+        "kind": "text",
+        "defaultValue": "IBRACO Viajes",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "dual-section.textarea_3",
+        "section": "Niños y viajes",
+        "label": "Descripción · Experiencias culturales, académicas e inmersivas",
+        "kind": "textarea",
+        "defaultValue": "Experiencias culturales, académicas e inmersivas para viajar, estudiar y vivir Brasil.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "dual-section.link_2",
+        "section": "Niños y viajes",
+        "label": "Destino · Quiero saber más",
+        "kind": "link",
+        "defaultValue": "https://wa.me/573125841068",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "dual-section.text_7",
+        "section": "Niños y viajes",
+        "label": "Texto del botón · Quiero saber más",
+        "kind": "text",
+        "defaultValue": "Quiero saber más",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "final-cta.text_1",
+        "section": "Cierre",
+        "label": "Título · O BRASIL É AQUI.",
+        "kind": "text",
+        "defaultValue": "O BRASIL É AQUI.",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "final-cta.textarea_1",
+        "section": "Cierre",
+        "label": "Descripción · Empieza hoy a aprender portugués con IBRACO y de",
+        "kind": "textarea",
+        "defaultValue": "Empieza hoy a aprender portugués con IBRACO y descubre Brasil a través de su idioma, su cultura y su comunidad.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "final-cta.link_1",
+        "section": "Cierre",
+        "label": "Destino · Ver cursos",
+        "kind": "link",
+        "defaultValue": "/cursos",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "final-cta.text_2",
+        "section": "Cierre",
+        "label": "Texto del botón · Ver cursos",
+        "kind": "text",
+        "defaultValue": "Ver cursos",
+        "required": true,
+        "maxLength": 500
+      }
+    ]
+  },
+  "/sedes": {
+    "name": "Sedes",
+    "fields": [
+      {
+        "key": "inner-hero.text_1",
+        "section": "Presentación",
+        "label": "Texto · Bogotá y modalidad virtual",
+        "kind": "text",
+        "defaultValue": "Bogotá y modalidad virtual",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "inner-hero.text_2",
+        "section": "Presentación",
+        "label": "Título · Sedes IBRACO",
+        "kind": "text",
+        "defaultValue": "Sedes IBRACO",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "inner-hero.textarea_1",
+        "section": "Presentación",
+        "label": "Descripción · Estudia donde mejor te quede y vive la experienc",
+        "kind": "textarea",
+        "defaultValue": "Estudia donde mejor te quede y vive la experiencia IBRACO de manera presencial en Bogotá o desde cualquier ciudad.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "inner-hero.link_1",
+        "section": "Presentación",
+        "label": "Destino · Ver cursos",
+        "kind": "link",
+        "defaultValue": "/cursos",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "inner-hero.text_3",
+        "section": "Presentación",
+        "label": "Texto del botón · Ver cursos",
+        "kind": "text",
+        "defaultValue": "Ver cursos",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "inner-grid.image_1",
+        "section": "Sedes y modalidad virtual",
+        "label": "Imagen de la sede",
+        "kind": "image",
+        "defaultValue": "",
+        "required": false,
+        "maxLength": 2048
+      },
+      {
+        "key": "inner-grid.text_1",
+        "section": "Sedes y modalidad virtual",
+        "label": "Texto · 🌿",
+        "kind": "text",
+        "defaultValue": "🌿",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "inner-grid.text_2",
+        "section": "Sedes y modalidad virtual",
+        "label": "Título · Sede Norte",
+        "kind": "text",
+        "defaultValue": "Sede Norte",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "inner-grid.textarea_1",
+        "section": "Sedes y modalidad virtual",
+        "label": "Descripción · Una sede cercana, tradicional y llena de vida cu",
+        "kind": "textarea",
+        "defaultValue": "Una sede cercana, tradicional y llena de vida cultural para aprender portugués en comunidad.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "inner-grid.link_1",
+        "section": "Sedes y modalidad virtual",
+        "label": "Destino · Ver cursos en Norte →",
+        "kind": "link",
+        "defaultValue": "/cursos?sede=Norte#cursos-disponibles",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "inner-grid.text_3",
+        "section": "Sedes y modalidad virtual",
+        "label": "Texto del botón · Ver cursos en Norte →",
+        "kind": "text",
+        "defaultValue": "Ver cursos en Norte →",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "inner-grid.image_2",
+        "section": "Sedes y modalidad virtual",
+        "label": "Imagen de la sede",
+        "kind": "image",
+        "defaultValue": "",
+        "required": false,
+        "maxLength": 2048
+      },
+      {
+        "key": "inner-grid.text_4",
+        "section": "Sedes y modalidad virtual",
+        "label": "Texto · 🏙️",
+        "kind": "text",
+        "defaultValue": "🏙️",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "inner-grid.text_5",
+        "section": "Sedes y modalidad virtual",
+        "label": "Título · Sede Centro · CityU",
+        "kind": "text",
+        "defaultValue": "Sede Centro · CityU",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "inner-grid.textarea_2",
+        "section": "Sedes y modalidad virtual",
+        "label": "Descripción · Un espacio contemporáneo y universitario en el c",
+        "kind": "textarea",
+        "defaultValue": "Un espacio contemporáneo y universitario en el centro estudiantil de Bogotá.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "inner-grid.link_2",
+        "section": "Sedes y modalidad virtual",
+        "label": "Destino · Ver cursos en Centro →",
+        "kind": "link",
+        "defaultValue": "/cursos?sede=Centro#cursos-disponibles",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "inner-grid.text_6",
+        "section": "Sedes y modalidad virtual",
+        "label": "Texto del botón · Ver cursos en Centro →",
+        "kind": "text",
+        "defaultValue": "Ver cursos en Centro →",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "inner-grid.image_3",
+        "section": "Sedes y modalidad virtual",
+        "label": "Imagen de la sede",
+        "kind": "image",
+        "defaultValue": "",
+        "required": false,
+        "maxLength": 2048
+      },
+      {
+        "key": "inner-grid.text_7",
+        "section": "Sedes y modalidad virtual",
+        "label": "Texto · 🌎",
+        "kind": "text",
+        "defaultValue": "🌎",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "inner-grid.text_8",
+        "section": "Sedes y modalidad virtual",
+        "label": "Título · IBRACO Virtual",
+        "kind": "text",
+        "defaultValue": "IBRACO Virtual",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "inner-grid.textarea_3",
+        "section": "Sedes y modalidad virtual",
+        "label": "Descripción · Clases en vivo con profesores de IBRACO, estés d",
+        "kind": "textarea",
+        "defaultValue": "Clases en vivo con profesores de IBRACO, estés donde estés, con la misma metodología y acompañamiento.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "inner-grid.link_3",
+        "section": "Sedes y modalidad virtual",
+        "label": "Destino · Ver cursos virtuales →",
+        "kind": "link",
+        "defaultValue": "/cursos?modalidad=Virtual#cursos-disponibles",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "inner-grid.text_9",
+        "section": "Sedes y modalidad virtual",
+        "label": "Texto del botón · Ver cursos virtuales →",
+        "kind": "text",
+        "defaultValue": "Ver cursos virtuales →",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "inner-cta.text_1",
+        "section": "Cierre",
+        "label": "Título · Una sola comunidad",
+        "kind": "text",
+        "defaultValue": "Una sola comunidad",
+        "required": true,
+        "maxLength": 500
+      },
+      {
+        "key": "inner-cta.textarea_1",
+        "section": "Cierre",
+        "label": "Descripción · Presencial en Bogotá o virtual desde cualquier c",
+        "kind": "textarea",
+        "defaultValue": "Presencial en Bogotá o virtual desde cualquier ciudad: estudias con la misma identidad académica y cultural de IBRACO.",
+        "required": true,
+        "maxLength": 3000
+      },
+      {
+        "key": "inner-cta.link_1",
+        "section": "Cierre",
+        "label": "Destino · Elige tu curso",
+        "kind": "link",
+        "defaultValue": "/cursos",
+        "required": true,
+        "maxLength": 2048
+      },
+      {
+        "key": "inner-cta.text_2",
+        "section": "Cierre",
+        "label": "Texto del botón · Elige tu curso",
+        "kind": "text",
+        "defaultValue": "Elige tu curso",
+        "required": true,
+        "maxLength": 500
+      }
+    ]
+  }
+}

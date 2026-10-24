@@ -452,6 +452,8 @@ export default function BlogAdminPage() {
 
             <button type="button" className={view === "seo" ? "active" : ""} disabled={seoSaving || seoLoading} onClick={() => void openSeo()}>◎ &nbsp; SEO de páginas</button>
 
+            <Link href="/admin/paginas">▦ &nbsp; Editar Inicio y Sedes</Link>
+
             <Link href="/admin">◈ &nbsp; Centro de administración</Link>
 
             <Link href="/blog" target="_blank">↗ &nbsp; Ver blog público</Link>
@@ -569,3 +571,4 @@ export default function BlogAdminPage() {
   );
 
 }
+
