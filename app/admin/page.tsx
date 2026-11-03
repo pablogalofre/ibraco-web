@@ -257,6 +257,16 @@ export default function AdminDashboardPage() {
           )}
           {canSeeContent && (
             <AdminCard
+              eyebrow="CAMPAÑAS Y NOVEDADES"
+              title="Publicidad y pop-ups"
+              description="Sube una imagen, agrega un enlace y programa tus promociones. Activa o retira los anuncios sin tocar código."
+              href="/admin/publicidad"
+              buttonText="Administrar publicidad"
+              accent="#ffd800"
+            />
+          )}
+          {canSeeContent && (
+            <AdminCard
               eyebrow="MARKETING Y CONTENIDOS"
               title="SEO y Blog"
               description="Administra la configuración SEO de las páginas y los artículos del blog de IBRACO."
@@ -492,3 +502,4 @@ function AdminCard({
     </article>
   );
 }
+

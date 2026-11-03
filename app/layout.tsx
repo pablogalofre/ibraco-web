@@ -1,3 +1,4 @@
+import SitePromotions from "./components/site-promotions";
 import SiteNavigation from "./components/site-navigation";
 import type { Metadata } from "next";
 import Script from "next/script";
@@ -41,7 +42,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </noscript>
         <SiteNavigation />
         {children}
+        <SitePromotions />
       </body>
     </html>
   );
 }
+
