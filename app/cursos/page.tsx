@@ -1,3 +1,4 @@
+import CourseTracking from "../components/course-tracking";
 import { displayCampusText } from "../lib/campus-label";
 import { programs, filterCourses, courseListUrl, type Course } from "../lib/course-catalog";
 import "./cursos.css";
@@ -103,6 +104,12 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
   }
   return (
     <>
+        <CourseTracking context={{
+          campus: allCourses.some(c => c.campus === filters.sede) ? filters.sede : "",
+          modality: ["Presencial", "Virtual", ...allCourses.map(c => c.modality)].includes(filters.modalidad) ? filters.modalidad : "",
+          program: programs.some(p => p.slug === filters.programa) ? filters.programa : "",
+          results: error ? null : courses.length,
+        }} />
         <style>{`
           .courses-page-hero {
             min-height: 620px !important;
@@ -233,7 +240,7 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-secondary courses-hero-secondary"
-                data-cta="whatsapp-asesor-hero"
+                data-cta="whatsapp-asesor-hero" data-course-event="catalog_whatsapp" data-surface="hero"
                 style={{ backgroundColor: "#ffffff", color: "#171717", borderColor: "#ffffff" }}
               >
                 Hablar con un asesor
@@ -286,7 +293,7 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
                 Cursos disponibles
               </h2>
             </div>
-            <form action="/cursos#cursos-disponibles" method="get" className="qa-filters">
+            <form data-course-search action="/cursos#cursos-disponibles" method="get" className="qa-filters">
               <label>Sede<select name="sede" defaultValue={filters.sede}><option value="">Todas las sedes</option>{Array.from(new Set([...allCourses.map(c => c.campus), filters.sede].filter((v): v is string => Boolean(v)))).map(value => <option key={value} value={value}>{displayCampusText(value)}</option>)}</select></label>
               <label>Modalidad<select name="modalidad" defaultValue={filters.modalidad}><option value="">Todas las modalidades</option>{Array.from(new Set(["Presencial", "Virtual", ...allCourses.map(c => c.modality), filters.modalidad].filter((v): v is string => Boolean(v)))).map(value => <option key={value} value={value}>{displayCampusText(value)}</option>)}</select></label>
               <label>Programa<select name="programa" defaultValue={filters.programa}><option value="">Todos los programas</option>{programs.map(p => <option key={p.slug} value={p.slug}>{p.title}</option>)}{filters.programa && !programs.some(p => p.slug === filters.programa) && <option value={filters.programa}>{filters.programa}</option>}</select></label>
@@ -314,7 +321,7 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn btn-yellow"
-                  data-cta="whatsapp-asesor-sin-cursos"
+                  data-cta="whatsapp-asesor-sin-cursos" data-course-event="catalog_whatsapp" data-surface="empty"
                 >
                   Hablar con un asesor
                 </a>
@@ -458,6 +465,7 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
                             {formatPrice(course.price)}
                           </div>
                           <a
+                            data-course-event="course_detail_click" data-course-id={course.id}
                             href={`/cursos/${encodeURIComponent(course.slug)}`}
                             className="btn btn-yellow"
                             style={{
@@ -511,12 +519,14 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
                   <p>{program.description}</p>
                   <div className="courses-program-actions">
                     <a
+                      data-course-event="program_click" data-program={program.slug}
                       href={`/cursos/programas/${program.slug}`}
                       className="text-link"
                     >
                       Conocer programa →
                     </a>
                     <a
+                      data-course-event="availability_click" data-program={program.slug}
                       href={courseListUrl({ programa: program.slug })}
                       className="btn btn-yellow"
                     >
@@ -610,7 +620,7 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-secondary"
-              data-cta="whatsapp-asesor-final"
+              data-cta="whatsapp-asesor-final" data-course-event="catalog_whatsapp" data-surface="final"
               style={{ backgroundColor: "#ffffff", color: "#171717", borderColor: "#ffffff" }}
             >
               Hablar con un asesor
@@ -654,6 +664,7 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
           </a>
           <a
             href={WHATSAPP_URL}
+            data-course-event="catalog_whatsapp" data-surface="footer"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -685,3 +696,4 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
     </>
   );
 }
+

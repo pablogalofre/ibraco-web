@@ -365,47 +365,9 @@ export default function AdminDashboardPage() {
           </div>
         </section>
         {profile.is_superadmin && (
-          <section
-            style={{
-              border: "2px dashed #d8d3c4",
-              borderRadius: "28px",
-              padding: "36px",
-            }}
-          >
-            <div
-              style={{
-                color: "#777",
-                fontSize: "13px",
-                fontWeight: 800,
-                textTransform: "uppercase",
-                marginBottom: "8px",
-              }}
-            >
-              Próxima etapa
-            </div>
-            <h2
-              style={{
-                margin: "0 0 12px",
-                fontSize: "30px",
-                fontWeight: 900,
-              }}
-            >
-              Indicadores comerciales
-            </h2>
-            <p
-              style={{
-                margin: 0,
-                color: "#555",
-                fontSize: "17px",
-                lineHeight: 1.6,
-                maxWidth: "850px",
-              }}
-            >
-              Aquí podremos integrar Google Analytics,
-              Meta, Mercado Pago y otros indicadores de
-              ventas, tráfico, campañas y conversión.
-            </p>
-          </section>
+          <AdminCard eyebrow="SOLO SUPERADMINISTRADORES" title="Resultados y métricas"
+            description="Visualiza el interés en cursos, publicidad y WhatsApp con gráficos, cifras y filtros por fecha."
+            href="/admin/metricas" buttonText="Abrir dashboard" accent="#126348" />
         )}
         <p
           style={{
@@ -502,4 +464,5 @@ function AdminCard({
     </article>
   );
 }
+
 

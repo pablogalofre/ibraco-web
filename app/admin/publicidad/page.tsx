@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../../lib/supabase";
 import { PROMOTION_PAGES, colombiaInput, fromColombiaInput, promotionErrors, promotionState, type Promotion } from "../../lib/promotions";
+import AdvertisingMetrics from "./advertising-metrics";
 import PromotionModal from "../../components/promotion-modal";
 import styles from "./advertising.module.css";
 
@@ -124,6 +125,7 @@ export default function AdvertisingPage() {
   return <main className={styles.page}>
     <header className={styles.header}><div><a href="/admin" onClick={e => { if (lock.current || (dirty && !window.confirm("¿Salir sin guardar los cambios?"))) e.preventDefault(); }}>← Centro de administración</a><span className={styles.eyebrow}>CAMPAÑAS Y NOVEDADES</span><h1>Publicidad y pop-ups</h1><p>Una imagen, un enlace y tus fechas. Prepara tus anuncios desde aquí.</p></div>
       <button type="button" className={styles.primary} disabled={Boolean(busy) || !loaded} onClick={() => choose()}>+ Nueva campaña</button></header>
+    <AdvertisingMetrics />
     {error && <div className={styles.error} role="alert">{error}{conflict && <button type="button" onClick={() => void reloadSaved()} disabled={Boolean(busy)}>Recargar versión guardada</button>}</div>}
     {notice && <div className={styles.notice} role="status">{notice}</div>}
     <div className={styles.grid}><aside className={styles.sidebar}><h2>Mis campañas</h2><p className={styles.help}>Activas, programadas y anteriores.</p>
@@ -151,3 +153,4 @@ export default function AdvertisingPage() {
     {preview && form && <PromotionModal key={form.image_url} campaign={form} preview onClose={() => setPreview(false)} />}
   </main>;
 }
+
