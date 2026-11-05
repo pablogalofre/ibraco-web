@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import styles from "./dashboard-access.module.css";
 import { supabase } from "../../lib/supabase";
 type AdminProfile = {
   full_name: string | null;
@@ -206,8 +207,15 @@ export default function AdminDashboardPage() {
             Cerrar sesión
           </button>
         </div>
+        {profile.is_superadmin && (
+          <a href="/admin/metricas" className={styles.access} aria-label="Abrir dashboard">
+            <div><small>SOLO SUPERADMINISTRADORES</small><strong>Dashboard de resultados</strong><span>Cursos, publicidad y WhatsApp: gráficos y cifras en un solo lugar.</span></div>
+            <b>Abrir dashboard <span aria-hidden="true">→</span></b>
+          </a>
+        )}
         <section
           style={{
+            padding: 0,
             display: "grid",
             gridTemplateColumns:
               "repeat(auto-fit, minmax(280px, 1fr))",
@@ -364,11 +372,7 @@ export default function AdminDashboardPage() {
             </div>
           </div>
         </section>
-        {profile.is_superadmin && (
-          <AdminCard eyebrow="SOLO SUPERADMINISTRADORES" title="Resultados y métricas"
-            description="Visualiza el interés en cursos, publicidad y WhatsApp con gráficos, cifras y filtros por fecha."
-            href="/admin/metricas" buttonText="Abrir dashboard" accent="#126348" />
-        )}
+
         <p
           style={{
             textAlign: "center",
@@ -464,5 +468,6 @@ function AdminCard({
     </article>
   );
 }
+
 
 

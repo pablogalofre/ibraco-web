@@ -5,3 +5,12 @@
 
 .donut{aspect-ratio:1;align-self:center}.donut svg{height:auto}.legend .emptyLegend{display:block;line-height:1.7;color:#687b71}
 @media(max-width:700px){.donutContent{align-items:center}}
+
+
+/* Aislamiento frente a los estilos generales de la página pública. */
+.page .cards{padding:0;width:100%;max-width:none;background:transparent}
+.page .header h1{text-transform:none}
+.page .notes{display:block;background:transparent;grid-template-columns:none;width:auto;max-width:none;border:0;border-radius:0}
+.page .notes h2{color:inherit}
+.page .toolbar{position:sticky;top:12px;z-index:10;box-shadow:0 6px 22px rgba(20,60,51,.06)}
+@media(max-width:700px){.page .toolbar{top:0}}
