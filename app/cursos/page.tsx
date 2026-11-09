@@ -631,7 +631,7 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
       <footer>
         <div className="footer-brand">
           <img
-            src="/assets/logos/logo-ibraco.png"
+            src="/assets/logos/logo-ibraco-clasico.svg"
             alt="IBRACO Instituto de Cultura Brasil Colombia"
           />
           <p>

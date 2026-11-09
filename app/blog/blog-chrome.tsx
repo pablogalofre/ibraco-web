@@ -6,7 +6,7 @@ export default function BlogChrome({ children }: { children: ReactNode }) {
     {children}
     <footer>
       <div className="footer-brand">
-        <img src="/assets/logos/logo-ibraco.png" alt="IBRACO Instituto de Cultura Brasil Colombia" />
+        <img src="/assets/logos/logo-ibraco-clasico.svg" alt="IBRACO Instituto de Cultura Brasil Colombia" />
         <p>Instituto de Cultura Brasil Colombia. Portugués, cultura brasileña y comunidad.</p>
       </div>
       <div><h4>Estudia</h4><a href="/cursos">Cursos</a><a href="/sedes">Sedes</a><a href="/empresas">Empresas</a></div>

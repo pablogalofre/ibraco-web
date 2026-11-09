@@ -353,7 +353,7 @@ export default function PagesEditor() {
   if (access !== "allowed")
     return (
       <main className={styles.gate}>
-        <img src="/assets/logos/logo-ibraco.png" alt="IBRACO" />
+        <img src="/assets/logos/logo-ibraco-clasico.svg" alt="IBRACO" />
         <h1>
           {access === "loading"
             ? "Verificando acceso…"
@@ -372,7 +372,7 @@ export default function PagesEditor() {
     <main className={styles.shell}>
       <aside className={styles.sidebar}>
         <Link href="/admin" onClick={leaveEditor} className={styles.brand}>
-          <img src="/assets/logos/logo-ibraco.png" alt="IBRACO" />
+          <img src="/assets/logos/logo-ibraco-clasico.svg" alt="IBRACO" />
           <span>Editor de páginas</span>
         </Link>
         <p className={styles.navLabel}>Páginas del sitio</p>

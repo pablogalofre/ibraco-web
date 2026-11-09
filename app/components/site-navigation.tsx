@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { recordInteraction } from "../lib/interaction-tracking";
+import { institutionalPortals } from "../lib/institutional-portals";
 import styles from "./site-navigation.module.css";
 
 type IconName = "home" | "courses" | "building" | "culture" | "community" | "user" | "phone";
@@ -47,11 +48,12 @@ export default function SiteNavigation() {
   function closeMenu() { dialog.current?.close(); setOpen(false); }
   function current(href: string) { return pathname === href ? "page" as const : undefined; }
   function Brand() {
-    return <a href="/" className={styles.logo} aria-label="IBRACO, ir al inicio" onClick={closeMenu}><img src="/assets/logos/logo-ibraco.png" alt="IBRACO Instituto de Cultura Brasil Colombia" /></a>;
+    return <a href="/" className={styles.logo} aria-label="IBRACO, ir al inicio" onClick={closeMenu}><img src="/assets/logos/logo-ibraco-clasico.svg" alt="IBRACO Instituto de Cultura Brasil Colombia" /></a>;
   }
   function Contacts() {
     return <div className={styles.contacts}>
       <a href="tel:+573125841068" className={styles.phone}><span>(+57) 312 584 1068</span><Icon name="phone" /></a>
+      <a href={institutionalPortals.virtual.href} className={styles.virtualAccess} target="_blank" rel="noopener noreferrer" title="IBRACO Virtual (abre en otra pestaña)"><Icon name="courses" /><span>IBRACO Virtual</span></a>
       <a href="/admin/login" className={styles.admin} aria-label="Acceso a administración" title="Administración" onClick={closeMenu}><Icon name="user" /><span>Administración</span></a>
     </div>;
   }
@@ -79,6 +81,16 @@ export default function SiteNavigation() {
             </a>
             {category.links.length > 0 && <div className={styles.subLinks}>{category.links.map(link => <a key={link.href} href={link.href} onClick={closeMenu} aria-current={current(link.href)}>{link.label}</a>)}</div>}
           </div>)}
+        </nav>
+        <nav className={styles.portalGrid} aria-label="Plataformas de IBRACO">
+          {[institutionalPortals.q10, institutionalPortals.virtual].map(portal => (
+            <a key={portal.href} href={portal.href} className={styles.portalCard} target="_blank" rel="noopener noreferrer" onClick={closeMenu}>
+              <span className={styles.portalIcon}><Icon name={portal === institutionalPortals.q10 ? "user" : "courses"} /></span>
+              <span><strong>{portal.title}</strong><small>{portal.description}</small></span>
+              <span className={styles.portalArrow} aria-hidden="true"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17 17 7M7 7h10v10" /></svg></span>
+              <span className={styles.visuallyHidden}>Abre en otra pestaña</span>
+            </a>
+          ))}
         </nav>
         <div className={styles.menuFooter}><a href="/admin/login" onClick={closeMenu}>Acceso a administración</a><a href="/cursos#cursos-disponibles" className={styles.courseCta} onClick={closeMenu}>Ver cursos e inscribirme <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg></a></div>
       </div>

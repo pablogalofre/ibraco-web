@@ -12,3 +12,18 @@
 .whatsapp>svg{flex-shrink:0}.whatsapp:hover{background:#065c37;transform:translateY(-2px)}.whatsapp:focus-visible{outline:2px solid #008a4b;outline-offset:4px}
 @media(max-width:760px){.headerInner{padding-top:6px;padding-bottom:6px}.whatsapp{right:16px;bottom:max(16px,env(safe-area-inset-bottom));font-size:13px;padding:12px 17px;min-height:48px;gap:8px}.whatsapp>svg{width:21px;height:21px}}
 @media(prefers-reduced-motion:reduce){.whatsapp{transition:none}}
+
+/* Logo institucional: proporciones originales, sin márgenes del archivo fuente. */
+.logo{width:300px;height:72px;display:flex;align-items:center;justify-content:center}
+.logo img{position:static;transform:none;width:100%;height:auto;max-width:100%;max-height:100%;object-fit:contain}
+.virtualAccess{display:inline-flex;align-items:center;gap:7px;min-height:44px;color:#175d48;text-decoration:none;font-size:12px;white-space:nowrap}
+.virtualAccess svg{width:19px;height:19px;flex-shrink:0}.virtualAccess:hover{color:#008653}
+.portalGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;max-width:960px;margin:0 auto;padding:0 40px 26px;box-sizing:border-box}
+.portalCard{display:flex;align-items:center;gap:15px;padding:18px 20px;min-width:0;background:#f4f7f1;border:1px solid #dfe8db;border-radius:14px;color:#174638;text-decoration:none;transition:border-color .15s,background .15s}
+.portalCard:hover{border-color:#26745a;background:#eaf2e5}.portalIcon{display:flex;align-items:center;justify-content:center;width:42px;height:42px;background:#fff;border-radius:12px;flex-shrink:0}
+.portalCard strong{display:block;font-size:16px;font-weight:650}.portalCard small{display:block;margin-top:4px;font-size:12px;line-height:1.5;color:#59685e}
+.portalArrow{margin-left:auto;font-size:23px;flex-shrink:0}.visuallyHidden{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+@media(max-width:1250px){.phone{display:none}.contacts{gap:16px}}
+@media(max-width:760px){.virtualAccess{display:none}.logo{width:204px;height:60px}.logo img{width:100%;height:auto;max-width:100%}.portalGrid{padding:0 24px 24px;grid-template-columns:1fr;gap:12px}.portalCard{padding:16px}.portalCard strong{font-size:16px}}
+@media(max-width:360px){.logo{width:176px;height:56px}.logo img{width:100%;height:auto;max-width:100%}.portalGrid{padding-left:18px;padding-right:18px}}
+@media(prefers-reduced-motion:reduce){.portalCard{transition:none}}

@@ -115,7 +115,7 @@ export default function ContentPreview() {
           Vista previa privada · {CONTENT_PAGES[page].name} · versión {version}
         </div>
         <div className={styles.previewHeader}>
-          <img src="/assets/logos/logo-ibraco.png" alt="IBRACO" />
+          <img src="/assets/logos/logo-ibraco-clasico.svg" alt="IBRACO" />
         </div>
         <div inert className={styles.previewContent}>
           {page === "/" ? (

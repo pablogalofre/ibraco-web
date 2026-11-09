@@ -440,7 +440,7 @@ export default function BlogAdminPage() {
 
         <aside className="ib-side">
 
-          <div className="ib-brand"><div className="ib-mark"><img src="/assets/logos/logo-ibraco.png" alt="Logotipo oficial de IBRACO" /></div><div><strong>IBRACO</strong><small>Estudio editorial</small></div></div>
+          <div className="ib-brand"><div className="ib-mark"><img src="/assets/logos/logo-ibraco-clasico.svg" alt="Logotipo oficial de IBRACO" /></div><div><strong>IBRACO</strong><small>Estudio editorial</small></div></div>
 
           <div className="ib-side-label">TU ESPACIO</div>
 

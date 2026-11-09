@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { institutionalPortals } from "../lib/institutional-portals";
 import styles from "./dashboard-access.module.css";
 import { supabase } from "../../lib/supabase";
 type AdminProfile = {
@@ -283,6 +284,24 @@ export default function AdminDashboardPage() {
               accent="#2563eb"
             />
           )}
+          <AdminCard
+            eyebrow="GESTIÓN ACADÉMICA"
+            title="Q10"
+            description="Ingresa a la plataforma académica con tu usuario y contraseña de Q10. Tus funciones dependen de los permisos asignados allí."
+            href={institutionalPortals.q10.href}
+            buttonText="Ingresar a Q10"
+            accent="#12633f"
+            external
+          />
+          <AdminCard
+            eyebrow="AULA VIRTUAL"
+            title="IBRACO Virtual"
+            description="Accede al aula virtual con tu cuenta de esa plataforma. Los docentes y administradores ingresan con sus propios permisos."
+            href={institutionalPortals.virtual.href}
+            buttonText="Ingresar a IBRACO Virtual"
+            accent="#2563eb"
+            external
+          />
         </section>
         <section
           style={{
@@ -394,6 +413,7 @@ function AdminCard({
   href,
   buttonText,
   accent,
+  external = false,
 }: {
   eyebrow: string;
   title: string;
@@ -401,6 +421,7 @@ function AdminCard({
   href: string;
   buttonText: string;
   accent: string;
+  external?: boolean;
 }) {
   const darkButton = accent === "#111111";
   return (
@@ -451,6 +472,9 @@ function AdminCard({
       </div>
       <a
         href={href}
+        target={external ? "_blank" : undefined}
+        rel={external ? "noopener noreferrer" : undefined}
+        aria-label={external ? `${buttonText.replace(" ↗", "")} (abre en otra pestaña)` : undefined}
         style={{
           display: "block",
           marginTop: "30px",
@@ -464,6 +488,7 @@ function AdminCard({
         }}
       >
         {buttonText}
+        {external && <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ marginLeft: 8, verticalAlign: "middle" }}><path d="M7 17 17 7M7 7h10v10" /></svg>}
       </a>
     </article>
   );
