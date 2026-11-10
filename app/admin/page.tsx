@@ -175,6 +175,7 @@ export default function AdminDashboardPage() {
             >
               CENTRO DE ADMINISTRACIÓN
             </h1>
+          {(profile.is_superadmin || profile.can_courses || profile.can_accounting) && <a href="/admin/promociones" style={{display:'inline-flex',background:'#ffe400',color:'#123f31',padding:'14px 22px',borderRadius:28,fontWeight:800,margin:'16px 0',textDecoration:'none'}}>Promociones y paquetes →</a>}
             <p
               style={{
                 fontSize: "19px",
@@ -493,6 +494,7 @@ function AdminCard({
     </article>
   );
 }
+
 
 
 

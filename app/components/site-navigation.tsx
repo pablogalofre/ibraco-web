@@ -21,12 +21,12 @@ function Icon({ name }: { name: IconName }) {
 }
 const categories: { title: string; href: string; description: string; icon: IconName; links: { href: string; label: string }[] }[] = [
   { title: "Inicio", href: "/", description: "Bienvenido a IBRACO", icon: "home", links: [] },
-  { title: "Cursos", href: "/cursos", description: "Encuentra tu curso", icon: "courses", links: [{ href: "/#nivel", label: "Mide tu nivel" }, { href: "/empresas", label: "Para empresas" }] },
+  { title: "Cursos", href: "/cursos", description: "Encuentra tu curso", icon: "courses", links: [{ href: "/promociones", label: "Promociones y paquetes" }, { href: "/#nivel", label: "Mide tu nivel" }, { href: "/empresas", label: "Para empresas" }] },
   { title: "Sedes", href: "/sedes", description: "Conoce nuestras sedes", icon: "building", links: [] },
   { title: "Cultura", href: "/cultura", description: "Vive Brasil con nosotros", icon: "culture", links: [{ href: "/agenda-cultural", label: "Agenda cultural" }, { href: "/eventos", label: "Eventos e inscripciones" }] },
   { title: "Comunidad", href: "/alumni", description: "Conecta con IBRACO", icon: "community", links: [{ href: "/alumni", label: "Alumni" }, { href: "/blog", label: "Blog" }, { href: "/blog/travessias", label: "Travessias" }] },
 ];
-const publicRoots = ["/cursos", "/sedes", "/cultura", "/agenda-cultural", "/eventos", "/empresas", "/alumni", "/blog", "/nivelacion"];
+const publicRoots = ["/promociones", "/cursos", "/sedes", "/cultura", "/agenda-cultural", "/eventos", "/empresas", "/alumni", "/blog", "/nivelacion"];
 
 export default function SiteNavigation() {
   const pathname = usePathname();
@@ -104,4 +104,5 @@ export default function SiteNavigation() {
     </a>
   </>;
 }
+
 

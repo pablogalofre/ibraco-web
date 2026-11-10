@@ -1,3 +1,4 @@
+import {handlePackagePayment} from '@/app/lib/package-payments';
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createQ10Preinscription } from "@/app/lib/q10";
@@ -234,6 +235,9 @@ export async function POST(request: Request) {
         received: true,
       });
     }
+
+    const packageResult=await handlePackagePayment(mpOrder,externalReference);
+    if(packageResult) return NextResponse.json(packageResult);
 
     // ==========================================
     // 2. DETERMINAR ESTADO DEL PAGO

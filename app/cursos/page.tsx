@@ -228,7 +228,7 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
               <span className="dot" />
               Oferta académica IBRACO
             </div>
-            <h1>Encuentra tu curso de portugués</h1>
+            <h1>Encuentra tu curso de portugués</h1><p><a href="/promociones" style={{display:"inline-block",padding:"13px 22px",background:"#ffe400",color:"#123f31",borderRadius:28,fontWeight:800,textDecoration:"none"}}>Ver promociones y paquetes →</a></p>
             <p>
               Elige el horario y la modalidad que mejor se adapten a tu ritmo
               de vida. Aprende portugués con IBRACO, donde lengua y cultura no
@@ -696,4 +696,5 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
     </>
   );
 }
+
 

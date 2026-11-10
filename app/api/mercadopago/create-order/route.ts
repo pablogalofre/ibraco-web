@@ -1,3 +1,4 @@
+import {packageSale} from '@/app/lib/packages-server';
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { randomUUID } from "crypto";
@@ -78,6 +79,16 @@ export async function POST(request: Request) {
       );
     }
 
+    let packageContext: Awaited<ReturnType<typeof packageSale>> | null = null;
+    if (order.product_type === 'package') {
+      packageContext = await packageSale(order.order_number,body.packageToken);
+      const s=packageContext.sale;
+      if(s.eligibility!=='approved') return NextResponse.json({error:'La reserva requiere validación de IBRACO antes del pago'},{status:409});
+      if(Date.now()>=Date.parse(s.pay_until)) return NextResponse.json({error:'El plazo de pago terminó'},{status:409});
+      if(['paid','refunded'].includes(order.payment_status)) return NextResponse.json({error:'Este pedido ya tiene un pago confirmado o en revisión'},{status:409});
+      if(s.checkout_url) return NextResponse.json({checkoutUrl:s.checkout_url});
+    }
+
     // ==========================================
     // 2. DEFINIR TIPO DE PRODUCTO
     // ==========================================
@@ -85,7 +96,7 @@ export async function POST(request: Request) {
     const productType =
       order.product_type === "event"
         ? "event"
-        : "course";
+        : order.product_type === "package" ? "package" : "course";
 
     // ==========================================
     // 3. TOMAR LOS VALORES SIEMPRE DESDE SUPABASE
@@ -204,17 +215,17 @@ export async function POST(request: Request) {
           }`.trim();
 
     const successUrl =
-      productType === "event"
+      productType === "package" ? `${baseUrl}/promociones/reserva?pedido=${encodeURIComponent(order.order_number)}` : productType === "event"
         ? `${baseUrl}/eventos/pago/exito`
         : `${baseUrl}/matricula/pago/exito`;
 
     const failureUrl =
-      productType === "event"
+      productType === "package" ? `${baseUrl}/promociones/reserva?pedido=${encodeURIComponent(order.order_number)}` : productType === "event"
         ? `${baseUrl}/eventos/pago/error`
         : `${baseUrl}/matricula/pago/error`;
 
     const pendingUrl =
-      productType === "event"
+      productType === "package" ? `${baseUrl}/promociones/reserva?pedido=${encodeURIComponent(order.order_number)}` : productType === "event"
         ? `${baseUrl}/eventos/pago/pendiente`
         : `${baseUrl}/matricula/pago/pendiente`;
 
@@ -288,7 +299,7 @@ export async function POST(request: Request) {
               "application/json",
 
             "X-Idempotency-Key":
-              randomUUID(),
+              productType === "package" ? order.order_number.replace("IBR-P-", "") : randomUUID(),
           },
 
           body: JSON.stringify(
@@ -353,6 +364,10 @@ export async function POST(request: Request) {
       );
     }
 
+    if (packageContext) {
+      const saved=await supabaseAdmin.from('package_sales').update({mp_order_id:String(mercadoPagoResult.id),checkout_url:checkoutUrl}).eq('order_id',order.id);
+      if(saved.error) return NextResponse.json({error:'No fue posible registrar la referencia. Reintenta el pago desde tu reserva.'},{status:503});
+    }
     // ==========================================
     // 8. GUARDAR REFERENCIA DE MERCADO PAGO
     // ==========================================
@@ -424,3 +439,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

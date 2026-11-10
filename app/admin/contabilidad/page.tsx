@@ -22,6 +22,8 @@ type Order = {
   payment_reference: string | null;
   q10_status: string | null;
   created_at: string;
+  product_type: string;
+  package_sales: {snapshot:any;frequency:string;eligibility:string;pay_until:string;entitlement_status:string;package_credits:{ordinal:number;kind:string;status:string;academic_level:string;course_id:number}[]} | null;
 };
 
 export default function ContabilidadPage() {
@@ -81,7 +83,9 @@ export default function ContabilidadPage() {
           payment_status,
           payment_reference,
           q10_status,
-          created_at
+          created_at,
+          product_type,
+          package_sales(snapshot,frequency,eligibility,pay_until,entitlement_status,package_credits(ordinal,kind,status,academic_level,course_id))
         `
         )
         .order("created_at", { ascending: false });
@@ -93,7 +97,7 @@ export default function ContabilidadPage() {
         return;
       }
 
-      setOrders((data || []) as Order[]);
+      setOrders((data || []) as unknown as Order[]);
       setLoading(false);
     }
 
@@ -154,6 +158,7 @@ export default function ContabilidadPage() {
   }
 
   function q10Label(status: string | null) {
+  if (status === "awaiting_course") return "Paquete: asignación por niveles";
   if (status === "preinscribed") return "Preinscrito";
   if (status === "completed") return "Registrado";
   if (status === "processing") return "Procesando";
@@ -174,6 +179,23 @@ export default function ContabilidadPage() {
       Teléfono: order.phone || "",
       Curso: order.course_name || "",
       Valor: Number(order.amount || 0),
+      "Tipo de producto": order.product_type === 'package' ? 'Paquete' : order.product_type,
+      Paquete: order.package_sales?.snapshot.name || '',
+      "Sede del paquete": order.package_sales?.snapshot.campus || '',
+      "Perfil del paquete": order.package_sales?.snapshot.profile || '',
+      "Intensidad del paquete": order.package_sales?.frequency || '',
+      "Niveles comprados": order.package_sales?.snapshot.levels || '',
+      "Preparación CELPE incluida": order.package_sales ? (order.package_sales.snapshot.prep ? 'Sí' : 'No') : '',
+      "Matrícula del paquete": order.package_sales?.snapshot.tuition ?? '',
+      "Materiales del paquete": order.package_sales?.snapshot.materials ?? '',
+      "Descuento matrícula COP": order.package_sales ? order.package_sales.snapshot.base_tuition-order.package_sales.snapshot.tuition : '',
+      "Validación del beneficio": order.package_sales?.eligibility || '',
+      "Habilitación de niveles": order.package_sales?.entitlement_status || '',
+      "Niveles asignados": order.package_sales?.package_credits.filter(c=>c.kind==='nivel'&&['assigned','completed'].includes(c.status)).length ?? '',
+      "Niveles disponibles": order.package_sales?.package_credits.filter(c=>c.kind==='nivel'&&c.status==='available').length ?? '',
+      "Detalle de niveles": order.package_sales?.package_credits.map(c=>`${c.ordinal}. ${c.kind} ${c.academic_level||''}: ${c.status} (curso ${c.course_id||'sin asignar'})`).join(' | ') || '',
+      "Condiciones reservadas": order.package_sales?.snapshot.conditions || '',
+      "Cierre de pago exclusivo": order.package_sales?.pay_until || '', 
       Moneda: order.currency || "COP",
       "Estado del pago": paymentLabel(order.payment_status),
       "Referencia Mercado Pago": order.payment_reference || "",
@@ -377,7 +399,7 @@ export default function ContabilidadPage() {
                   </Td>
 
                   <Td>
-                    {order.course_name || "—"}
+                    {order.course_name || "—"}{order.product_type === "package" && <><br/><a href="/admin/promociones">Ver paquete y niveles ↗</a></>}
                   </Td>
 
                   <Td>
@@ -560,3 +582,4 @@ if (status === "failed" || status === "error") {
     </span>
   );
 }
+
