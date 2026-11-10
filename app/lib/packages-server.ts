@@ -3,12 +3,12 @@ import {createHash,timingSafeEqual} from 'node:crypto';
 export function packageDb(){return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!,process.env.SUPABASE_SERVICE_ROLE_KEY!,{auth:{persistSession:false,autoRefreshToken:false}});}
 export function tokenHash(token:string){return createHash('sha256').update(token).digest('hex');}
 export function validToken(token:unknown,hash:string){if(typeof token!=='string'||!/^[a-f0-9]{64}$/.test(token))return false; return timingSafeEqual(Buffer.from(tokenHash(token)),Buffer.from(hash));}
-export function sameOrigin(req:Request){
+export function sameOrigin(req:Request,contentType="application/json"){
  const origin=req.headers.get('origin'),site=req.headers.get('sec-fetch-site'),host=req.headers.get('host')||new URL(req.url).host;
  if(site==='cross-site'||site==='same-site')throw Error('Origen no permitido');
  if(origin){const u=new URL(origin);if(!['http:','https:'].includes(u.protocol)||u.host!==host)throw Error('Origen no permitido');}
  else if(site!=='same-origin')throw Error('Origen no permitido');
- if(!req.headers.get('content-type')?.startsWith('application/json'))throw Error('Formato no permitido');
+ if(!req.headers.get('content-type')?.startsWith(contentType))throw Error('Formato no permitido');
 }
 export async function staff(req:Request,permission:'courses'|'accounting'|'read'='courses'){
  const db=packageDb(), token=req.headers.get('authorization')?.replace(/^Bearer /,'')||'';
