@@ -13,7 +13,12 @@ export function sameOrigin(req:Request){
 export async function staff(req:Request,permission:'courses'|'accounting'|'read'='courses'){
  const db=packageDb(), token=req.headers.get('authorization')?.replace(/^Bearer /,'')||'';
  const {data:{user},error}=await db.auth.getUser(token);if(error||!user)throw Error('Inicia sesión como administrador');
- const {data:p}=await db.from('admin_profiles').select('can_courses,can_accounting,is_superadmin').eq('user_id',user.id).single();
+ // Leer permisos con la misma identidad/RLS que el panel, tras verificar el token.
+ const publicKey=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+ if(!publicKey)throw Error('Falta configurar la clave pública de Supabase');
+ const userDb=createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!,publicKey,{auth:{persistSession:false,autoRefreshToken:false},global:{headers:{Authorization:`Bearer ${token}`}}});
+ const {data:p,error:profileError}=await userDb.from('admin_profiles').select('can_courses,can_accounting,is_superadmin').eq('user_id',user.id).single();
+ if(profileError){console.error('PACKAGE_PROFILE_LOOKUP',profileError.code);throw Error('No fue posible consultar tus permisos. Cierra sesión e ingresa nuevamente.');}
  if(!p||!(p.is_superadmin||(permission==='accounting'?p.can_accounting:permission==='read'?(p.can_courses||p.can_accounting):p.can_courses)))throw Error('No tienes permisos para esta acción');
  return {db,user,profile:p};
 }
