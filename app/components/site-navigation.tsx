@@ -53,7 +53,7 @@ export default function SiteNavigation() {
   function Contacts() {
     return <div className={styles.contacts}>
       <a href="tel:+573125841068" className={styles.phone}><span>(+57) 312 584 1068</span><Icon name="phone" /></a>
-      <a href={institutionalPortals.q10.href} className={styles.virtualAccess} target="_blank" rel="noopener noreferrer" title="Q10 (abre en otra pestaña)"><span>Q10</span></a>
+      <a href={institutionalPortals.q10.href} className={styles.virtualAccess} target="_blank" rel="noopener noreferrer" title="Portal del estudiante · Q10 (abre en otra pestaña)"><span>Portal del estudiante</span></a>
       <a href={institutionalPortals.virtual.href} className={styles.virtualAccess} target="_blank" rel="noopener noreferrer" title="IBRACO Virtual (abre en otra pestaña)"><Icon name="courses" /><span>IBRACO Virtual</span></a>
       <a href="/cursos" className={styles.storeAccess} onClick={closeMenu}>Ver tienda</a>
       <a href="/admin/login" className={styles.admin} aria-label="Acceso a administración" title="Administración" onClick={closeMenu}><Icon name="user" /><span>Administración</span></a>
@@ -67,7 +67,7 @@ export default function SiteNavigation() {
         <Brand /><Contacts />
       </div>
       <nav className={styles.mobileAccessBar} aria-label="Accesos rápidos">
-        <a href={institutionalPortals.q10.href} target="_blank" rel="noopener noreferrer" title="Q10 (abre en otra pestaña)">Q10</a>
+        <a href={institutionalPortals.q10.href} target="_blank" rel="noopener noreferrer" title="Portal del estudiante · Q10 (abre en otra pestaña)">Portal del estudiante</a>
         <a href={institutionalPortals.virtual.href} target="_blank" rel="noopener noreferrer" title="IBRACO Virtual (abre en otra pestaña)">IBRACO Virtual</a>
         <a href="/cursos" className={styles.mobileStore}>Ver tienda</a>
       </nav>
@@ -94,7 +94,7 @@ export default function SiteNavigation() {
           {[institutionalPortals.q10, institutionalPortals.virtual].map(portal => (
             <a key={portal.href} href={portal.href} className={styles.portalCard} target="_blank" rel="noopener noreferrer" onClick={closeMenu}>
               <span className={styles.portalIcon}><Icon name={portal === institutionalPortals.q10 ? "user" : "courses"} /></span>
-              <span><strong>{portal.title}</strong><small>{portal.description}</small></span>
+              <span><strong>{portal === institutionalPortals.q10 ? "Portal del estudiante" : portal.title}</strong><small>{portal === institutionalPortals.q10 ? "Q10 · Notas y gestión académica" : portal.description}</small></span>
               <span className={styles.visuallyHidden}>Abre en otra pestaña</span>
             </a>
           ))}
