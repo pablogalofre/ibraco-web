@@ -53,7 +53,9 @@ export default function SiteNavigation() {
   function Contacts() {
     return <div className={styles.contacts}>
       <a href="tel:+573125841068" className={styles.phone}><span>(+57) 312 584 1068</span><Icon name="phone" /></a>
+      <a href={institutionalPortals.q10.href} className={styles.virtualAccess} target="_blank" rel="noopener noreferrer" title="Q10 (abre en otra pestaña)"><span>Q10 ↗</span></a>
       <a href={institutionalPortals.virtual.href} className={styles.virtualAccess} target="_blank" rel="noopener noreferrer" title="IBRACO Virtual (abre en otra pestaña)"><Icon name="courses" /><span>IBRACO Virtual</span></a>
+      <a href="/cursos" className={styles.storeAccess} onClick={closeMenu}>Ver tienda →</a>
       <a href="/admin/login" className={styles.admin} aria-label="Acceso a administración" title="Administración" onClick={closeMenu}><Icon name="user" /><span>Administración</span></a>
     </div>;
   }
@@ -64,7 +66,13 @@ export default function SiteNavigation() {
         <button type="button" className={styles.toggle} onClick={showMenu} aria-expanded={open} aria-controls="ibraco-site-menu" aria-haspopup="dialog"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true"><path d="M4 8h16M4 16h16" /></svg><span>Menú</span></button>
         <Brand /><Contacts />
       </div>
+      <nav className={styles.mobileAccessBar} aria-label="Accesos rápidos">
+        <a href={institutionalPortals.q10.href} target="_blank" rel="noopener noreferrer" title="Q10 (abre en otra pestaña)">Q10 ↗</a>
+        <a href={institutionalPortals.virtual.href} target="_blank" rel="noopener noreferrer" title="IBRACO Virtual (abre en otra pestaña)">IBRACO Virtual ↗</a>
+        <a href="/cursos" className={styles.mobileStore}>Ver tienda →</a>
+      </nav>
     </header>
+    <div className={styles.accessSpacer} aria-hidden="true" />
     {pathname?.startsWith("/eventos") && <div className={styles.spacer} aria-hidden="true" />}
     <dialog id="ibraco-site-menu" ref={dialog} className={styles.dialog} aria-label="Menú principal de IBRACO" onCancel={event => { event.preventDefault(); closeMenu(); }} onClose={() => setOpen(false)} onClick={event => { if (event.target === event.currentTarget) closeMenu(); }}>
       <div className={styles.surface}>
@@ -92,7 +100,7 @@ export default function SiteNavigation() {
             </a>
           ))}
         </nav>
-        <div className={styles.menuFooter}><a href="/admin/login" onClick={closeMenu}>Acceso a administración</a><a href="/cursos#cursos-disponibles" className={styles.courseCta} onClick={closeMenu}>Ver cursos e inscribirme <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg></a></div>
+        <div className={styles.menuFooter}><a href="/admin/login" onClick={closeMenu}>Acceso a administración</a><a href="/cursos#cursos-disponibles" className={styles.courseCta} onClick={closeMenu}>Ver tienda <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg></a></div>
       </div>
     </dialog>
     <a className={styles.whatsapp} onClick={() => {

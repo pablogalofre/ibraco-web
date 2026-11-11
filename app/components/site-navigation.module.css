@@ -27,3 +27,19 @@
 @media(max-width:760px){.virtualAccess{display:none}.logo{width:204px;height:60px}.logo img{width:100%;height:auto;max-width:100%}.portalGrid{padding:0 24px 24px;grid-template-columns:1fr;gap:12px}.portalCard{padding:16px}.portalCard strong{font-size:16px}}
 @media(max-width:360px){.logo{width:176px;height:56px}.logo img{width:100%;height:auto;max-width:100%}.portalGrid{padding-left:18px;padding-right:18px}}
 @media(prefers-reduced-motion:reduce){.portalCard{transition:none}}
+
+/* Accesos públicos a plataformas y tienda, también visibles en celular. */
+.header{flex-direction:column}
+.contacts{gap:12px}
+.storeAccess{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border-radius:999px;background:#ffe000;color:#173e30;text-decoration:none;font-size:12px;font-weight:650;white-space:nowrap}
+.storeAccess:hover{background:#f4d600}
+.mobileAccessBar,.accessSpacer{display:none}
+@media(max-width:1600px){.phone{display:none}}
+@media(max-width:1050px){
+ .contacts .virtualAccess,.contacts .storeAccess{display:none}
+ .mobileAccessBar{display:grid;grid-template-columns:1fr 1.4fr 1fr;width:100%;height:44px;border-top:1px solid #eef1e9;background:#f5f8f1}
+ .mobileAccessBar a{display:flex;align-items:center;justify-content:center;min-width:0;min-height:44px;padding:0 6px;text-decoration:none;color:#175d48;font-size:12px;font-weight:550;white-space:nowrap}
+ .mobileAccessBar a:hover{background:#e8f0e2}
+ .mobileAccessBar .mobileStore{background:#ffe000;color:#173e30;font-weight:650}
+ .accessSpacer{display:block;height:44px;flex-shrink:0}
+}
