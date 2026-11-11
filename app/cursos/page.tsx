@@ -1,3 +1,4 @@
+import PromotionEntry from "../components/promotion-entry";
 import CourseTracking from "../components/course-tracking";
 import { displayCampusText } from "../lib/campus-label";
 import { programs, filterCourses, courseListUrl, type Course } from "../lib/course-catalog";
@@ -292,6 +293,7 @@ export default async function CursosPage({ searchParams }: { searchParams: Promi
               >
                 Cursos disponibles
               </h2>
+              <PromotionEntry/>
             </div>
             <form data-course-search action="/cursos#cursos-disponibles" method="get" className="qa-filters">
               <label>Sede<select name="sede" defaultValue={filters.sede}><option value="">Todas las sedes</option>{Array.from(new Set([...allCourses.map(c => c.campus), filters.sede].filter((v): v is string => Boolean(v)))).map(value => <option key={value} value={value}>{displayCampusText(value)}</option>)}</select></label>

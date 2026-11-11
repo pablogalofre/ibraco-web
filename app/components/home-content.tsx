@@ -1,3 +1,4 @@
+import HomeAgenda from "./home-agenda";
 import LevelConsultation from "./level-consultation";
 import homeStyles from "../home.module.css";
 import { cssImage, type PageContent } from "../lib/site-content-schema";
@@ -112,6 +113,8 @@ export default function HomeContent({
             <span>{content["quick-path.text_9"]}</span>
           </a>
         </section>
+
+        <HomeAgenda/>
 
         <section className="campus-section" id="sedes">
           <div className="section-header">

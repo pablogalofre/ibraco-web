@@ -48,3 +48,8 @@
 }
 
 @media(max-width:360px){.mobileAccessBar{padding:0 6px}.mobileAccessBar a{font-size:10px}.mobileAccessBar .mobileStore{padding:0 10px}}
+
+/* Seis destinos principales; agenda y ofertas visibles al abrir el menú. */
+.grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:22px}
+@media(max-width:1100px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 18px}}
+@media(max-width:760px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 16px}.category:last-child{grid-column:auto;padding-top:0;border-top:0}.category:last-child .subLinks{flex-direction:column;gap:2px}}

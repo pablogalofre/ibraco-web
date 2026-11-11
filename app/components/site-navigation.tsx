@@ -20,11 +20,12 @@ function Icon({ name }: { name: IconName }) {
   return <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
 }
 const categories: { title: string; href: string; description: string; icon: IconName; links: { href: string; label: string }[] }[] = [
-  { title: "Inicio", href: "/", description: "Bienvenido a IBRACO", icon: "home", links: [] },
-  { title: "Cursos", href: "/cursos", description: "Encuentra tu curso", icon: "courses", links: [{ href: "/promociones", label: "Promociones y paquetes" }, { href: "/#nivel", label: "Mide tu nivel" }, { href: "/empresas", label: "Para empresas" }] },
-  { title: "Sedes", href: "/sedes", description: "Conoce nuestras sedes", icon: "building", links: [] },
-  { title: "Cultura", href: "/cultura", description: "Vive Brasil con nosotros", icon: "culture", links: [{ href: "/agenda-cultural", label: "Agenda cultural" }, { href: "/eventos", label: "Eventos e inscripciones" }] },
-  { title: "Comunidad", href: "/alumni", description: "Conecta con IBRACO", icon: "community", links: [{ href: "/alumni", label: "Alumni" }, { href: "/blog", label: "Blog" }, { href: "/blog/travessias", label: "Travessias" }] },
+ {title:"Inicio",href:"/",description:"Bienvenido a IBRACO",icon:"home",links:[]},
+ {title:"Cursos de portugués",href:"/cursos",description:"Horarios, modalidades y matrículas",icon:"courses",links:[{href:"/#nivel",label:"Mide tu nivel"},{href:"/empresas",label:"Para empresas"}]},
+ {title:"Días IBRACO",href:"/promociones",description:"Ofertas y paquetes de varios niveles",icon:"courses",links:[]},
+ {title:"Agenda cultural",href:"/agenda-cultural",description:"Próximos eventos e inscripciones",icon:"culture",links:[{href:"/cultura",label:"Explorar cultura"},{href:"/eventos",label:"Todos los eventos"}]},
+ {title:"Sedes",href:"/sedes",description:"Conoce nuestras sedes",icon:"building",links:[]},
+ {title:"Comunidad",href:"/alumni",description:"Conecta con IBRACO",icon:"community",links:[{href:"/alumni",label:"Alumni"},{href:"/blog",label:"Blog"},{href:"/blog/travessias",label:"Travessias"}]},
 ];
 const publicRoots = ["/promociones", "/cursos", "/sedes", "/cultura", "/agenda-cultural", "/eventos", "/empresas", "/alumni", "/blog", "/nivelacion"];
 
@@ -55,7 +56,7 @@ export default function SiteNavigation() {
       <a href="tel:+573125841068" className={styles.phone}><span>(+57) 312 584 1068</span><Icon name="phone" /></a>
       <a href={institutionalPortals.q10.href} className={styles.virtualAccess} target="_blank" rel="noopener noreferrer" title="Portal del estudiante · Q10 (abre en otra pestaña)"><span>Portal del estudiante</span></a>
       <a href={institutionalPortals.virtual.href} className={styles.virtualAccess} target="_blank" rel="noopener noreferrer" title="IBRACO Virtual (abre en otra pestaña)"><Icon name="courses" /><span>IBRACO Virtual</span></a>
-      <a href="/cursos" className={styles.storeAccess} onClick={closeMenu}>Ver tienda</a>
+      <a href="/cursos" className={styles.storeAccess} onClick={closeMenu}>Ver cursos</a>
       <a href="/admin/login" className={styles.admin} aria-label="Acceso a administración" title="Administración" onClick={closeMenu}><Icon name="user" /><span>Administración</span></a>
     </div>;
   }
@@ -69,7 +70,7 @@ export default function SiteNavigation() {
       <nav className={styles.mobileAccessBar} aria-label="Accesos rápidos">
         <a href={institutionalPortals.q10.href} target="_blank" rel="noopener noreferrer" title="Portal del estudiante · Q10 (abre en otra pestaña)">Portal del estudiante</a>
         <a href={institutionalPortals.virtual.href} target="_blank" rel="noopener noreferrer" title="IBRACO Virtual (abre en otra pestaña)">IBRACO Virtual</a>
-        <a href="/cursos" className={styles.mobileStore}>Ver tienda</a>
+        <a href="/cursos" className={styles.mobileStore}>Ver cursos</a>
       </nav>
     </header>
     <div className={styles.accessSpacer} aria-hidden="true" />
@@ -99,7 +100,7 @@ export default function SiteNavigation() {
             </a>
           ))}
         </nav>
-        <div className={styles.menuFooter}><a href="/admin/login" onClick={closeMenu}>Acceso a administración</a><a href="/cursos#cursos-disponibles" className={styles.courseCta} onClick={closeMenu}>Ver tienda</a></div>
+        <div className={styles.menuFooter}><a href="/admin/login" onClick={closeMenu}>Acceso a administración</a><a href="/cursos#cursos-disponibles" className={styles.courseCta} onClick={closeMenu}>Ver cursos</a></div>
       </div>
     </dialog>
     <a className={styles.whatsapp} onClick={() => {
