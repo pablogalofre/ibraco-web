@@ -53,9 +53,9 @@ export default function SiteNavigation() {
   function Contacts() {
     return <div className={styles.contacts}>
       <a href="tel:+573125841068" className={styles.phone}><span>(+57) 312 584 1068</span><Icon name="phone" /></a>
-      <a href={institutionalPortals.q10.href} className={styles.virtualAccess} target="_blank" rel="noopener noreferrer" title="Q10 (abre en otra pestaña)"><span>Q10 ↗</span></a>
+      <a href={institutionalPortals.q10.href} className={styles.virtualAccess} target="_blank" rel="noopener noreferrer" title="Q10 (abre en otra pestaña)"><span>Q10</span></a>
       <a href={institutionalPortals.virtual.href} className={styles.virtualAccess} target="_blank" rel="noopener noreferrer" title="IBRACO Virtual (abre en otra pestaña)"><Icon name="courses" /><span>IBRACO Virtual</span></a>
-      <a href="/cursos" className={styles.storeAccess} onClick={closeMenu}>Ver tienda →</a>
+      <a href="/cursos" className={styles.storeAccess} onClick={closeMenu}>Ver tienda</a>
       <a href="/admin/login" className={styles.admin} aria-label="Acceso a administración" title="Administración" onClick={closeMenu}><Icon name="user" /><span>Administración</span></a>
     </div>;
   }
@@ -67,9 +67,9 @@ export default function SiteNavigation() {
         <Brand /><Contacts />
       </div>
       <nav className={styles.mobileAccessBar} aria-label="Accesos rápidos">
-        <a href={institutionalPortals.q10.href} target="_blank" rel="noopener noreferrer" title="Q10 (abre en otra pestaña)">Q10 ↗</a>
-        <a href={institutionalPortals.virtual.href} target="_blank" rel="noopener noreferrer" title="IBRACO Virtual (abre en otra pestaña)">IBRACO Virtual ↗</a>
-        <a href="/cursos" className={styles.mobileStore}>Ver tienda →</a>
+        <a href={institutionalPortals.q10.href} target="_blank" rel="noopener noreferrer" title="Q10 (abre en otra pestaña)">Q10</a>
+        <a href={institutionalPortals.virtual.href} target="_blank" rel="noopener noreferrer" title="IBRACO Virtual (abre en otra pestaña)">IBRACO Virtual</a>
+        <a href="/cursos" className={styles.mobileStore}>Ver tienda</a>
       </nav>
     </header>
     <div className={styles.accessSpacer} aria-hidden="true" />
@@ -95,12 +95,11 @@ export default function SiteNavigation() {
             <a key={portal.href} href={portal.href} className={styles.portalCard} target="_blank" rel="noopener noreferrer" onClick={closeMenu}>
               <span className={styles.portalIcon}><Icon name={portal === institutionalPortals.q10 ? "user" : "courses"} /></span>
               <span><strong>{portal.title}</strong><small>{portal.description}</small></span>
-              <span className={styles.portalArrow} aria-hidden="true"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17 17 7M7 7h10v10" /></svg></span>
               <span className={styles.visuallyHidden}>Abre en otra pestaña</span>
             </a>
           ))}
         </nav>
-        <div className={styles.menuFooter}><a href="/admin/login" onClick={closeMenu}>Acceso a administración</a><a href="/cursos#cursos-disponibles" className={styles.courseCta} onClick={closeMenu}>Ver tienda <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg></a></div>
+        <div className={styles.menuFooter}><a href="/admin/login" onClick={closeMenu}>Acceso a administración</a><a href="/cursos#cursos-disponibles" className={styles.courseCta} onClick={closeMenu}>Ver tienda</a></div>
       </div>
     </dialog>
     <a className={styles.whatsapp} onClick={() => {

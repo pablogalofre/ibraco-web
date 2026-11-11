@@ -31,15 +31,18 @@
 /* Accesos públicos a plataformas y tienda, también visibles en celular. */
 .header{flex-direction:column}
 .contacts{gap:12px}
-.storeAccess{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border-radius:999px;background:#ffe000;color:#173e30;text-decoration:none;font-size:12px;font-weight:650;white-space:nowrap}
-.storeAccess:hover{background:#f4d600}
+.storeAccess{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border-radius:999px;background:#fff;border:1px solid #cbd9d0;color:#175d48;text-decoration:none;font-size:12px;font-weight:550;white-space:nowrap}
+.storeAccess:hover{background:#f3f7f2;border-color:#175d48}
 .mobileAccessBar,.accessSpacer{display:none}
 @media(max-width:1600px){.phone{display:none}}
 @media(max-width:1050px){
  .contacts .virtualAccess,.contacts .storeAccess{display:none}
- .mobileAccessBar{display:grid;grid-template-columns:1fr 1.4fr 1fr;width:100%;height:44px;border-top:1px solid #eef1e9;background:#f5f8f1}
- .mobileAccessBar a{display:flex;align-items:center;justify-content:center;min-width:0;min-height:44px;padding:0 6px;text-decoration:none;color:#175d48;font-size:12px;font-weight:550;white-space:nowrap}
- .mobileAccessBar a:hover{background:#e8f0e2}
- .mobileAccessBar .mobileStore{background:#ffe000;color:#173e30;font-weight:650}
+ .mobileAccessBar{display:grid;grid-template-columns:1fr 1.55fr 1.15fr;align-items:center;gap:0;width:100%;height:44px;padding:0 20px;box-sizing:border-box;border-top:1px solid #f1f3ee;background:#fff}
+ .mobileAccessBar a{display:flex;align-items:center;justify-content:center;min-width:0;min-height:44px;padding:0 8px;text-decoration:none;color:#52635a;font-size:11px;font-weight:450;letter-spacing:.01em;white-space:nowrap}
+ .mobileAccessBar a:hover{color:#087b49}
+ .mobileAccessBar a:nth-child(2){position:relative}
+ .mobileAccessBar a:nth-child(2)::before{content:"";position:absolute;left:0;top:15px;width:1px;height:14px;background:#e5ebe5}
+ .mobileAccessBar .mobileStore{justify-self:end;min-height:30px;padding:0 15px;border:1px solid #d5dfd5;border-radius:999px;background:#fff;color:#175d48;font-weight:550}
+ .mobileAccessBar .mobileStore:hover{background:#f3f7f2;border-color:#175d48}
  .accessSpacer{display:block;height:44px;flex-shrink:0}
 }
