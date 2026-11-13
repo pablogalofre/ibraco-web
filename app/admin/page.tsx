@@ -15,6 +15,7 @@ type AdminProfile = {
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [canIntranet,setCanIntranet]=useState(false);
   const [profile, setProfile] = useState<AdminProfile | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   useEffect(() => {
@@ -26,6 +27,8 @@ export default function AdminDashboardPage() {
         router.replace("/admin/login");
         return;
       }
+      const access=await supabase.rpc("intranet_access");
+      setCanIntranet(!!access.data?.allowed);
       const { data, error } = await supabase
         .from("admin_profiles")
         .select(
@@ -34,6 +37,7 @@ export default function AdminDashboardPage() {
         .eq("user_id", session.user.id)
         .single();
       if (error || !data) {
+        if(access.data?.allowed){router.replace("/admin/intranet");return;}
         console.error("Error cargando permisos:", error);
         setErrorMessage(
           "Tu usuario existe, pero todavía no tiene permisos de administración asignados."
@@ -225,6 +229,7 @@ export default function AdminDashboardPage() {
             marginBottom: "52px",
           }}
         >
+          {canIntranet && <AdminCard eyebrow="GESTIÓN INTERNA" title="INTRANET IBRACO" description="Registra horas docentes, revisa aprobaciones y descarga los registros autorizados." href="/admin/intranet" buttonText="Entrar a Intranet" accent="#12633f"/>}
           {canSeeCourses && (
             <AdminCard
               eyebrow="OFERTA ACADÉMICA"
