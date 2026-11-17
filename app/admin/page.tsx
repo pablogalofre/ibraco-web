@@ -229,6 +229,7 @@ export default function AdminDashboardPage() {
             marginBottom: "52px",
           }}
         >
+          {(profile.is_superadmin || profile.can_content) && <AdminCard eyebrow="SEGUIMIENTO COMERCIAL" title="Solicitudes y reservas" description="Consulta las solicitudes de la nueva web y revisa el resultado de su envío a HubSpot." href="/admin/hubspot/envios" buttonText="Ver solicitudes" accent="#12633f"/>}
           {canIntranet && <AdminCard eyebrow="GESTIÓN INTERNA" title="INTRANET IBRACO" description="Registra horas docentes, revisa aprobaciones y descarga los registros autorizados." href="/admin/intranet" buttonText="Entrar a Intranet" accent="#12633f"/>}
           {canSeeCourses && (
             <AdminCard

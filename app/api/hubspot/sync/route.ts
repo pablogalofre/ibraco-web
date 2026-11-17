@@ -3,11 +3,11 @@ import {processDelivery} from '@/app/lib/hubspot-deliveries';
 export const maxDuration=60;
 const headers={'Cache-Control':'no-store, private',Vary:'Authorization'};
 export async function GET(req:Request){try{
- const {db,profile}=await staff(req,'read');if(!profile.is_superadmin)return Response.json({error:'Acceso exclusivo de superadministrador.'},{status:403,headers});
+ const {db,profile}=await staff(req,'leads');
  const {data,error}=await db.from('hubspot_deliveries').select('id,order_number,email,status,attempts,message,created_at,updated_at,next_attempt_at').order('created_at',{ascending:false}).limit(100);
  if(error)return Response.json({error:'Falta instalar INSTALAR_HUBSPOT_RESERVAS.sql en Supabase IBRACO.'},{status:503,headers});
- return Response.json({deliveries:data,configured:!!process.env.HUBSPOT_ACCESS_TOKEN},{headers});
- }catch{return Response.json({error:'Inicia sesión como superadministrador.'},{status:403,headers});}}
+ return Response.json({deliveries:data,configured:!!process.env.HUBSPOT_ACCESS_TOKEN,canProcess:!!profile.is_superadmin},{headers});
+ }catch{return Response.json({error:'Inicia sesión con permiso de Marketing y contenidos para consultar las solicitudes.'},{status:403,headers});}}
 export async function POST(req:Request){try{
  sameOrigin(req);const {db,profile}=await staff(req,'read');if(!profile.is_superadmin)return Response.json({error:'Acceso exclusivo de superadministrador.'},{status:403,headers});
  if(!process.env.HUBSPOT_ACCESS_TOKEN)return Response.json({error:'Falta HUBSPOT_ACCESS_TOKEN.'},{status:503,headers});
