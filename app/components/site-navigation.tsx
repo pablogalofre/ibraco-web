@@ -19,15 +19,13 @@ function Icon({ name }: { name: IconName }) {
   };
   return <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
 }
+// Navegación temporal hasta aprobar el resto del contenido institucional.
 const categories: { title: string; href: string; description: string; icon: IconName; links: { href: string; label: string }[] }[] = [
- {title:"Inicio",href:"/",description:"Bienvenido a IBRACO",icon:"home",links:[]},
- {title:"Cursos de portugués",href:"/cursos",description:"Horarios, modalidades y matrículas",icon:"courses",links:[{href:"/#nivel",label:"Mide tu nivel"},{href:"/empresas",label:"Para empresas"}]},
- {title:"Días IBRACO",href:"/promociones",description:"Ofertas y paquetes de varios niveles",icon:"courses",links:[]},
- {title:"Agenda cultural",href:"/agenda-cultural",description:"Próximos eventos e inscripciones",icon:"culture",links:[{href:"/cultura",label:"Explorar cultura"},{href:"/eventos",label:"Todos los eventos"}]},
- {title:"Sedes",href:"/sedes",description:"Conoce nuestras sedes",icon:"building",links:[]},
- {title:"Comunidad",href:"/alumni",description:"Conecta con IBRACO",icon:"community",links:[{href:"/alumni",label:"Alumni"},{href:"/blog",label:"Blog"},{href:"/blog/travessias",label:"Travessias"}]},
+ {title:"Sitio institucional",href:"https://www.ibraco.org.co/",description:"Inicio oficial de IBRACO",icon:"home",links:[]},
+ {title:"Cursos de portugués",href:"/cursos",description:"Horarios, modalidades y matrículas",icon:"courses",links:[]},
+ {title:"Promociones y paquetes",href:"/promociones",description:"Beneficios y paquetes de varios niveles",icon:"courses",links:[]},
 ];
-const publicRoots = ["/promociones", "/cursos", "/sedes", "/cultura", "/agenda-cultural", "/eventos", "/empresas", "/alumni", "/blog", "/nivelacion"];
+const publicRoots = ["/promociones", "/cursos"];
 
 export default function SiteNavigation() {
   const pathname = usePathname();
@@ -49,7 +47,7 @@ export default function SiteNavigation() {
   function closeMenu() { dialog.current?.close(); setOpen(false); }
   function current(href: string) { return pathname === href ? "page" as const : undefined; }
   function Brand() {
-    return <a href="/" className={styles.logo} aria-label="IBRACO, ir al inicio" onClick={closeMenu}><img src="/assets/logos/logo-ibraco-clasico.svg" alt="IBRACO Instituto de Cultura Brasil Colombia" /></a>;
+    return <a href="https://www.ibraco.org.co/" className={styles.logo} aria-label="IBRACO, ir al sitio institucional" onClick={closeMenu}><img src="/assets/logos/logo-ibraco-clasico.svg" alt="IBRACO Instituto de Cultura Brasil Colombia" /></a>;
   }
   function Contacts() {
     return <div className={styles.contacts}>
@@ -83,7 +81,7 @@ export default function SiteNavigation() {
             <Brand /><Contacts />
           </div>
         </div>
-        <nav className={styles.grid} aria-label="Todas las secciones">
+        <nav className={styles.grid} aria-label="Secciones disponibles">
           {categories.map(category => <div className={styles.category} key={category.title}>
             <a href={category.href} className={styles.categoryLink} onClick={closeMenu} aria-current={current(category.href)}>
               <Icon name={category.icon} /><span className={styles.categoryTitle}>{category.title}</span><span className={styles.description}>{category.description}</span>
