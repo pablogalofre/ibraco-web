@@ -37,6 +37,7 @@ type FormData = {
   city: string;
   address: string;
   acceptedPrivacy: boolean;
+  acceptedContact: boolean;
 };
 
 const initialForm: FormData = {
@@ -51,6 +52,7 @@ const initialForm: FormData = {
   city: "",
   address: "",
   acceptedPrivacy: false,
+  acceptedContact: false,
 };
 
 function formatPrice(price: number | null) {
@@ -491,6 +493,11 @@ export default function MatriculaPage() {
                 personales para gestionar mi proceso de
                 matrícula en IBRACO.
               </span>
+            </label>
+
+            <label className="privacy-row">
+              <input type="checkbox" checked={form.acceptedContact} onChange={(e)=>updateField('acceptedContact',e.target.checked)}/>
+              <span>Quiero recibir orientación de un asesor y el correo de bienvenida de IBRACO. Autorizo el contacto sobre mi solicitud. Es opcional y puedo dejar de recibir comunicaciones.</span>
             </label>
 
             {message && (

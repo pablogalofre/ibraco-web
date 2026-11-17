@@ -1,0 +1,11 @@
+'use client';
+import {useRef,useState,type FormEvent} from 'react';
+import styles from './course-lead-form.module.css';
+export default function CourseLeadForm({courseSlug}:{courseSlug:string}){
+ const [busy,setBusy]=useState(false),[sent,setSent]=useState(false),[error,setError]=useState('');
+ const requestId=useRef('');
+ async function submit(e:FormEvent<HTMLFormElement>){e.preventDefault();if(busy||sent)return;setBusy(true);setError('');
+  const data=Object.fromEntries(new FormData(e.currentTarget));if(!requestId.current)requestId.current=crypto.randomUUID();
+  try{const r=await fetch('/api/public/course-leads',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...data,courseSlug,requestId:requestId.current,consent:data.consent==='on'})});const b=await r.json();if(!r.ok)throw Error(b.error||'No fue posible enviar tu solicitud.');setSent(true);}catch(e){setError(e instanceof Error?e.message:'No fue posible enviar tu solicitud.');}finally{setBusy(false);}}
+ return <section className={styles.card} aria-labelledby='course-advice-title'><h2 id='course-advice-title'>¿Quieres que te contactemos?</h2><p>Déjanos tus datos para recibir orientación sobre este curso.</p>{sent?<p role='status'>Recibimos tu solicitud. El equipo de IBRACO te contactará.</p>:<form onSubmit={submit}><div className={styles.fields}>{[['firstname','Nombres','text','given-name'],['lastname','Apellidos','text','family-name'],['email','Correo electrónico','email','email'],['phone','Celular','tel','tel']].map(([name,label,type,autoComplete])=><label key={name}>{label}<input name={name} type={type} autoComplete={autoComplete} required maxLength={name==='phone'?40:180}/></label>)}</div><div className={styles.trap} aria-hidden='true'><label>Sitio web<input name='website' tabIndex={-1} autoComplete='off'/></label></div><label className={styles.check}><input name='consent' type='checkbox' required/>Autorizo a IBRACO a tratar mis datos, contactarme sobre este curso y enviarme el correo de bienvenida. Puedo solicitar dejar de recibir comunicaciones.</label>{error&&<p role='alert' className={styles.error}>{error}</p>}<button disabled={busy}>{busy?'Enviando…':'Solicitar asesoría'}</button></form>}</section>;
+}

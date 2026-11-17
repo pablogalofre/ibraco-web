@@ -1,5 +1,9 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+
+import {sameOrigin} from '@/app/lib/packages-server';
+import {processDelivery} from '@/app/lib/hubspot-deliveries';
+export const maxDuration=60;
 
 const supabaseUrl =
   process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -163,6 +167,7 @@ async function createCourseOrder(body: any) {
     hubspot_status: "pending",
 
     accepted_privacy: true,
+    hubspot_contact_requested: student.acceptedContact === true,
     source: "ibraco-web",
   };
 
@@ -196,6 +201,8 @@ async function createCourseOrder(body: any) {
       }
     );
   }
+
+  if (student.acceptedContact === true) after(async () => { await processDelivery({orderNumber}); });
 
   return NextResponse.json({
     success: true,
@@ -621,8 +628,10 @@ export async function POST(
   request: Request
 ) {
   try {
-    const body =
-      await request.json();
+    sameOrigin(request);
+    const raw = await request.text();
+    if (raw.length > 20000) return NextResponse.json({error:'Solicitud demasiado extensa.'},{status:413});
+    const body = JSON.parse(raw);
 
     /*
       Mantiene compatibilidad total con el
