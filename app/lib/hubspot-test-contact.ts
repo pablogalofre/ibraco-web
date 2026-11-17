@@ -1,4 +1,4 @@
-export const TEST_EMAIL='gerencia@misegundacasa.co';
+export const TEST_EMAIL='info@turismoencasasyfincas.com.co';
 const PROGRAMS=['Cursos Intensivos','Cursos Semi Intensivos Sábados','Cursos Semi Intensivos Entre Semana','Otros Cursos','Preparatorio Celpe Bras','Examen Celpe-Bras'];
 export async function createTestContact(token:string,input:{program?:unknown;campus?:unknown;confirmed?:unknown},fetcher:typeof fetch=fetch){
  if(!token)throw Error('Falta configurar HUBSPOT_ACCESS_TOKEN.');
