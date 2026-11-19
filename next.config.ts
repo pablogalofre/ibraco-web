@@ -4,7 +4,7 @@ import type { NextConfig } from "next";
 // Redirecciones temporales; retirar este bloque cuando IBRACO apruebe el lanzamiento completo.
 const nextConfig: NextConfig = {
   async redirects() {
-    const pendingSections = ["sedes", "cultura", "agenda-cultural", "eventos", "empresas", "alumni", "blog", "nivelacion"];
+    const pendingSections = ["sedes", "cultura", "empresas", "alumni", "nivelacion"];
     return [
       { source: "/", destination: "https://www.ibraco.org.co/", permanent: false },
       ...pendingSections.map(section => ({

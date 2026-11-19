@@ -8,6 +8,9 @@ import { useRouter } from "next/navigation";
 
 import { supabase } from "../../../lib/supabase";
 
+import BlogEditor from "../../components/blog-editor";
+import {BlogContent, textContent} from "../../components/blog-content";
+
 type Status = "draft" | "published";
 
 type Access = "loading" | "allowed" | "denied";
@@ -326,7 +329,7 @@ export default function BlogAdminPage() {
 
     if (!cleanTitle || !cleanSlug) { setErrorMessage("Completa el título y la URL del artículo."); return; }
 
-    if (!content.trim()) { setErrorMessage("Escribe el contenido del artículo."); return; }
+    if (!textContent(content).trim()) { setErrorMessage("Escribe el contenido del artículo."); return; }
 
     setSaving(true);
 
@@ -544,7 +547,7 @@ export default function BlogAdminPage() {
 
                 <div><label className="ib-label" htmlFor="ib-excerpt">Una breve introducción</label><textarea className="ib-input ib-textarea" id="ib-excerpt" rows={3} value={excerpt} placeholder="Cuenta de qué trata tu historia..." onChange={e => setExcerpt(e.target.value)} /></div>
 
-                <div><div className="ib-editor-tabs"><button type="button" className={tab === "write" ? "active" : ""} onClick={() => setTab("write")}>✎ Escribir</button><button type="button" className={tab === "preview" ? "active" : ""} onClick={() => setTab("preview")}>◉ Vista previa</button></div>{tab === "write" ? <><label className="ib-label" htmlFor="ib-content">Contenido del artículo *</label><textarea className="ib-input ib-textarea" id="ib-content" rows={17} value={content} placeholder="Aquí empieza tu historia..." onChange={e => setContent(e.target.value)} /><div className="ib-field-hint">Editor de texto simple. La vista previa respeta los saltos de línea.</div></> : <div className="ib-preview"><div className="ib-preview-category">{category.toUpperCase()}</div><h2>{title || "Tu gran título aparecerá aquí"}</h2>{coverImage && <img src={coverImage} alt="Vista previa de portada" onError={e => { e.currentTarget.style.display = "none"; }} />}{excerpt && <p><strong>{excerpt}</strong></p>}<p>{content || "Cuando escribas tu artículo, podrás leerlo aquí antes de guardarlo."}</p></div>}</div>
+                <div><div className="ib-editor-tabs"><button type="button" className={tab === "write" ? "active" : ""} onClick={() => setTab("write")}>✎ Escribir</button><button type="button" className={tab === "preview" ? "active" : ""} onClick={() => setTab("preview")}>◉ Vista previa</button></div>{tab === "write" ? <><label className="ib-label" htmlFor="ib-content">Contenido del artículo *</label><BlogEditor value={content} onChange={setContent} /></> : <div className="ib-preview"><div className="ib-preview-category">{category.toUpperCase()}</div><h2>{title || "Tu gran título aparecerá aquí"}</h2>{coverImage && <img src={coverImage} alt="Vista previa de portada" onError={e => { e.currentTarget.style.display = "none"; }} />}{excerpt && <p><strong>{excerpt}</strong></p>}<BlogContent value={content || "Cuando escribas tu artículo, podrás leerlo aquí antes de guardarlo."} /></div>}</div>
 
                 <div className="ib-actions"><button type="submit" className="ib-btn ib-btn-dark" disabled={saving} aria-busy={saving}>{saving ? "Guardando..." : "Guardar borrador"}</button><button type="button" className="ib-btn ib-btn-green" disabled={saving} aria-busy={saving} onClick={() => void savePost("published")}>{saving ? "Guardando..." : "✓ Marcar como publicado"}</button><button type="button" className="ib-btn ib-btn-light" disabled={saving} onClick={newPost}>Limpiar</button></div>
 
@@ -571,4 +574,5 @@ export default function BlogAdminPage() {
   );
 
 }
+
 

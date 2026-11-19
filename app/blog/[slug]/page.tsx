@@ -1,3 +1,4 @@
+import {BlogContent} from "../../components/blog-content";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import BlogChrome from "../blog-chrome";
@@ -41,10 +42,11 @@ export default async function ArticlePage({ params }: Props) {
         {post.excerpt && <p style={{ fontSize: 20, lineHeight: 1.65 }}>{post.excerpt}</p>}
       </header>
       {cover && <img src={cover} alt={post.title} style={{ width: "100%", maxHeight: 540, objectFit: "cover", borderRadius: 20, margin: "24px 0" }} />}
-      <div style={{ whiteSpace: "pre-wrap", fontSize: 18, lineHeight: 1.85, marginTop: 30 }}>{post.content}</div>
+      <div style={{ fontSize: 18, lineHeight: 1.85, marginTop: 30 }}><BlogContent value={post.content}/></div>
       <div style={{ marginTop: 48 }}><a href="/blog#articulos" className="text-link">← Explorar más artículos</a></div>
     </article>
     <section className="inner-cta"><h2>Tu próxima historia puede empezar en portugués</h2>
       <p>Conoce los cursos de IBRACO y conecta con Brasil.</p><a href="/cursos" className="btn btn-yellow">Ver cursos de portugués</a></section>
   </main></BlogChrome>;
 }
+

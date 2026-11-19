@@ -24,8 +24,10 @@ const categories: { title: string; href: string; description: string; icon: Icon
  {title:"Sitio institucional",href:"https://www.ibraco.org.co/",description:"Inicio oficial de IBRACO",icon:"home",links:[]},
  {title:"Cursos de portugués",href:"/cursos",description:"Horarios, modalidades y matrículas",icon:"courses",links:[]},
  {title:"Promociones y paquetes",href:"/promociones",description:"Beneficios y paquetes de varios niveles",icon:"courses",links:[]},
+ {title:"Blog",href:"/blog",description:"Portugués, cultura brasileña y comunidad",icon:"community",links:[]},
+ {title:"Agenda Cultural",href:"/agenda-cultural",description:"Próximos encuentros y actividades",icon:"culture",links:[]},
 ];
-const publicRoots = ["/promociones", "/cursos"];
+const publicRoots = ["/promociones", "/cursos", "/blog", "/agenda-cultural", "/eventos"];
 
 export default function SiteNavigation() {
   const pathname = usePathname();

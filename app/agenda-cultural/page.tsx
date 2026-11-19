@@ -239,15 +239,7 @@ export default function AgendaCulturalPage() {
         </div>
       </footer>
 
-      <a
-        className="whatsapp-float"
-        href={WHATSAPP_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="WhatsApp IBRACO"
-      >
-        ☘
-      </a>
+
     </>
   );
 }
