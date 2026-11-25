@@ -1,3 +1,4 @@
+import {packagePaymentPath} from '@/app/lib/package-payment-links';
 import {validPackageImagePath} from '@/app/lib/package-images';
 import {staff,sameOrigin,fail} from '@/app/lib/packages-server';
 import {createQ10Preinscription} from '@/app/lib/q10';
@@ -10,10 +11,16 @@ export async function POST(req:Request){try{sameOrigin(req);const b=await req.js
   const {data,error}=await query.select('id');if(error)throw Error('No fue posible guardar: revisa fechas, intensidad y valores');if(!data?.length)throw Error('Otro administrador modificó esta oferta. Recarga antes de guardar');return Response.json({ok:true});
  }
  const {data:s,error}=await db.from('package_sales').select('*,orders(*)').eq('order_id',b.orderId).single();if(error||!s)throw Error('Reserva no encontrada');
+ if(b.action==='payment_link'){return Response.json({ok:true,paymentPath:packagePaymentPath(s.orders,s)},{headers:{'Cache-Control':'no-store, private'}});}
  if(b.action==='eligibility'){
   if(!['approved','rejected'].includes(b.value)||String(b.note||'').trim().length<10)throw Error('Registra la validación de perfil, sede, intensidad y nivel de ingreso');
   if(s.orders.payment_status==='paid'&&b.value==='rejected')throw Error('Un pago recibido debe revisarse con Contabilidad');
   const {error}=await db.from('package_sales').update({eligibility:b.value,eligibility_note:String(b.note).slice(0,2000),validated_by:user.id,validated_at:new Date().toISOString()}).eq('order_id',b.orderId);if(error)throw error;
+  if(b.value==='approved'){
+   const fresh=await db.from('package_sales').select('*,orders(*)').eq('order_id',b.orderId).single();
+   if(fresh.error||!fresh.data)return Response.json({ok:true,paymentLinkError:'La validación quedó guardada. Actualiza para generar el enlace.'},{headers:{'Cache-Control':'no-store, private'}});
+   try{return Response.json({ok:true,paymentPath:packagePaymentPath(fresh.data.orders,fresh.data)},{headers:{'Cache-Control':'no-store, private'}});}catch(e){return Response.json({ok:true,paymentLinkError:e instanceof Error?e.message:'No fue posible generar el enlace.'},{headers:{'Cache-Control':'no-store, private'}});}
+  }
  }else if(b.action==='release_payment'){
   if(s.orders.payment_status!=='paid'||s.eligibility!=='approved'||s.entitlement_status!=='review'||String(b.note||'').trim().length<10)throw Error('Verifica pago, elegibilidad y motivo de revisión');
   const {error}=await db.from('package_sales').update({payment_detail:{...s.payment_detail,reviewed_by:user.id,review_note:String(b.note).slice(0,2000),reviewed_at:new Date().toISOString()}}).eq('order_id',b.orderId);if(error)throw error;

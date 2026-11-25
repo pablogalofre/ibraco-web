@@ -1,3 +1,4 @@
+import {validSharedPackageToken} from './package-payment-links';
 import {createClient} from '@supabase/supabase-js';
 import {createHash,timingSafeEqual} from 'node:crypto';
 export function packageDb(){return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!,process.env.SUPABASE_SERVICE_ROLE_KEY!,{auth:{persistSession:false,autoRefreshToken:false}});}
@@ -22,5 +23,5 @@ export async function staff(req:Request,permission:'courses'|'accounting'|'read'
  if(!p||!(p.is_superadmin||(permission==='leads'?p.can_content:permission==='accounting'?p.can_accounting:permission==='read'?(p.can_courses||p.can_accounting):p.can_courses)))throw Error('No tienes permisos para esta acción');
  return {db,user,profile:p};
 }
-export async function packageSale(orderNumber:string,token:unknown){const db=packageDb();const {data:o}=await db.from('orders').select('*').eq('order_number',orderNumber).eq('product_type','package').single();if(!o)throw Error('Reserva no encontrada');const {data:s}=await db.from('package_sales').select('*').eq('order_id',o.id).single();if(!s||!validToken(token,s.token_hash))throw Error('Enlace de reserva inválido');return {db,order:o,sale:s};}
+export async function packageSale(orderNumber:string,token:unknown){const db=packageDb();const {data:o}=await db.from('orders').select('*').eq('order_number',orderNumber).eq('product_type','package').single();if(!o)throw Error('Reserva no encontrada');const {data:s}=await db.from('package_sales').select('*').eq('order_id',o.id).single();if(!s||!(validToken(token,s.token_hash)||validSharedPackageToken(token,o,s)))throw Error('Enlace de reserva inválido');return {db,order:o,sale:s};}
 export function fail(e:unknown,status=400){console.error('Paquetes:',e instanceof Error?e.message:'Error');return Response.json({error:e instanceof Error?e.message:'No fue posible completar la operación'},{status,headers:{'Cache-Control':'no-store'}});}
