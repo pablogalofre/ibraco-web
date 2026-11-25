@@ -1,3 +1,4 @@
+import {processReservationNote} from './hubspot-reservation-notes';
 import {packageDb} from './packages-server';
 import {DeliveryError,mapCourse,syncNewContact,type ContactInput} from './hubspot-contact-sync';
 type Db=ReturnType<typeof packageDb>;
@@ -25,11 +26,14 @@ export async function processDelivery(options:{orderNumber?:string;id?:string}={
  const token=process.env.HUBSPOT_ACCESS_TOKEN;if(!token)return {processed:false};
  const {data,error}=await db.rpc('claim_ibraco_hubspot',{p_order:options.orderNumber||null,p_id:options.id||null});
  if(error){console.error('HUBSPOT_QUEUE_CLAIM',error.code);return {processed:false};}
- const job=(data as Job[]|null)?.[0];if(!job)return {processed:false};
+ const job=(data as Job[]|null)?.[0];if(!job){await noteSafely(options,db,fetcher);return {processed:false};}
  let update:Record<string,unknown>;
  try{const result=await syncNewContact(token,await resolveInput(db,job),fetcher);update={status:result.status,contact_id:result.id,message:result.status==='created'?'Contacto nuevo creado; el workflow existente gestiona el reparto y la bienvenida.':'El correo ya existe. Se conservó toda su información.'};}
  catch(e){const code=e instanceof DeliveryError?e.code:'database';const review=(e instanceof DeliveryError&&e.review)||job.attempts>=8;update={status:review?'review':'error',message:MESSAGES[code]||MESSAGES.database,next_attempt_at:new Date(Date.now()+Math.min(60,Math.pow(2,job.attempts))*60000).toISOString()};}
  const {error:saveError}=await db.from('hubspot_deliveries').update({...update,locked_at:null,lock_token:null,updated_at:new Date().toISOString()}).eq('id',job.id).eq('lock_token',job.lock_token);
  if(saveError)console.error('HUBSPOT_QUEUE_SAVE',saveError.code);
+ else if(update.status==='created'||update.status==='existing')await noteSafely({id:job.id},db,fetcher);
  return {processed:true};
 }
+
+async function noteSafely(options:{orderNumber?:string;id?:string},db:Db,fetcher:typeof fetch){try{await processReservationNote(options,db,fetcher);}catch{console.error('HUBSPOT_RESERVATION_NOTE_SOURCE');}}
